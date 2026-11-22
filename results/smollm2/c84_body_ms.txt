@@ -1,0 +1,13 @@
+teacher top-64 mass on the fitting text: mean 0.832, min 0.176; distinct tokens with mass 22693 of 49152
+block 4: relative error of the student residual stream 0.293
+block 9: relative error of the student residual stream 0.393
+block 14: relative error of the student residual stream 0.171
+block 19: relative error of the student residual stream 0.174
+block 24: relative error of the student residual stream 0.192
+block 29: relative error of the student residual stream 0.430
+all binary, tied matrix in both roles, original final gain:         KL  2.817  agree 0.268  acc 0.1419
+all binary, final gain refitted (plain):                             KL  2.864  agree 0.280  acc 0.1419
+all binary, final gain refitted (uniform-centered):                  KL  2.537  agree 0.277  acc 0.1436
+all binary, final gain refitted (probability-weighted):              KL  3.139  agree 0.201  acc 0.1205
+all binary, final gain refitted (probability-weighted + 0.1 uniform-centered): KL  2.845  agree 0.222  acc 0.1300
+all binary, final gain refitted (probability-weighted + 1.0 uniform-centered): KL  2.512  agree 0.241  acc 0.1354

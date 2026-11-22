@@ -1,0 +1,7 @@
+   plain fit (section 2L):             KL  1.586  agree 0.350  acc 0.1917
+   rounded embedding:                  KL  3.230  agree 0.166  acc 0.1091
+   softmax-aware fit, floor  4.0:      KL  1.324  agree 0.376  acc 0.2091  signs differing from the plain fit 7.5%, lookup error 1.054
+   softmax-aware fit, floor -1000000000.0:      KL  1.415  agree 0.361  acc 0.2014  signs differing from the plain fit 6.0%, lookup error 1.112
+   softmax-aware fit, floor 1000000000.0:      KL  1.273  agree 0.397  acc 0.2158  signs differing from the plain fit 7.4%, lookup error 1.049
+   softmax-aware fit, floor 40.0:      KL  1.253  agree 0.385  acc 0.2056  signs differing from the plain fit 7.4%, lookup error 1.050
+   softmax-aware fit, floor 400.0:      KL  1.259  agree 0.392  acc 0.2158  signs differing from the plain fit 7.4%, lookup error 1.049
