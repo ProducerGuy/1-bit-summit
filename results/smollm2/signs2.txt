@@ -1,0 +1,10 @@
+weights whose flip is predicted to lower the loss: 52729462 (49.666%); training changed 66220
+of the 66220 trained changes, predicted to help: 66.4%; median rank percentile of trained changes 0.3652
+   flip the   16555 most favorable, scales A: KL 48.783  agree 0.000  acc 0.0000; overlap with trained changes 0.0%
+   flip the   16555 most favorable, scales D: KL 48.668  agree 0.000  acc 0.0000; overlap with trained changes 0.0%
+   flip the   66220 most favorable, scales A: KL 31.103  agree 0.000  acc 0.0000; overlap with trained changes 0.1%
+   flip the   66220 most favorable, scales D: KL 30.953  agree 0.000  acc 0.0000; overlap with trained changes 0.1%
+smol_train.py:74: RuntimeWarning: overflow encountered in exp
+  return dict(kl=float(kl / n), agree=float(ag / n), acc=float(ac / n), ppl=float(np.exp(nl / n)))
+   flip the  264880 most favorable, scales A: KL 117.567  agree 0.000  acc 0.0000; overlap with trained changes 0.4%
+   flip the  264880 most favorable, scales D: KL 111.438  agree 0.000  acc 0.0000; overlap with trained changes 0.4%

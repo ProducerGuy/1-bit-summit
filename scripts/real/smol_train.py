@@ -100,7 +100,7 @@ if __name__ == '__main__':
         print(f"teacher states cached: train {ft.shape}, held {fh.shape}, {time.time() - t0:.0f} s; teacher on held: {evaluate(Wt, G, E, held, fh, tb)}"); sys.exit()
     init, lr, steps, tag, seed = sys.argv[5], float(sys.argv[6]), int(sys.argv[7]), sys.argv[8], int(sys.argv[9])
     lr_s = float(sys.argv[10]) if len(sys.argv) > 10 else lr; evals = [0, 8, 25, 75, 150, 300, 450, 600, 900, 1200]
-    ft_train = np.load(out + '/ft_train.npy', mmap_mode='r'); ft_held = np.load(out + '/ft_held.npy'); comp = dict(np.load(sys.argv[11])) if init.startswith('comp') else None
+    ft_train = np.load(out + '/ft_train.npy', mmap_mode='r'); ft_held = np.load(out + '/ft_held.npy'); comp = dict(np.load(sys.argv[11])) if init != 'round' else None; given = np.load(init[6:]) if init.startswith('signs:') else None
     U, S0, A, M1, V1, MA, VA, sign_t = {}, {}, {}, {}, {}, {}, {}, {}
     for k in BODY:
         Wm = W[k]; R, d = Wm.shape; g = gs(d); mt = np.maximum(np.abs(Wm).reshape(R, -1, g).mean(2), 1e-8)
@@ -108,7 +108,8 @@ if __name__ == '__main__':
         if init == 'round': U[k] = (Wm / mt.repeat(g, axis=1)).astype(np.float32); S0[k] = mt.astype(np.float32)
         else:
             C = comp[k]; sc = np.where(C >= 0, 1.0, -1.0); S0[k] = np.maximum(np.abs(C).reshape(R, -1, g).mean(2), 1e-8).astype(np.float32)
-            U[k] = (sc * (1.0 if init == 'compconst' else np.maximum(np.abs(Wm) / mt.repeat(g, axis=1), 1e-3))).astype(np.float32)
+            if given is not None: sc = np.unpackbits(given[k])[:R * d].reshape(R, d).astype(np.float32) * 2 - 1
+            U[k] = (sc * (1.0 if init != 'comp' else np.maximum(np.abs(Wm) / mt.repeat(g, axis=1), 1e-3))).astype(np.float32)
         A[k] = np.zeros_like(S0[k]); M1[k] = np.zeros_like(U[k]); V1[k] = np.zeros_like(U[k]); MA[k] = np.zeros_like(A[k]); VA[k] = np.zeros_like(A[k])
     del comp
     sign0 = {k: np.packbits(U[k] >= 0) for k in BODY}; ntot = sum(U[k].size for k in BODY)

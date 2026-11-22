@@ -1,0 +1,17 @@
+start: KL 2.755  agree 0.315  acc 0.1622
+free signs at tau 0.014: 965941 (0.910% of body weights)
+favored by the gradient: 483842
+   one pass, flip   8000 favored free signs, ranked by     gain: KL 24.834  agree 0.001  acc 0.0010; overlap with training's changes 0.9%
+   one pass, flip  16000 favored free signs, ranked by     gain: KL 26.885  agree 0.001  acc 0.0007; overlap with training's changes 1.8%
+   one pass, flip  33000 favored free signs, ranked by     gain: KL 30.053  agree 0.001  acc 0.0007; overlap with training's changes 4.0%
+   one pass, flip  66000 favored free signs, ranked by     gain: KL 31.678  agree 0.000  acc 0.0000; overlap with training's changes 8.5%
+   one pass, flip 132000 favored free signs, ranked by     gain: KL 31.964  agree 0.000  acc 0.0000; overlap with training's changes 17.9%
+   one pass, flip 264000 favored free signs, ranked by     gain: KL 32.759  agree 0.000  acc 0.0000; overlap with training's changes 37.2%
+   one pass, flip  16598 favored free signs, ranked by smallest: KL 2.917  agree 0.248  acc 0.1391; overlap with training's changes 10.5%
+   one pass, flip  16598 favored free signs, ranked by smallest: KL 2.917  agree 0.248  acc 0.1391; overlap with training's changes 10.5%
+   one pass, flip  33001 favored free signs, ranked by smallest: KL 4.891  agree 0.124  acc 0.0699; overlap with training's changes 21.0%
+   one pass, flip  66002 favored free signs, ranked by smallest: KL 11.884  agree 0.027  acc 0.0149; overlap with training's changes 39.2%
+   one pass, flip 132001 favored free signs, ranked by smallest: KL 21.016  agree 0.001  acc 0.0000; overlap with training's changes 58.7%
+   one pass, flip 264001 favored free signs, ranked by smallest: KL 27.394  agree 0.000  acc 0.0000; overlap with training's changes 66.3%
+best single pass: smallest, 8000; second pass with fresh batches from there:
+   second pass flip 4000: changed from start 16650; KL 4.100  agree 0.285  acc 0.1463

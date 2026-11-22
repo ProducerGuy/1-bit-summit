@@ -1,0 +1,10 @@
+block 4: relative error of the student residual stream 0.283
+block 9: relative error of the student residual stream 0.382
+block 14: relative error of the student residual stream 0.172
+block 19: relative error of the student residual stream 0.176
+block 24: relative error of the student residual stream 0.193
+block 29: relative error of the student residual stream 0.441
+embedding-first body, rounded embedding as input, original output matrix: KL  2.788  agree 0.319  acc 0.1615
+embedding-first body, rounded embedding in both roles (all binary):      KL  4.254  agree 0.092  acc 0.0556
+reference: body fitted from the original embedding, rounded embedding in both roles: KL  4.687  agree 0.071  acc 0.0451
+reference: that body with the original embedding: KL  2.755  agree 0.315  acc 0.1622

@@ -1,0 +1,11 @@
+tied matrix fitted for the output role on teacher states: signs changed 29.3%, lookup error 1.118
+block 4: relative error of the student residual stream 0.301
+block 9: relative error of the student residual stream 0.396
+block 14: relative error of the student residual stream 0.163
+block 19: relative error of the student residual stream 0.166
+block 24: relative error of the student residual stream 0.185
+block 29: relative error of the student residual stream 0.447
+output-first tied matrix as input, original output matrix: KL  2.892  agree 0.312  acc 0.1625
+all binary, tied matrix in both roles:                     KL  2.958  agree 0.254  acc 0.1312
+all binary, final gain refitted (plain):                  KL  2.773  agree 0.247  acc 0.1300
+all binary, final gain refitted (softmax-aware):                  KL  2.604  agree 0.262  acc 0.1317
