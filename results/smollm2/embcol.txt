@@ -1,0 +1,11 @@
+column factor spread (std of log): per-group fit 0.335, whole-row fit 0.334; max/min 10.7
+full precision body
+         embedding untouched  KL  0.000  agree 1.000  acc 0.338  weight error 0.000  lookup error 0.000
+                     rounded  KL 10.496  agree 0.010  acc 0.007  weight error 0.671  lookup error 0.643
+   column factors, per group  KL 10.796  agree 0.010  acc 0.005  weight error 0.500  lookup error 0.599
+   column factors, whole row  KL 10.846  agree 0.010  acc 0.005  weight error 0.500  lookup error 0.598
+binary body
+         embedding untouched  KL  2.755  agree 0.315  acc 0.162  weight error 0.000  lookup error 0.000
+                     rounded  KL  4.687  agree 0.071  acc 0.045  weight error 0.671  lookup error 0.643
+   column factors, per group  KL 10.523  agree 0.010  acc 0.008  weight error 0.500  lookup error 0.599
+   column factors, whole row  KL 10.497  agree 0.009  acc 0.008  weight error 0.500  lookup error 0.598

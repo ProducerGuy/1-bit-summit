@@ -21,10 +21,10 @@ Judgment figures, uncalibrated until real Qwen results exist.
 | Baseline harness and format parity (T0, T1) | 90% | Engineering only | C65, harness build |
 | Match PrismML binary 1.7B (T4) | 40% | Compute; no recipe of ours proven on a language model | C10, C55, staged race |
 | Beat PrismML binary somewhere (T6) | 40% | Same, plus the embedding matrix | C58, C59, C76 |
-| Match PrismML ternary 1.7B, if the rung is added | 55% | The public reproduction has no benchmark score | Reference reproduction (rule 10), C56 |
-| 95% retention at about 2B, ternary | 25% | PrismML's own best is 96.7% | Same |
+| Match PrismML ternary 1.7B, if the rung is added | 50% | An open reproduction of the ternary format on a 9B model matches the official model on perplexity and falls well short on math and code (section 2I) | Reference reproduction (rule 10), C56, C88 |
+| 95% retention at about 2B, ternary | 20% | PrismML's own best is 96.7%; the open reproduction keeps 84% to 90% of GSM8K and under 80% of HumanEval at 9B | Same |
 | 99% retention, binary, 1.7B (T8) | 5% | Best published binary at this size is 89%, body only | C46, C58 |
-| Same recipe transfers to LFM2 (T5) | 30 to 35% | Untested architecture; pretraining confound | C63 |
+| Same recipe transfers to LFM2 (T5) | 30% | Untested architecture; pretraining confound; 64% of LFM2-350M is the kind of matrix that breaks first; upstream runtime rotation does not cover LFM2 | C63 |
 | Independent replication (T7), given a match | 85% | Repository discipline | Section 7 |
 
 ### Problems, challenges and unknowns
@@ -33,20 +33,20 @@ Judgment figures, uncalibrated until real Qwen results exist.
 |---|---|---|---|
 | P1 | No result on Qwen or LFM2 weights | Open. Real-weights results exist on RoBERTa-base (section 2J). A real pretrained causal decoder of Qwen's architecture family, SmolLM2-135M, is now in this workspace (C81) | C28, C58, C59, C67, C69, C76 |
 | P2 | Toy evidence is mostly single linear rows | Reduced: real rows and a nonlinear network now tested | C75 |
-| P3 | No recipe of ours leads | Open. Lead is the published rotation-in-loop recipe. A training-free compensating conversion of ours now gives a working starting point on a real model (section 2J) | Rule 10, C79 |
-| P4 | Target includes the tied embedding, 18% of the model | Open. OneBit and ParetoQ confirmed body-only at source | C58, C77 |
-| CH1 | Compute: published binary budgets are 13 to 30 billion processed tokens | Open. A ternary run at about 8 million is reported | C10, C56 |
+| P3 | No recipe of ours leads | Open. On a real decoder the compensating start followed by straight-through training leads plain straight-through training at every token count tested (section 2M). Not yet compared with rotation inside the loop | Rule 10, C79 |
+| P4 | Target includes the tied embedding, 18% of the model | Open, and the largest measured loss. On a real decoder with a binary body, rounding the tied embedding takes accuracy from 16.2% to 4.5%. Fitting its output role works only with the two roles untied; the best tied form found without training reaches 7.1% (section 2L). Four causes measured. OneBit and ParetoQ confirmed body-only at source | C58, C77, C84, C85 |
+| CH1 | Compute: published binary budgets are 13 to 30 billion processed tokens | Open. A ternary run at about 8 million is reported. Teacher-cache design fixed: sampled token ids, with full distributions on a small verification set (rule 12) | C10, C56, C64 |
 | CH2 | Size of the race | Reduced: staged, with a reference reproduction first | Rules 10, 11 |
-| CH3 | Proof for 99% | Open. Evidence needed is 5.8 times T4's times a variance ratio to be measured | C55, rule 7 |
+| CH3 | Proof for 99% | Rule fixed (rule 7): seed spread and question noise are separate, and the seed count comes from the seed spread. One input, the seed spread of a real trained conversion, can only be measured on real runs | C55, rule 7 |
 | CH4 | Rotation against free column factors | Closed: ordered construction, tested on real rows | C70 |
 | CH5 | Attributing a failed LFM2 transfer | Open. Graded outcomes defined | H4, C63 |
 | CH6 | Pending Caltech patent | Open. A legal question | Section 2H |
-| U1 | Real column spread and spectral decay | First answer on one model: slope near -1, column spread 0.12 to 0.23 | C28, C67, C75 |
-| U2 | Binary past 89% on an affordable budget | Open | Staged race |
-| U3 | Whether KL ranks recipes as benchmarks do | Open. Extra diagnostics and a rank check are defined | Rule 5 |
-| U4 | How PrismML gets there | Open. Sign audit defined | C59, C76 |
-| U5 | Whether errors across layers cancel or compound | First real answer: they compound to collapse unless each matrix is fitted on the student's own inputs, which lifts final cosine from 0.37 to 0.72 on RoBERTa-base (section 2J) | C49, C79 |
-| U6 | Whether a Qwen recipe carries to LFM2 | Open | C63 |
+| U1 | Real column spread and spectral decay | Answered on two real models (sections 2J, 2M): spectral slope near -1, body column spread 0.07 to 0.24, free column factors worth 0.2% to 2.9% of weight error. Qwen and LFM2 themselves remain | C28, C67 |
+| U2 | Binary past 89% on an affordable budget | Open. First curve on a real decoder (section 2M): 48% retention with no training, 65% after 230 thousand tokens, still rising; plain rounding reaches 33% at 77 thousand. The latent state trained from is a factor of its own. Published binary budgets are four orders of magnitude more tokens per weight | Staged race |
+| U3 | Whether KL ranks recipes as benchmarks do | Answered here: top-token agreement ranks as accuracy does in every set tested (0.97 to 1.00); KL fails in one trained family (0.65) and on one close pair (sections 2K, 2L, 2M). No candidate is cut on KL alone (rule 5). Benchmarks themselves remain | Rule 5 |
+| U4 | How PrismML gets there | Narrowed from public sources (section 2B): the exact rotation the runtime applies, a fixed zero count per group in the second-generation ternary weights, and an open reproduction that matches perplexity and not reasoning. Our compensation reproduces the released 1-bit model's share of changed signs and not its scales, which are 2.26 times the base's mean magnitude (section 2M). The training method is still unpublished; the sign audit of the binary weights still needs them | C59, C76, C88 |
+| U5 | Whether errors across layers cancel or compound | Answered on real models: they compound to collapse under rounding, and in every student that works they cancel by construction. Putting any one kind of original matrix back makes a compensated or trained student worse in 7 of 7 kinds, and any one block in 30 of 30 after training (section 2M) | C49, C79 |
+| U6 | Whether a Qwen recipe carries to LFM2 | Open. Proxy: the same procedure works unchanged on two architectures, and the damage sits in feed-forward matrices with gated products, the kind LFM2 is mostly made of (section 2M). LFM2 weights are not reachable from this workspace | C63 |
 
 ### Closure plan
 
@@ -55,17 +55,17 @@ What counts as done in this workspace for each item, before any work on Qwen its
 | Id | Done here when | Today |
 |---|---|---|
 | CH4 | Closed | Closed |
-| U1 | Spectra and column spread measured on a real causal decoder as well as RoBERTa | RoBERTa done; SmolLM2 spectra to run |
-| U5 | Conversion ladder and block swap run on a real causal decoder, scored on next-token prediction | Ladder done on both models (sections 2J, 2K); block swap needs a trained student |
-| P4 | Cost of converting the tied embedding measured on a real causal decoder, and the rotated tied form tested against it | Cost measured: as damaging as the whole body (section 2K). Rotated and fitted forms to run |
-| U3 | Cheap measures checked against next-token accuracy across at least six conversions of a real decoder | Done for nine far-apart conversions: agreement 1.00, KL 0.93, hidden-state error 0.68. Close candidates still to check |
+| U1 | Spectra and column spread measured on a real causal decoder as well as RoBERTa | Done (section 2M) |
+| U5 | Conversion ladder and block swap run on a real causal decoder, scored on next-token prediction | Done: ladder (sections 2J, 2K), swaps by kind and by block on four students, two of them trained (section 2M) |
+| P4 | Cost of converting the tied embedding measured on a real causal decoder, and the rotated tied form tested against it; a training-free tied form that beats rounding with a binary body, or a measured statement that only training closes it | Cost measured per role (section 2L). Fitted and rotated tied forms run: none beats 7.1% accuracy against 16.2% with the embedding left alone. Two forms still to run: C84, C85 |
+| U3 | Cheap measures checked against next-token accuracy across at least six conversions of a real decoder | Done: nine conversions, one close pair, 20 trained checkpoints (sections 2K, 2L, 2M). Rule 5 changed accordingly |
 | P2 | Every toy claim the plan still relies on has been re-run on real weights or removed | Partly |
-| CH3 | Paired disagreement measured between converted models and teacher, and the evidence rule for 99% fixed from it | Upper end measured on broken models (0.20 to 0.25); a near-lossless student needs training first |
-| P3 | Conversions and short training runs ranked on a real decoder, with one named starting recipe and one named fallback | Two candidates, no ranking yet |
-| U2 | Retention against training tokens measured on a real decoder from the best start and from plain rounding | To run |
-| CH1 | Teacher-cache design fixed and tested; tokens needed per point of retention measured on a real decoder | Design only |
-| CH2 | Candidates that lose on the real decoder are cut, leaving a short list | Staging rule only |
-| CH5, U6 | Proxy: the identical procedure run unchanged on RoBERTa and SmolLM2, two different architectures. The real answer needs LFM2 weights | Proxy done: same ladder and same sign-flip counts on both (section 2K) |
+| CH3 | Paired disagreement measured between converted models and teacher, and the evidence rule for 99% fixed from it | Rule fixed (rule 7). Disagreement measured on broken models (0.20 to 0.25); seed spread needs trained students |
+| P3 | Conversions and short training runs ranked on a real decoder, with one named starting recipe and one named fallback | Starting recipe named: compensating start, then straight-through training. Fallback: plain straight-through training. Rotation inside the loop and more seeds still to run (C89) |
+| U2 | Retention against training tokens measured on a real decoder from the best start and from plain rounding | Done to 230 thousand tokens (section 2M). One seed, one learning rate per start |
+| CH1 | Teacher-cache design fixed and tested; tokens needed per point of retention measured on a real decoder | Design fixed (rule 12), tested on an outside reviewer's small decoders and in the published study (S61). Tokens per point of retention to run |
+| CH2 | Candidates that lose on the real decoder are cut, leaving a short list | Short list for the first stage: plain straight-through training as control, rotation inside the training loop, the student-input compensating start followed by straight-through training. The vertex penalty enters only as a start for the same training. The shrinking cage is last in line. The frozen-hidden-state tied-embedding fit is cut (section 2L) |
+| CH5, U6 | Proxy: the identical procedure run unchanged on RoBERTa and SmolLM2, two different architectures. The real answer needs LFM2 weights | Proxy done: same ladder and same sign-flip counts on both (section 2K); damage located by kind and compared with LFM2's composition (section 2M) |
 | P1 | Not answerable here: needs Qwen and LFM2 weights | Narrowed by two real models |
 | U4 | Not answerable here: needs PrismML's released weights | Sign audit defined |
 | CH6 | Not answerable here: legal review | Recorded |
@@ -79,6 +79,8 @@ In this workspace, in order:
 1. C81: build the forward pass and tokenizer for SmolLM2-135M from its GGUF file, confirm its perplexity, then run on it: body and interface attribution, the conversion ladder of `real_whole.py` scored by KL, top-token agreement and next-token accuracy, and the check of whether cheap measures rank conversions the way accuracy does.
 1B. C79: on the real model, add to the compensating conversion a real downstream measure (the package's own tagging head on final states), a second pass over the layers, the ordered rotation, and a ternary version, and repeat on more seeds and text.
 1A. C75: column factors in function space, threshold shifts and the vertex penalty on real rows.
+1C. C84, C85: the two remaining tied-embedding forms on SmolLM2.
+1D. C89: rotation inside the training loop, a scale-only control and more seeds on SmolLM2, with the training code of section 2M.
 2. C77 and the rest of C5: source checks of the tied-embedding handling in llama.cpp, S53's teacher scores, BinaryLLM and BitDistill.
 3. C56, C7, C6: token counts in S20, ThakiCloud's scripts, PrismML's forks.
 4. C62, C51, C52, C57: the located papers and code not yet read in full.
@@ -88,7 +90,7 @@ Tabled by the project owner until the research on problems, challenges and unkno
 
 ### Needed from the project owner
 
-Nothing blocks the current research. The six decisions in section 10 wait until the tabled work resumes.
+Nothing blocks the current research. The six decisions in section 10 wait until the tabled work resumes. One limit to know about: this workspace refuses to install a training library, so training here runs on hand-written numpy code on two processor cores (section 2M). Runs past a few hundred thousand tokens on a 135M model belong on the Mac.
 
 ## 2. What is established
 
@@ -123,6 +125,14 @@ Every row below was read at the source. Numbers are copied from the source, not 
 | It gives a joint pruning and quantization potential, `max(|w|^(1+e), b*|w|^q)` per weight, which is sparse below a threshold and large-q above it | S37 equations 23 to 25 |
 | It shows one LLM layer before and after: unimodal near zero, then bimodal with modes near plus and minus 0.3. No model, dataset, token count, learning rate or accuracy number is given | S37 figures 7A and 7B |
 | It contains no mention of ternary levels, rotations, Hadamard transforms, distillation or per-group scales | S37, full text |
+| The second-generation models are ternary only. The 1-bit format is described as the earlier format and not a second-generation packing. Their smallest packing stores 28 bytes per 128 weights, 1.75 bits per weight | S66 |
+| The rotation the runtime applies is now in upstream llama.cpp and is exact: a stored weight is `W*D*H`, with `D` one vector of plus and minus ones per input width, shared by every matrix of that width, and `H` the normalized Sylvester Hadamard matrix in blocks of one power-of-two size. The graph multiplies the input of each such matrix by `D`, then `H`. The token embedding is stored rotated and the rotation is undone after lookup. A tied model stores one rotated table that serves both roles. The loader accepts this only for the Llama and Qwen architecture families | S67 |
+| A third-party audit of the official second-generation 9B ternary file: 202 ternary matrices including embedding and output matrix, 8.95 billion weights, 32.76% zeros, and 96.65% of all groups of 128 hold exactly 42 zeros, none more. All scales are positive, median 0.0142, 1st and 99th percentiles 0.0086 and 0.0235. Not verified here on the weights | S65 |
+| For Gaussian weights the ternary code with the least weight error has 45.9% zeros (relative squared error 0.190); one third zeros costs 0.207. An open conversion by error-feedback rounding lands at 45.5% zeros. PrismML's codes are therefore not the least-weight-error codes | computed here; S65 |
+| First-generation ternary files do not show the fixed share: zeros are 39.9%, 37.7%, 38.3% and 29.7% at 1.7B, 4B, 8B and 27B | S68 |
+| PrismML's CPU kernels quantize activations to 8 bits, so its outputs differ slightly from the same weights in full precision arithmetic: 99.2% same top token over 2,040 positions | S65 |
+| The public fingerprint of the 1-bit 1.7B model (71.62% sign agreement, scale ratio 2.257 over 196 matrices) excludes embeddings and normalization tensors, skips matrices whose shapes differ, weights sign agreement by element count, and reports the scale ratio as the median over matrices of each matrix's median of group scale over the base group's mean magnitude | `scripts/bonsai_repro.py` and `results.json` in S19's repository, read here |
+| The released 1-bit 1.7B file is configured with a 32,768-token context and YaRN position scaling, factor 4 over an original 8,192, where the Qwen base has none. An outside reviewer also reports 151,669 vocabulary rows against the base's 151,936, not checked here. Both have to be handled before the two checkpoints are compared tensor by tensor or by output distribution | GGUF metadata as listed publicly; outside note of November 22 |
 
 ### 2C. The answer key (Qwen3-1.7B)
 
@@ -173,6 +183,15 @@ Qwen3-1.7B is Apache 2.0 licensed, 28 layers, 1.7B parameters (1.4B non-embeddin
 The LFM2 convolution block is a `d to 3d` linear projection, two multiplicative gates, a depthwise convolution with kernel size 3, and a `d to d` linear projection. The rest of the model uses RMSNorm, RoPE grouped-query attention and SwiGLU. LFM2 itself was trained with knowledge distillation using a top-32 decoupled logit objective (S12).
 
 Reading those equations, the two linear projections hold about `4*d^2` weights per block and the depthwise kernel about `3*d`. That is a derivation from the equations, to be confirmed by counting parameters in the real checkpoint under checklist item C9.
+
+| Fact | Source |
+|---|---|
+| LFM2-350M: 16 blocks, width 1024, feed-forward width 4608, 16 heads over 8 key and value groups, 6 attention blocks and 10 convolution blocks, kernel 3, vocabulary 65,536, RMSNorm before each sublayer, normalization on queries and keys, RoPE. 700M and 1.2B: same 16 blocks at widths 1536 and 2048. 2.6B: 30 blocks, 8 of them attention | S12 |
+| Pretrained on 10 trillion tokens at context 4,096 plus 1 trillion at 32,768, distilled from an internal LFM1-7B teacher with the top 32 teacher logits per token | S12 |
+| In llama.cpp the convolution block is `in_proj` (width to three times width), a per-channel 3-tap kernel, and `out_proj` (width to width); the feed-forward part is SwiGLU in every block; the output matrix falls back to the token embedding when the file has none | S69 |
+| Weight shares of LFM2-350M from those shapes: feed-forward 63.9%, convolution projections 11.8%, attention 5.3%, token embedding 18.9%, total 354.4M with the embedding counted once. SmolLM2-135M for comparison: 59.2%, none, 19.7%, 21.0%. Every LFM2 width is a multiple of 128 | computed here from S12 |
+| LFM2 is not among the architectures for which upstream llama.cpp applies the runtime rotation. The 1-bit tensor type itself is not tied to an architecture | S67 |
+| Bonsai, Qwen and LFM2 weights are hosted where this workspace cannot reach; no copy was found on the package index or in GitHub releases | searched here |
 
 ### 2G. Public results on real weights near this size
 
@@ -238,8 +257,16 @@ Outside engineering: PrismML's recipe is undisclosed (2B). S37 is a pending appl
 | OneBit keeps 80.1% to 84.2% of full precision average zero-shot accuracy across OPT-1.3B to LLaMA2-13B, with perplexity 1.7 to 1.8 times full precision. On LLaMA-7B the hidden-state term lifts average accuracy from 45.50 to 51.33, and an attention-matching term makes training diverge | S9 tables 2 and 6 |
 | OneBit's authors state that the principles behind good 1-bit parameters are not understood, which is why the transfer needs costly distillation | S9 appendix B |
 | ParetoQ's code keeps the output head as an ordinary full precision layer and the token embedding in full precision, and gives each output row one learned scale. Its 89.2% binary result at 1.5B is therefore for a binary body only | `models/modeling_llama_quant.py`, `models/utils_quant.py` in S54 |
-| Reported by an outside reviewer on three small causal decoders it trained (three blocks, pre-normalization, grouped-query attention, SwiGLU, tied embedding, 573 thousand weights), not reproduced here because the package has not reached this workspace: converting the tied embedding alone raised KL more than converting the whole body (0.617 against 0.385); straight-through recovery on 76,800 tokens took next-token accuracy from 61% to 97% of the teacher's with only 77% top-token agreement; restoring any one original block into the trained binary student made KL worse in 9 of 9 cases; and lower KL did not always mean higher accuracy across five recovery configurations | outside note of November 22 on plan version 12 |
-| Sampling a few tokens from the teacher's distribution gives an unbiased estimate of the distillation gradient; 32 sampled token ids need 128 bytes per position against 304 kilobytes for a full FP16 distribution over Qwen's vocabulary | Sparse Logit Sampling, ACL 2025, to be read (C82) |
+| Reported by an outside reviewer on three small causal decoders it trained (three blocks, pre-normalization, grouped-query attention, SwiGLU, tied embedding, 573 thousand weights), with its raw result files now in this workspace, from which the embedding figure recomputes, and its training runs not repeated here: converting the tied embedding alone raised KL more than converting the whole body (0.617 against 0.385); straight-through recovery on 76,800 tokens took next-token accuracy from 61% to 97% of the teacher's with only 77% top-token agreement; restoring any one original block into the trained binary student made KL worse in 9 of 9 cases; and lower KL did not always mean higher accuracy across five recovery configurations | outside note of November 22 on plan version 12 |
+| Storing only the teacher's top-k probabilities trains the student toward a rescaled, over-confident distribution: the logit gradient becomes (kept mass) times p minus t. Top-12 targets give loss 2.87 and calibration error 4.7% against 2.75 and 0.7% for full distributions. Drawing 50 tokens from the teacher's distribution, about 12 distinct ids per position, gives 2.75 and 0.8%, with a gradient 4 degrees from the full one against 58 degrees for top-12. Training throughput is 1.7 to 2.6 times that of full-distribution distillation on students of 300M and 3B, trained from scratch on 10B to 100B tokens on H100 nodes; none of that is binary conversion. For Qwen's vocabulary, 32 sampled ids need 128 bytes per position against 304 kilobytes for a full FP16 distribution | S61 |
+| In models that tie the embedding to the output matrix, the shared matrix is shaped mainly by the output role: it aligns with the output matrix of a comparable untied model more than with that model's input embedding (0.719 against 0.525 after a linear map, OLMo-1B), output-side gradients are about 70% of the gradient on it early in training, and the first layers of tied models are less compatible with the output space. Qwen3-4B is among the tied models studied. Single training runs; scaling up the input gradient gave no consistent gain | S60 |
+| An open pipeline (OpenBonsai) writes PrismML's second-generation ternary format from Qwen3.5-9B on one RTX 5090: the same signed Hadamard rotation, error-feedback rounding layer by layer on the inputs of the already converted layers, output matrix and embedding rounded the same way, then training of the group scales only, codes frozen, on 4.2M tokens against the teacher's top 64 probabilities plus one bucket. WikiText loss: full precision 2.42, official ternary 3.19, rotation plus rounding 8.94, error-feedback rounding 3.32, with ternary output matrix 3.38, with ternary embedding 3.48, after scale training 2.89. WikiText is partly in-domain for it | S65 |
+| The same model keeps perplexity and loses reasoning: GSM8K 30 of 100 and HumanEval 6 of 50 against 77 and 45 for the official ternary model and 77 and 44 for full precision. Calibrating and distilling on the teacher's own answers to math and code prompts raises these to 69 and 19, and more code to 65 and 34. The data, not the optimizer, moved reasoning | S65 |
+| Letting codes change by block-wise straight-through training before the scale training lowered loss before it (3.69 to 3.40) and left reasoning within noise after it. It flipped 0.05% to 0.94% of codes per layer and no signs | S65 |
+| Refitting scales to the original weights after error-feedback rounding made the model much worse (loss 5.15 against 3.32): the codes are deliberately wrong in weight space | S65 |
+| Round-to-nearest sensitivity on Qwen3.5-9B, one part at a time: feed-forward gate and up 3.08, down 2.64, attention projections 2.49 to 2.51, against 2.42 unrounded; the first 8 layers 7.70 against 3.05 for the last 8 | S65 |
+| Its embedding metric: an embedding row reaches the network only through the first block's normalization, so its rounding error is weighted by the square of that normalization's gain | S65 |
+| It does not convert a tied embedding: models that share one table keep it in 16 bits. On Qwen3-8B, untied, it keeps 80% of GSM8K and 54% of HumanEval where PrismML's first-generation ternary 8B keeps 99% and 95% | S65 |
 | A training method with a trust gradient estimator and Hadamard normalization trains stably down to 1-bit weights and activations, from scratch, with code | S48 |
 | A hard constraint on the weight histogram, applied after each optimizer step, lowers 1-bit perplexity by up to 21 points on models up to 610M trained from scratch | S49 |
 | Pushing weights toward the quantized set by a regularizer whose weight grows during training was published for binary networks in 2018 | S50 |
@@ -305,7 +332,7 @@ Whole-body conversion without training (`real_whole.py`): all 72 projection matr
 
 ### 2K. A real pretrained causal decoder converted without training
 
-Model: SmolLM2-135M-Instruct, read from the 4-bit GGUF file bundled in the `llm-smollm2` package (S59) and run as a numpy model (`smol.py`): 30 blocks, width 576, 9 query heads over 3 key and value heads, RoPE, SwiGLU, RMSNorm before each sublayer, output tied to the token embedding, which is 21% of the weights. Its perplexity on WikiText-2 with 128-token sequences is 38.7 and its next-token accuracy 33.8%. The teacher is the 4-bit model. Groups are 96 wide where the input width is 576 (1.167 bits per weight) and 128 where it is 1536. 96 sequences fit, 32 others score (`smol_exp.py`).
+Model: SmolLM2-135M-Instruct, read from the 4-bit GGUF file bundled in the `llm-smollm2` package (S59) and run as a numpy model (`smol.py`): 30 blocks, width 576, 9 query heads over 3 key and value heads, RoPE, SwiGLU, RMSNorm before each sublayer, output tied to the token embedding, which is 21% of the weights. Its perplexity on WikiText-2 with 128-token sequences is 38.7 and its next-token accuracy 33.8%. The teacher is the 4-bit model: 210 tensors are stored at 4 bits, the token embedding at 8 bits and 61 normalization vectors in full precision, and every retention figure here is against that teacher. Groups are 96 wide where the input width is 576 (1.167 bits per weight) and 128 where it is 1536. No layout on a 576-wide row gives exactly 1.125: padding to 640 or groups of 64 give 1.25, four groups of 128 plus one of 64 give 1.139. 96 sequences fit, 32 others score (`smol_exp.py`).
 
 | Conversion | KL to teacher | Top-token agreement | Next-token accuracy | Perplexity | Signs flipped |
 |---|---|---|---|---|---|
@@ -326,6 +353,129 @@ Model: SmolLM2-135M-Instruct, read from the 4-bit GGUF file bundled in the `llm-
 - The training-free result is far from the teacher on a 30-block decoder: perplexity 455 against 38.7. Training has to close it.
 - Across these nine conversions, rank correlation with next-token accuracy is 1.00 for top-token agreement, 0.93 for KL, 0.92 for perplexity and 0.68 for final hidden-state error. Hidden-state error is a poor selector. The conversions here are far apart, so this says nothing yet about ranking close candidates.
 - The variance of the paired difference in per-token correctness against the teacher is 0.20 to 0.25 for these conversions.
+
+### 2L. The tied embedding on the real decoder
+
+Same model, text and scoring as section 2K. The body is the binary one from that section's last ladder row unless stated (`smol_tied.py`, `smol_tied_diag.py`).
+
+The two roles separately, as a diagnostic with the roles untied (not a storable format):
+
+| Body | Input role | Output role | KL | Agreement | Accuracy | Perplexity |
+|---|---|---|---|---|---|---|
+| Binary | full precision | full precision | 2.76 | 31.5% | 16.2% | 455 |
+| Binary | rounded | full precision | 3.84 | 27.3% | 13.2% | 1,482 |
+| Binary | full precision | rounded | 4.24 | 9.1% | 6.0% | 2,005 |
+| Binary | full precision | least-squares fit on the student's final states | 2.52 | 26.6% | 14.1% | 346 |
+| Full precision | full precision | rounded | 3.23 | 16.6% | 10.9% | 883 |
+| Full precision | full precision | least-squares fit | 1.59 | 35.0% | 19.2% | 175 |
+
+The tied matrix, one stored copy serving both roles, binary body:
+
+| Tied embedding | KL | Agreement | Accuracy | Lookup error | Signs flipped |
+|---|---|---|---|---|---|
+| Full precision | 2.76 | 31.5% | 16.2% | 0 | |
+| Rounded | 4.69 | 7.1% | 4.5% | 0.64 | 0% |
+| Rounded in rotated coordinates | 7.16 | 0.7% | 0.5% | 0.60 | |
+| Joint fit, weight 0 on lookup (output only) | 4.82 | 8.7% | 5.2% | 1.51 | 38.0% |
+| Joint fit, weight 0.1, 1, 10, token frequencies from the fitting text | 5.16, 5.97, 6.16 | 3.0%, 2.8%, 3.0% | 0.5%, 0.4%, 0.5% | 0.86, 0.85, 0.85 | 37%, 37%, 36% |
+| Joint fit, weight 0.1, 1, 10, smoothed frequencies from 87 thousand tokens | 5.07, 5.15, 5.05 | 2.3%, 2.9%, 4.3% | 0.2%, 0.5%, 1.7% | 0.75, 0.68, 0.65 | 35%, 27%, 10% |
+| Output-only fit, second pass on the new hidden states | 8.78 | 2.5% | 1.6% | 2.06 | 43.3% |
+| Output-only fit in rotated coordinates | 3.99 | 12.4% | 7.1% | 1.29 | |
+| The same, second pass | 11.37 | 1.0% | 0.8% | 2.17 | |
+
+The joint fit is the one proposed by an outside reviewer: per row, mean squared logit error on frozen student hidden states plus a frequency-weighted squared lookup error, signs and scales solved. Lookup error is the relative error of the looked-up vectors, weighted by held-out token frequency. Rotation is 9 blocks of a 64-point Hadamard transform.
+
+- The output-role fit is sound by itself. With the roles untied it more than recovers what rounding the output role costs, and with the binary body it reaches a lower KL than the original output matrix, because it compensates the body's error at the last step.
+- Tied, it fails. Every joint setting loses to plain rounding on KL, and no tied form without training gets past 7.1% accuracy against 16.2% with the embedding left alone.
+- Cause 1, the roles pull one stored row in opposite directions. The output fit cuts relative logit error on the 1,000 most-predicted rows from 0.47 to 0.14 and raises their lookup error from 0.39 to 1.78, flipping 31% to 38% of signs. The final hidden state is strongly uneven across directions, so the fit moves row error into directions the output never reads, and the lookup reads all of them.
+- Cause 2, the hidden states do not stay frozen. Changing the rows changes every lookup, so the states the fit was solved on no longer exist: a second pass makes it worse, not better.
+- Cause 3, the objective. 82% of the mean square of the teacher's logits is the per-position average over the vocabulary, which the softmax ignores (52.5 of 63.7). A least-squares fit on raw logits spends most of its effort there. On the full precision body the fit drives raw logit error to 0.03 and still leaves KL at 1.59.
+- Cause 4, vocabulary coverage. 12,288 fitting tokens contain 2,413 of 49,152 token ids; 16.7% of held-out tokens were never seen, so their rows get no lookup weight. Smoothed frequencies from 87 thousand tokens leave 4.8% unseen and do not rescue the fit. The reviewer's test model has 1,024 token ids, all seen.
+- Rounding the output role costs more than rounding the input role (accuracy 6.0% against 13.2%), which agrees with the finding that tied matrices are shaped mainly by the output role (S60).
+- A case where KL and accuracy disagree on close candidates: the fitted output matrix beats the original on KL (2.52 against 2.76) and loses on accuracy (14.1% against 16.2%) and agreement (26.6% against 31.5%). Agreement sides with accuracy.
+
+### 2M. Unknowns worked on the real decoder
+
+Same model, text and scoring as section 2K. Training here is hand-written numpy (`smol_train.py`), because this workspace refuses to install a training library; its gradients match finite differences to 1 part in 100,000 on every kind of matrix in blocks 0, 14 and 29.
+
+**Spectra and column spread (U1, `smol_u1.py`).**
+
+| Matrix | Rounding error | With free column factors | Gain | Column spread (range over blocks) | Kurtosis |
+|---|---|---|---|---|---|
+| Query | 0.622 | 0.609 | 2.1% | 0.153 (0.055 to 0.667) | 5.3 |
+| Key | 0.620 | 0.607 | 2.1% | 0.160 (0.063 to 0.720) | 5.0 |
+| Value | 0.626 | 0.608 | 2.9% | 0.239 (0.139 to 0.454) | 3.8 |
+| Attention output | 0.614 | 0.603 | 1.8% | 0.177 (0.106 to 0.322) | 5.3 |
+| Feed-forward gate | 0.609 | 0.607 | 0.2% | 0.073 (0.035 to 0.120) | 5.1 |
+| Feed-forward up | 0.609 | 0.606 | 0.5% | 0.096 (0.063 to 0.123) | 4.1 |
+| Feed-forward down | 0.613 | 0.607 | 0.9% | 0.091 (0.034 to 0.146) | 4.2 |
+| Token embedding | 0.671 | 0.500 | 25.5% | 0.292 | 8.3 |
+
+- Inputs of the 16 projections sampled (blocks 0, 10, 20, 29): spectral slope from -0.72 to -1.83, median -0.98. Participation ratio from 4 to 190 directions, 0.3% to 15% of the width. The largest direction holds 7% to 75% of the second moment. The final hidden state: slope -1.17, participation ratio 16, largest direction 46%.
+- Both quantities repeat what RoBERTa-base showed (section 2J): slope near -1, and body columns too even for free column factors to matter.
+- The embedding is the exception in weight space and not in function. Free column factors cut its weight error by a quarter, and the converted model is no better: accuracy 0.5% against 0.7% rounded with a full precision body, 0.8% against 4.5% with the binary body (`smol_embcol.py`). Weight error does not predict function.
+
+**Where the damage sits, and whether errors cancel (U5, U6, `smol_swap.py`, 16 held-out sequences).**
+
+| Student | KL, whole body binary | Feed-forward restored | Attention restored | One kind restored: worse in | One block restored: worse in | Sum of single-block KLs |
+|---|---|---|---|---|---|---|
+| Plain rounding | 10.51 | 6.43 | 12.23 | 1 of 7 | 6 of 30 | 42.06 |
+| Compensated, no training | 2.65 | 1.07 | 3.93 | 7 of 7 | 14 of 30 | 6.56 |
+| Rounding, then 76,800 tokens of training | 3.18 | 5.98 | 10.63 | 7 of 7 | 30 of 30 | 43.22 |
+| Compensated, then 76,800 tokens of training | 1.68 | 1.11 | 2.84 | 7 of 7 | 30 of 30 | 6.40 |
+
+One kind of matrix rounded alone, everything else original, KL: query 2.72, key 2.16, attention output 2.76, value 4.98, gate 7.22, up 12.09, down 12.60.
+
+- Under plain rounding errors compound. A single kind of feed-forward matrix, rounded alone, is enough to collapse the model.
+- In every student that works, errors cancel, because the parts were fitted to each other's errors. Putting any one kind of original matrix back makes it worse, 7 of 7 in three students. After training, putting any one block back makes it worse in 30 of 30. The whole body's KL is a fraction of the sum of its single-block KLs.
+- A swap test on a working student therefore measures how tightly the parts are fitted to each other, not which part is bad. Keeping selected blocks in full precision is not a free rescue: everything around them has to be refitted. The open ternary pipeline reports the same thing from the other side: refitting scales toward the original weights destroyed its conversion (section 2I).
+- The damage is in the feed-forward matrices. With them restored and attention still binary, the untrained compensated student scores 24.9% accuracy against 16.7% with the whole body binary. The round-to-nearest sweep on Qwen3.5-9B ranks the same way (section 2I).
+- For LFM2 (section 2F): 64% of its weights are feed-forward matrices of the same form, and its convolution blocks add a second gated product. It has less of the kind that converts easily, attention, 5% against 20%. The proxy says LFM2 is no easier per weight than a Qwen-style decoder, and its hard part is the same kind. This is a prediction from another model, not a measurement on LFM2.
+
+**Retention against training tokens (U2, `smol_train.py`).** Binary body, embedding and gains untouched, loss KL to the teacher over the whole vocabulary, Adam, 512 tokens per step, 87,936 distinct training tokens, one seed. Learning rate chosen per start from three values at 25 steps.
+
+| Processed tokens | From plain rounding: KL, agreement, accuracy, retention | From the compensating start: KL, agreement, accuracy, retention |
+|---|---|---|
+| 0 | 10.57, 6.7%, 3.5%, 10% | 2.76, 31.5%, 16.2%, 48% |
+| 4,096 | 7.62, 0.7%, 0.6%, 2% | 2.38, 30.9%, 16.4%, 49% |
+| 12,800 | 5.04, 5.0%, 3.4%, 10% | 2.11, 33.6%, 17.0%, 50% |
+| 38,400 | 3.65, 16.9%, 9.5%, 28% | 1.82, 36.4%, 19.0%, 56% |
+| 76,800 | 3.15, 20.7%, 11.1%, 33% | 1.70, 37.9%, 19.5%, 58% |
+| 153,600 | | 1.61, 39.0%, 20.7%, 61% |
+| 230,400 | | 1.56, 40.3%, 22.0%, 65% |
+
+- The compensating start is worth more than the whole training budget tested: plain rounding after 76,800 tokens is still below where the compensating start begins with none.
+- From the compensating start the curve is still rising at the end, about 3.7 points of retention for each of the last two steps in token count.
+- At these budgets few signs move, 0.2% in either run against the 26% the training-free conversion had already flipped, and those few matter. Three runs from the identical binary start, same scale learning rate, scored at 38,400 tokens: latent magnitudes restored from the teacher KL 1.82 and accuracy 19.0% (0.06% of signs changed); constant latent magnitudes, which lets no sign change and so trains scales only, 1.97 and 17.4%; restored magnitudes with a ten times larger sign learning rate 2.02 and 18.8% (0.54% changed). The state used to train a binary model is a factor of its own, separate from the binary model it starts as, as an outside reviewer found on small decoders and as S70 argues: latent magnitudes act as inertia against sign changes.
+- These budgets are four orders of magnitude below published binary ones per weight (about 0.002 processed tokens per body weight here against about 10 for 13.5 billion tokens on a 1.4 billion weight body), so this is the start of the curve and says nothing about where it ends.
+- The embedding is untouched here, as in the published 89% result. One seed and one learning rate per start; held-out accuracy carries a standard error of 0.6 points.
+
+**Metric ranking among trained checkpoints (U3, `smol_u3.py`).** Rank correlation with next-token accuracy:
+
+| Set | Checkpoints | KL | Agreement | Perplexity |
+|---|---|---|---|---|
+| All trained | 20 | 0.96 | 1.00 | 0.96 |
+| From the compensating start | 11 | 0.99 | 0.99 | 0.99 |
+| From plain rounding | 9 | 0.65 | 0.98 | 0.65 |
+| Accuracy of 16% and above | 8 | 0.99 | 0.97 | 0.99 |
+
+- Agreement ranks as accuracy does in every set. KL fails in the rounding family, where early training lowers KL from 10.6 to 7.6 while accuracy falls from 3.5% to 0.6%.
+
+**Weight fingerprints of students whose conversion is known (U4, `smol_forensic.py`).**
+
+| Student | Signs changed against the teacher | By quartile of original magnitude in the group, smallest to largest | Stored scale over the group's mean magnitude |
+|---|---|---|---|
+| Compensated, no training | 26.1% | 36.9%, 30.1%, 23.1%, 14.2% | 0.93 |
+| Compensated, then 230,400 tokens | 26.1% | 37.0%, 30.1%, 23.1%, 14.2% | 0.93 |
+| Rounding, then 76,800 tokens | 0.2% | 0.9%, 0.0%, 0.0%, 0.0% | 1.00 |
+| Released 1-bit Bonsai 1.7B, as reported | 28.4% | not reported | 2.26 |
+
+- The training-free compensation reproduces the share of changed signs in the released model and not its scales. Its scales sit just under the mean magnitude; the released model's are 2.26 times it. No conversion run here or by the outside reviewer (1.01 to 1.41 on its small decoders) produces that ratio. A least-squares fit of scales to original weights cannot exceed 1, so the released scales were not fitted to the weights.
+- Short training changes only the smallest weights' signs. Compensation changes signs across all magnitudes. The split by magnitude therefore separates the two mechanisms where the total does not, and the total alone says nothing about whether a model was trained: the public report's reading of 71.6% agreement as "no retraining" does not follow.
+
+**Local measures against measured damage (U1).** For rounding one block alone, rank correlation with the measured KL over the 30 blocks: activation-weighted local output error 0.68, rounding weight error 0.18, column spread -0.01. Block 0 has a lower local error than block 10 (0.51 against 0.61) and nine times the damage (KL 6.47 against 0.72). Local error is a partial guide on this model and no guide to the worst case.
+
+**Fitting-set size (U1, `smol_calsize.py`).** The subspace holding 90% of input energy, median over 16 projection inputs: 6.2% of the width when measured on 128 positions, 13.4% on 512, 18.9% on 2,048, 22.1% on 8,192. It captures 58%, 72%, 80% and 82% of held-out energy. A small fitting set overstates redundancy, as an outside reviewer found on small decoders; from about 2,000 positions the estimate is stable on this model, and 18% of held-out energy stays outside it at any size tested.
 
 ## 3. What is not known
 
@@ -654,6 +804,8 @@ Each is written so a result can prove it false.
 - **H19, on-policy healing.** After conversion, train the student on its own generated trajectories with the full precision teacher supplying targets, so supervision lands where the converted model actually drifts. Published at 2 and 3 bits with code, starting from block-wise calibration, with a reported gain of 10.26 points over the strongest compared baseline on Qwen3-8B at 2 bits (S29, S30). A failure-weighted variant samples prompts where teacher and student diverge most and keeps a fixed regression set. Prompts are drawn from sources disjoint from every benchmark. False if on-policy healing does not beat fixed-corpus distillation on the dev metric at equal tokens. Prediction to check: it recovers long-horizon categories more than knowledge categories. A paired-prompt arm is compared inside this stage: prompts that differ in one fact, with an added loss on the difference between the student's and teacher's change in logits. That loss is bounded by twice the sum of the two ordinary losses, so it adds weight and no new constraint, and any gain comes from what the pairs cover.
 - **H20, shrinking cage.** Train the full precision weights under distillation from the original, in the rotated basis, with ordinary exact gradients, and after every step clip each group of 128 to a cap that is lowered on a schedule. Weights on the cap are binary with the cap as their scale. Free weights compensate. No straight-through estimator is used until the last free weights are settled, by sign search or a short straight-through polish. Per layer, the share of weights on the cap against the dev metric is logged at every evaluation, which gives the conversion's cost curve while it runs and a per-layer measure of how much converts for free. This is the trade of fit against potential in S37 with the rigid cage, applied per group; S37 states none of per-group caps, rotation or distillation. A magnitude-equalizing term is not used to choose signs (section 4B). False if, at equal training tokens, candidate G does not beat candidate D on the dev metric. Standing after the toy tests: it beat straight-through training on single rows in 9 of 9 runs and lost on a two-layer network in 3 of 3 (section 4B). It stays in the race as one arm and is not the lead candidate. Its per-layer cost curve is kept as a diagnostic whichever arm wins.
 - **H21, vertex penalty.** Train full precision weights under distillation with exact gradients, each group boxed to its cap, with the penalty `g - sqrt(g) * ||u||_2` ramped up until every weight is on a vertex. The formulation is an exact restatement of the binary constraint and has prior art in binary optimization; its use with group scales and whole-model distillation is the test. It beat sign search on single rows from a fitted start in 9 of 9 runs (section 4B). False if, at equal processed tokens, candidate H does not beat candidate D on the dev metric. On the two-layer network, the test the shrinking cage lost, it beat straight-through training in 3 of 3 runs when followed by a short straight-through stage, by 12% to 16% (section 4B). Used alone it lost in 3 of 3 runs here and in 3 of 3 runs of an independent implementation (2.4% to 2.8% error against 1.7% to 2.1%). Its only supported role is a first stage ahead of straight-through training, and it is not the lead candidate.
+- **H22, fixed occupancy.** PrismML's second-generation ternary groups hold exactly 42 zeros of 128 in 96.65% of groups and never more (section 2B). That is a rank rule, not a threshold rule: the 42 smallest latent magnitudes of a group are zero whatever their size. It is not the least-weight-error choice, which has 46% zeros for Gaussian weights. A rank rule keeps every group's code occupancy fixed while training moves the latents, which a per-group threshold does not. Test in the ternary rung: the fixed-count ternarizer against the least-error threshold, same start, same tokens. The binary analogue to test with it: a fixed sign balance per group.
+- **H23, outward scales.** The released 1-bit model stores scales 2.26 times the base's group mean magnitude (section 2M), which no fit to weights or to layer outputs produced here. A patent figure shows a layer moving from one mode near zero to two modes near plus and minus 0.3 (section 2B). Both fit training that pushes weights outward to a shared magnitude instead of fitting a scale to them. Test in the audit: the scale ratio by kind of matrix. A ratio that is large only for query and key matrices would be a free gauge under their normalization; a ratio that is large everywhere is outward training.
 
 Examined and not adopted, with reasons:
 - **Starting from PrismML's ternary checkpoint.** The formula must convert a model that has no PrismML release, including LFM2. A ternary stage built by our own recipe remains admissible as a step inside a candidate.
@@ -718,22 +870,23 @@ MMLU-Redux, IFBench and BFCL v3 are missing from the table because their questio
 2. **Paired comparisons.** Every model answers the same questions with the same prompts and decoding. Differences are computed per question, then averaged. Benchmarks with grouped questions use clustered standard errors.
 3. **Decoding.** Greedy, temperature 0, thinking disabled, fixed seed, the same output-token budgets as S1 appendix B.3. A determinism check runs before any scored run.
 4. **Scoring.** Rule-based only. No paid model API is used as a judge. A response the rule parser cannot read is scored wrong for every model alike. This will lower absolute scores against PrismML's published numbers, which is why T0 measures all three models on our harness.
-5. **Dev metric.** Recipe and hyperparameter choices use only a held-out text set, and the deciding number is KL divergence to the full precision teacher, reported for the whole set and for each stratum of it. Perplexity is logged and never decides a choice: a quantized model's perplexity can improve while 18.7% of its interpretable features degrade (S45). The benchmark suite is used only when a trophy is claimed. Beside KL, every evaluation logs top-token agreement with the teacher on teacher prefixes and on the student's own prefixes, the first position where greedy generation diverges, and the share of positions where KL is below the exact amount needed to flip the teacher's top choice, `p_a*log(2p_a/(p_a+p_b)) + p_b*log(2p_b/(p_a+p_b))` for its top two probabilities. Before the race winner is chosen, these are rank-correlated across saved checkpoints against a held-out task set that shares nothing with the trophy suite; if KL misranks, the deciding number is replaced by the one that ranks best.
+5. **Dev metric.** Recipe and hyperparameter choices use only a held-out text set, and the deciding number is KL divergence to the full precision teacher, reported for the whole set and for each stratum of it. Perplexity is logged and never decides a choice: a quantized model's perplexity can improve while 18.7% of its interpretable features degrade (S45). The benchmark suite is used only when a trophy is claimed. Beside KL, every evaluation logs top-token agreement with the teacher on teacher prefixes and on the student's own prefixes, the first position where greedy generation diverges, and the share of positions where KL is below the exact amount needed to flip the teacher's top choice, `p_a*log(2p_a/(p_a+p_b)) + p_b*log(2p_b/(p_a+p_b))` for its top two probabilities. Before the race winner is chosen, these are rank-correlated across saved checkpoints against a held-out task set that shares nothing with the trophy suite; if KL misranks, the deciding number is replaced by the one that ranks best. Every accuracy comparison with the teacher is also reported as its two parts, answers the teacher had right that the student lost and answers the teacher had wrong that the student gained, because equal accuracy can hide both. Until that check has run on the model being trained, no candidate is cut on KL alone: a cut needs a loss on both KL and top-token agreement larger than the spread between seeds. On real-decoder conversions agreement ranked as accuracy did where KL did not (section 2L), and on an outside reviewer's small decoders the rank correlation with accuracy across eight close starts was 0.91, 0.71 and 0.74 for agreement against 0.43, -0.19 and 0.79 for KL.
 6. **Seeds.** A trophy-claiming configuration is trained with at least three seeds. All seeds are reported. If the seed spread is too wide to decide the trophy, more seeds are added. Seeds are never dropped.
 7. **Margin.** The non-inferiority margin for T4 is `M = 1.4` points on the primary metric. T4 passes when the 95% confidence interval of (ours minus PrismML's released weights), from question-level paired differences, lies entirely above `-1.4`.
    - **Basis.** A margin states the largest loss still counted as a match, and is fixed before any data (S25). T4 is a replication claim, so the margin is the difference the reference evaluation itself could not reliably detect: the difference PrismML's suite had only 33% power to detect between two independently scored models, at two-sided alpha 0.05. This is the "small telescopes" standard for replications (S25).
-   - **Derivation.** `scripts/margin.py` computes it from PrismML's published question counts and 1-bit Bonsai 1.7B scores alone. The standard error of the 10-benchmark mean is 0.69 to 0.71, the standard error of a difference is 0.97 to 1.00, and the 33% power difference is 1.47 to 1.52 across every bracketed value of the three question counts PrismML does not state. The strictest value, rounded down, is 1.4.
+   - **Derivation.** `scripts/toy/margin.py` computes it from PrismML's published question counts and 1-bit Bonsai 1.7B scores alone. The standard error of the 10-benchmark mean is 0.69 to 0.71, the standard error of a difference is 0.97 to 1.00, and the 33% power difference is 1.47 to 1.52 across every bracketed value of the three question counts PrismML does not state. The strictest value, rounded down, is 1.4.
    - **Alternative considered.** The clinical-trial convention defines non-inferiority as preserving a fraction, often 50%, of the reference's effect over no treatment (S26). Here the reference's effect over an untrained conversion is tens of points, so that convention would allow a loss far too large to call a match. It is not used.
    - **Scale checks.** 1.4 points is 16% of the gap between PrismML's binary and ternary 1.7B models (40.88 and 49.58), so a match leaves 84% of the distance to the next operating point. The stricter engineering convention for deterministic conversions, 99% of the reference score (S27), would be 0.41 points. It is reported as a secondary result and is not the gate, because a trained conversion carries seed variation that a deterministic conversion does not.
    - **Noise is handled by sample size, never by the margin.** Showing non-inferiority with 80% power at one-sided alpha 0.025 needs a paired standard error of the difference of 0.50 points or less. T0 measures the suite's paired standard error. If it exceeds 0.50, the question pool is enlarged from a list fixed in `PREREGISTRATION.md` before any trained model is scored. HumanEval+ alone carries about 32% of the suite's variance at 164 questions, so enlargement starts with the code benchmarks. If the pool cannot reach 0.50, the T4 verdict is reported as inconclusive with its interval, not as a pass.
    - **T5** uses the same rule with retention as the quantity, its margin computed by the same script from the LFM2 suite's question counts.
    - **T8.** A 99% retention claim against a teacher score near 58 allows a loss of about 0.58 points, which needs a paired standard error near 0.21. That is 5.8 times the evidence of T4 multiplied by the ratio of the two paired variances, and a near-lossless student disagrees with its teacher on fewer questions than two different 1-bit models disagree with each other, so the ratio is measured, not assumed. Observed retention and statistically established retention are reported as two separate results.
-   - **Power.** The quantity tested is the recipe's score averaged over its seeds, question by question, against PrismML's single release. With unpaired standard error of the difference near 0.98, a paired standard error of 0.50 needs a question-level correlation of at least 0.74 with one seed, 0.61 with three and 0.57 with five. The correlation is measured at T0 between PrismML's released models before any training (C55), and the seed count is fixed from it.
+   - **Power.** The quantity tested is the recipe's score averaged over its seeds, question by question, against the reference. Its variance has three parts: the spread between seeds divided by the number of seeds, the question noise divided by the number of questions, and their interaction divided by both. Question-level correlation with the reference shrinks only the question part; it says nothing about the spread between training runs. The question part: with unpaired standard error of the difference near 0.98, a paired standard error of 0.50 needs a question-level correlation of at least 0.74, measured at T0 between PrismML's released models (C55); benchmarks with grouped or contiguous items use cluster standard errors. The seed part: the seed count is fixed from the measured standard deviation of the suite score across the first seeds of the reference run, by the exact one-sided noncentral-t calculation at alpha 0.025 and 80% power (`scripts/tools/paired_evidence.py`). For T8's 0.58-point allowance, ignoring question noise, that is 4 seeds at a seed standard deviation of 0.2 points, 8 at 0.5 and 26 at 1.0. The maximum seed count is written into `PREREGISTRATION.md` before the first trophy run, the two sources of uncertainty are reported separately, and a claim about the recipe is distinguished from a claim about one trained model. Three seeds do not support inference that treats seeds and questions as jointly random: the two-way cluster-robust test rejects 12% to 17% of the time at a nominal 5% with ten clusters per dimension (S62), no bootstrap is exact for crossed effects and the row-and-column bootstrap is justified only when both counts are large (S63). The question-level formulas, clustered and paired, are those of S64, which does not treat training seeds.
 8. **One test per trophy.** Each trophy has one pre-stated comparison. Extra comparisons are labeled exploratory.
 9. **Negative results stay.** A failed recipe keeps its manifest and its row in the results table.
 
-10. **Staged race.** Before any candidates are compared, the published rotation-in-loop ternary run (S20) is reproduced at its own budget if the ternary rung is adopted, as the reference point. Cheap starting points are screened next at 250 thousand to 1 million tokens: ordered column factors, and per-group threshold shifts with the original weights frozen (2,048 trainable values in the two-layer test, where it reached 2.2% to 2.7% error against 1.7% to 2.1% for straight-through training). Candidates are compared at cumulative checkpoints of 100 thousand, 1 million, 10 million and 100 million processed tokens, on the fully snapped model, and the field is cut at each stage by a rule written before the stage starts. A candidate is not cut for a slow start alone: its curve's slope counts. Unique tokens, processed tokens and trainable parameters are logged separately. Retention gained per processed token is a reported result, because published low-bit training budgets of 10 to 30 billion tokens are out of reach on this hardware.
-11. **Training text and the hidden-state term are factors.** A layer-wise hidden-state matching term is tested on and off for each surviving optimizer: OneBit reports a large gain from it (S9) and a 1.125-bit study reports it hurting in-domain perplexity (S35). The first stages cross each surviving optimizer with four kinds of text: generic, balanced task families, teacher-generated trajectories and student-generated trajectories. No text overlaps the trophy suite.
+10. **Staged race.** Before any candidates are compared, the published rotation-in-loop ternary run (S20) is reproduced at its own budget if the ternary rung is adopted, as the reference point. Cheap starting points are screened next at 250 thousand to 1 million tokens: ordered column factors, and per-group threshold shifts with the original weights frozen (2,048 trainable values in the two-layer test, where it reached 2.2% to 2.7% error against 1.7% to 2.1% for straight-through training). Candidates are compared at cumulative checkpoints of 100 thousand, 1 million, 10 million and 100 million processed tokens, on the fully snapped model, and the field is cut at each stage by a rule written before the stage starts. A candidate is not cut for a slow start alone: its curve's slope counts. Unique tokens, processed tokens and trainable parameters are logged separately. Retention gained per processed token is a reported result, because published low-bit training budgets of 10 to 30 billion tokens are out of reach on this hardware. The latent state a candidate trains from is declared and controlled: latent magnitudes restored from the teacher inside each group are the default, constant magnitudes and a magnitude set from the exact cost of flipping each sign are the controls (section 2M). Every binary candidate starts from the student-input compensating conversion unless its own method forbids it: on a real decoder that start was worth more than 76,800 tokens of training from plain rounding (section 2M). If the ternary rung is adopted, its candidates include a fixed-count ternarizer, 42 zeros in every group of 128, beside the least-error threshold (section 2B).
+11. **Training text and the hidden-state term are factors.** A layer-wise hidden-state matching term is tested on and off for each surviving optimizer: OneBit reports a large gain from it (S9) and a 1.125-bit study reports it hurting in-domain perplexity (S35). The first stages cross each surviving optimizer with four kinds of text: generic, balanced task families, teacher-generated trajectories and student-generated trajectories. No text overlaps the trophy suite. Math and code retention are scored at every stage beside the text measures, on tasks outside the trophy suite: an open ternary conversion matched the official model on perplexity while scoring 30 of 100 on GSM8K against 77 for the official model, and the teacher's own math and code answers as training text moved that to 69 (section 2I).
+12. **Teacher cache.** Distillation targets for the main training text are stored as token ids sampled from the teacher's distribution, 32 to 50 draws per position, never as top-k probabilities, which bias the student toward over-confidence (S61). Full teacher distributions are stored for a small verification set, and each stage checks that training on sampled targets tracks training on full targets there. On an outside reviewer's small decoders, KL after equal training was 0.204 with full targets, 0.209 with 32 sampled ids and 0.255 with the top 32 plus one remainder bucket. The speed gain reported for sampled targets is not assumed for binary training on a Mac.
 
 ## 7. Reproducibility rules
 
@@ -769,7 +922,7 @@ Status values: `done`, `open`.
 | C3 | Read the Qwen3-1.7B model card directly: architecture numbers, license file, recommended decoding, base versus instruct variant | open |
 | C4 | Establish the evaluation harness for Apple Silicon: can EvalScope score an OpenAI-compatible local server, are PrismML's hotfix scripts public, what is needed for sandboxed code benchmarks | open |
 | C5 | Read BitDistill, OneBit and BinaryLLM in full, including appendices and any released code, and extract exact losses, schedules and data | open |
-| C6 | Read PrismML's MLX and llama.cpp forks for the 1-bit and Hadamard kernel code paths | open |
+| C6 | Read PrismML's MLX and llama.cpp forks for the 1-bit and Hadamard kernel code paths. Done for the Hadamard path as merged into upstream llama.cpp (graph, loader, converter) and for the demo repository's format and backend documents (S66, S67). The MLX fork and the 1-bit kernels remain | open |
 | C7 | Read the independent Bonsai reproduction study (ThakiCloud/bonsai-1bit-repro) in full: REPORT.md, the paper and the fingerprint scripts. Its README is read | open |
 | C8 | Confirm which upstream MLX and mlx-lm versions load 1-bit g128 checkpoints | open |
 | C9 | Count parameters by tensor type in the real LFM2 checkpoint | open |
@@ -824,13 +977,23 @@ Status values: `done`, `open`.
 | C74 | Which tensors ParetoQ converts, confirmed in its code. C57 now covers only its remaining result tables | done |
 | C75 | Repeat C73's activation test on general text and on a decoder with SwiGLU and pre-normalization as soon as one is reachable; add the vertex penalty and whole-block compensation to the real-row test | open |
 | C76 | Weights-only audit of PrismML's released binary 1.7B against Qwen3-1.7B, after confirming the two share coordinates: sign migration by original magnitude, group scale ratios, column structure, and for each group the fewest sign mismatches any single threshold on the sorted original weights can reach. An outside audit script exists for this and is reviewed line by line before it runs | open |
-| C77 | Confirm at source: the tied embedding handled through one stored rotated matrix in upstream llama.cpp; S53's scores against its own teacher; BinaryLLM's whole-model scale search; BitDistill's relation loss | open |
+| C77 | Confirm at source: the tied embedding handled through one stored rotated matrix in upstream llama.cpp (confirmed, S67); S53's scores against its own teacher; BinaryLLM's whole-model scale search; BitDistill's relation loss | open |
 | C78 | Outside note of November 22 on plan version 10 reviewed: ordered construction tested on real weights; perplexity-ratio reading of S20 corrected; vertex penalty results reconciled | done |
 | C79 | Extend the whole-body conversion on the real model: downstream agreement through the package's tagging head, a second pass, ordered rotation, ternary, more seeds and text; then gradient training on top of the best start if it can be run here | open |
 | C80 | Whole-body conversion of RoBERTa-base without training, three ways, on WikiText-2 (`real_whole.py`) | done |
 | C81 | SmolLM2-135M-Instruct (30 blocks, width 576, grouped-query attention, SwiGLU, pre-RMSNorm, tied embedding, 49,152 tokens) taken from the `llm-smollm2` package as a 4-bit GGUF file (S59). Use it as the real causal-decoder testbed for P1, P2, P4, U3 and U5. Its width is not a multiple of 128, so the group size and true bit rate are stated with every result, and its teacher weights are already 4-bit Forward pass, tokenizer, attribution, ladder and metric ranking are done (`smol.py`, `smol_exp.py`, section 2K); spectra, a fitted embedding, rotation and training remain | open |
-| C82 | Read Sparse Logit Sampling in full; compare sampled targets against top-k plus remainder bucket for the teacher cache (C64) | open |
+| C82 | Sparse Logit Sampling read (S61); sampled targets compared against top-k plus remainder bucket on an outside reviewer's small decoders; rule 12 written | done |
 | C83 | Outside note on plan version 12 reviewed. Its four-way protocol addition is taken into C49: the cross-term of the two logit changes under the teacher's Fisher metric, beside the loss interaction | done |
+| C84 | Tied embedding, softmax-aware consistent fit on SmolLM2: targets with the per-position vocabulary mean removed and positions weighted by teacher probability, lookup error weighted by smoothed frequency, hidden states recomputed between small steps so the fit never runs on states that no longer exist | open |
+| C85 | Tied embedding, embedding-first order on SmolLM2: round the tied matrix first, then run the student-input compensation through the body from that input, with the last block's two writing matrices fitted to the teacher's logits through the binary output matrix | open |
+| C86 | Outside package of November 22 reviewed: its tables recomputed from its raw result files and its seed table re-derived; its tied-embedding joint fit run on SmolLM2 (section 2L, not adopted); its seed-variance correction taken into rule 7; its cache comparison into rule 12; its weights-only audit script and raw 18-byte block codec read and self-tested, kept as tools for C59 and C65 | done |
+| C87 | Unknowns U1 to U6 worked in this workspace on SmolLM2-135M: spectra and column spread; restore tests by kind and by block on four students; straight-through training in hand-written numpy from two starts to 230 thousand tokens; metric ranking over 20 trained checkpoints; free column factors on the tied embedding (no gain in function); source reads for PrismML's runtime and LFM2 (sections 2B, 2F, 2I, 2M) | done |
+| C88 | OpenBonsai (S65): README, method, refine and audit documents read in full. Still to read: its error-feedback rounding and endpoint code, and the CAT-Q release it cites, before any of it enters a candidate | open |
+| C89 | On SmolLM2 with `smol_train.py`: rotation inside the loop (signed Hadamard on the input side, as the runtime applies it); a scale-only control from the compensating start; three seeds per arm for the seed spread rule 7 needs; a longer run on the Mac | open |
+| C90 | Run the weights-only audits on the Mac: zero count per group on PrismML's ternary 1.7B files of both generations, sign balance per group and sign flips against Qwen3-1.7B on the 1-bit file | open |
+| C91 | Outside package of November 22 on the unknowns reviewed: tables recomputed from its raw files; its latent-state lead tested on SmolLM2 and adopted into rule 10; its fitting-set-size finding repeated on SmolLM2; its critique of the public fingerprint checked against that repository's code and adopted; lost and gained answers added to rule 5. Not adopted: full residual targets (worse in its own test), adaptive replay (did not beat plain streaming in its own test), and the linearized sensitivity measure as a screening tool (it costs two forward passes where measuring the damage directly costs one and ranks better) | done |
+| C92 | Before the weights audit (C59, C76, C90): confirm tensor shapes and token-id mapping between the base and the released 1-bit model, score the two in their native position settings first, and report the teacher's probability mass on any vocabulary rows the student lacks. Add to the audit: sign changes by magnitude quartile, and scale ratio by kind of matrix and as a median over all groups | open |
+| C93 | On SmolLM2: the flip-cost latent magnitude as a third arm beside restored and constant; the same three at a longer budget and more seeds | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
 | C33 | Gauge search script: optimize the exact symmetries of Qwen3-1.7B toward plus or minus group scale and verify identical logits before and after | open |
@@ -920,6 +1083,17 @@ Status values: `done`, `open`.
 - S57. xuyuzhuang11/OneBit, source repository. https://github.com/xuyuzhuang11/OneBit
 - S58. explosion/spacy-models, release `en_core_web_trf-3.7.3` (RoBERTa-base weights and tokenizer). https://github.com/explosion/spacy-models/releases/tag/en_core_web_trf-3.7.3
 - S59. `llm-smollm2` 0.1.2 on the Python Package Index, bundling `SmolLM2-135M-Instruct.Q4_1.gguf`. https://pypi.org/project/llm-smollm2/
+- S60. Lopardo, Harish, Arnett, Gupta, "Weight Tying Biases Token Embeddings Towards the Output Space", Findings of ACL 2026. https://arxiv.org/abs/2603.26663
+- S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
+- S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
+- S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S70. Helwegen, Widdicombe, Geiger, Liu, Cheng, Nusselder, "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019. https://arxiv.org/abs/1906.02107
+- S65. esokullu/openbonsai, an independent open pipeline for PrismML's ternary format, with run reports and an audit of the official 9B file. https://github.com/esokullu/openbonsai
+- S66. PrismML-Eng/Bonsai-demo, `README.md`, `Bonsai1_README.md`, `MODEL-FORMATS.md`, `BACKEND-SUPPORT.md`. https://github.com/PrismML-Eng/Bonsai-demo
+- S67. ggml-org/llama.cpp at commit e300919, `src/llama-model.cpp` (`load_hparams_hadamard`), `src/llama-graph.cpp` (`build_hadamard_input`), `conversion/base.py` (`add_hadamard_metadata`), `src/models/qwen35.cpp`. https://github.com/ggml-org/llama.cpp
+- S68. Georganas, Heinecke, Dubey, "Breaking the 1.58-bit Barrier for Ternary LLMs". https://arxiv.org/abs/2609.16338
+- S69. ggml-org/llama.cpp, `src/models/lfm2.cpp`. https://github.com/ggml-org/llama.cpp
+- S64. Miller, "Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations". https://arxiv.org/abs/2411.00640
 - S25. Lakens, "Equivalence Testing and Interval Hypotheses", including the small telescopes approach of Simonsohn (2015). https://lakens.github.io/statistical_inferences/09-equivalencetest.html
 - S26. "A General Framework for Designing and Evaluating Active-Controlled Trials with Non-Inferiority Objectives", on the preservation-of-effect criterion. https://arxiv.org/abs/2510.22071
 - S27. MLPerf Inference quality targets, "99% of FP32" per benchmark. https://www.dell.com/en-us/infohub/articles/deep-learning-performance-with-mlperf-inference-v0-7-benchmark

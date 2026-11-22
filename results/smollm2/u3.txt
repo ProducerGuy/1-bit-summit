@@ -1,0 +1,19 @@
+all: 27 checkpoints, accuracy 0.001 to 0.220; rank correlation with accuracy: KL +0.98, agreement +0.99, perplexity +0.98
+compensating start: 14 checkpoints, accuracy 0.111 to 0.220; rank correlation with accuracy: KL +0.99, agreement +0.99, perplexity +0.99
+rounding start: 9 checkpoints, accuracy 0.001 to 0.111; rank correlation with accuracy: KL +0.65, agreement +0.98, perplexity +0.65
+accuracy at least 16%: 13 checkpoints, accuracy 0.162 to 0.220; rank correlation with accuracy: KL +0.98, agreement +0.96, perplexity +0.99
+standard error of one accuracy figure near 18%: 0.0061
+               main_comp step 450  KL 1.561  agree 0.403  ppl    126.3  acc 0.2200
+               main_comp step 300  KL 1.612  agree 0.390  ppl    134.1  acc 0.2073
+               main_comp step 150  KL 1.703  agree 0.379  ppl    147.3  acc 0.1949
+               main_comp step  75  KL 1.815  agree 0.364  ppl    164.7  acc 0.1900
+            arm_fastsign step  75  KL 2.021  agree 0.347  ppl    195.8  acc 0.1882
+               arm_const step  75  KL 1.971  agree 0.335  ppl    200.8  acc 0.1739
+               main_comp step  25  KL 2.106  agree 0.336  ppl    231.1  acc 0.1704
+        pilot_comp_0.001 step  25  KL 2.244  agree 0.326  ppl    257.5  acc 0.1704
+               arm_const step  25  KL 2.195  agree 0.326  ppl    252.2  acc 0.1672
+               main_comp step   8  KL 2.382  agree 0.309  ppl    304.5  acc 0.1644
+               arm_const step   0  KL 2.755  agree 0.315  ppl    455.4  acc 0.1622
+               arm_const step   8  KL 2.455  agree 0.300  ppl    321.8  acc 0.1622
+            arm_fastsign step   0  KL 2.755  agree 0.315  ppl    455.4  acc 0.1622
+            arm_fastsign step  25  KL 2.797  agree 0.298  ppl    457.6  acc 0.1558

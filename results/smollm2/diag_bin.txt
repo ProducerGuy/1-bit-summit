@@ -1,0 +1,13 @@
+teacher logits on fitting text: mean square 63.72; of which the per-position mean over the vocabulary 52.45, the rest 11.27
+rows holding teacher probability mass on fitting text: 50% in 63, 90% in 4205, 99% in 22476, 100% in 37463
+body: binary (student-input compensation)
+               input full precision, output full precision  KL  2.755  agree 0.315  acc 0.162  ppl     455.4  
+                      input full precision, output rounded  KL  4.237  agree 0.091  acc 0.060  ppl    2005.0  
+                      input rounded, output full precision  KL  3.841  agree 0.273  acc 0.132  ppl    1481.5  
+               input full precision, output fit (all rows)  KL  2.521  agree 0.266  acc 0.141  ppl     345.7  signs flipped 34.2%
+input full precision, output fit on top 4205 rows (90.0% mass)  KL  3.161  agree 0.253  acc 0.137  ppl     634.3  
+input full precision, output fit on top 22476 rows (99.0% mass)  KL  2.680  agree 0.253  acc 0.137  ppl     416.6  
+input full precision, output fit on top 37463 rows (99.9% mass)  KL  2.596  agree 0.254  acc 0.137  ppl     372.1  
+     top 1000 rows by mass: relative logit error rounded 0.474, fit 0.143; relative lookup error rounded 0.386, fit 1.777
+        rows 1000 to 10000: relative logit error rounded 0.673, fit 0.205; relative lookup error rounded 0.418, fit 1.676
+            remaining rows: relative logit error rounded 0.783, fit 0.296; relative lookup error rounded 0.456, fit 1.399

@@ -1,0 +1,11 @@
+A. fingerprints
+                                     student signs changed    by magnitude quartile, small to large   scale ratio: median of medians, global
+                    compensated, no training        26.06%                  36.9% 30.1% 23.1% 14.2%                0.933              0.957
+                compensated + 230,400 tokens        26.09%                  37.0% 30.1% 23.1% 14.2%                0.933              0.957
+                    rounding + 76,800 tokens         0.22%                      0.9% 0.0% 0.0% 0.0%                1.000              1.000
+B. local measures against measured single-block damage
+                     rounding weight error: rank correlation with measured KL +0.18
+    activation-weighted local output error: rank correlation with measured KL +0.68
+                             column spread: rank correlation with measured KL -0.01
+                               block index: rank correlation with measured KL -0.36
+  local output error, blocks 0, 10, 20, 28, 29: [np.float64(0.513), np.float64(0.607), np.float64(0.489), np.float64(0.635), np.float64(0.604)]  measured KL: [6.47, 0.72, 0.64, 1.04, 2.89]

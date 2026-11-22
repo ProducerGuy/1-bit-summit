@@ -1,0 +1,24 @@
+tokens: fitting 12288, other text 75097, held out 4096; distinct token ids in fitting text 2413, in all non-held-out text 8051; held-out tokens never seen in fitting text 16.7%, never seen in any non-held-out text 4.8%; singleton mass 0.037
+mean squared teacher logit 57.02
+body: binary (student-input compensation)
+                embedding full precision  KL  2.755  agree 0.315  acc 0.162  ppl     455.4  lookup err (held-out freq) 0.000
+                                   round  KL  4.687  agree 0.071  acc 0.045  ppl    3265.2  lookup err (held-out freq) 0.643
+                              round, rot  KL  7.164  agree 0.007  acc 0.005  ppl   41741.2  lookup err (held-out freq) 0.601
+                    fit, lam 0, freq cal  KL  4.821  agree 0.087  acc 0.052  ppl    3195.1  lookup err (held-out freq) 1.505  signs flipped 38.0%
+                                          (96 s)
+                  fit, lam 0.1, freq cal  KL  5.160  agree 0.030  acc 0.005  ppl    6316.1  lookup err (held-out freq) 0.856  signs flipped 37.0%
+                                          (93 s)
+                    fit, lam 1, freq cal  KL  5.969  agree 0.028  acc 0.004  ppl   16939.6  lookup err (held-out freq) 0.848  signs flipped 36.6%
+                                          (78 s)
+                   fit, lam 10, freq cal  KL  6.160  agree 0.030  acc 0.005  ppl   21546.2  lookup err (held-out freq) 0.846  signs flipped 36.4%
+                                          (83 s)
+               fit, lam 0.1, freq smooth  KL  5.066  agree 0.023  acc 0.002  ppl    5300.1  lookup err (held-out freq) 0.749  signs flipped 34.8%
+                                          (99 s)
+                 fit, lam 1, freq smooth  KL  5.150  agree 0.029  acc 0.005  ppl    6511.1  lookup err (held-out freq) 0.679  signs flipped 26.8%
+                                          (78 s)
+                fit, lam 10, freq smooth  KL  5.045  agree 0.043  acc 0.017  ppl    6077.7  lookup err (held-out freq) 0.650  signs flipped 10.0%
+                                          (52 s)
+  best by KL: lam 0, freq cal
+                             best, again  KL  8.775  agree 0.025  acc 0.016  ppl  188950.2  lookup err (held-out freq) 2.063  signs flipped 43.3%
+                       best setting, rot  KL  3.990  agree 0.124  acc 0.071  ppl    1497.1  lookup err (held-out freq) 1.289
+                best setting, rot, again  KL 11.371  agree 0.010  acc 0.008  ppl 2450672.8  lookup err (held-out freq) 2.171

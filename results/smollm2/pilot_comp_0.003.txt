@@ -1,0 +1,8 @@
+{"kl": 2.7549142837524414, "agree": 0.31547619047619047, "acc": 0.16220238095238096, "ppl": 455.355712890625, "step": 0, "tokens": 0, "train_loss": NaN, "flips_vs_teacher": 0.2605566613468123, "flips_vs_start": 0.0, "seconds": 0.0, "init": "comp", "lr": 0.003, "seed": 0}
+step 5 loss 8.1676 5.5 s/step
+{"kl": 3.666522741317749, "agree": 0.22594246031746032, "acc": 0.12748015873015872, "ppl": 1055.9794921875, "step": 8, "tokens": 4096, "train_loss": 6.816075503826141, "flips_vs_teacher": 0.26106830173068574, "flips_vs_start": 0.0026945137683256175, "seconds": 45.22492718696594, "init": "comp", "lr": 0.003, "seed": 0}
+step 10 loss 4.1619 5.8 s/step
+step 15 loss 3.4573 6.1 s/step
+step 20 loss 3.1584 6.2 s/step
+step 25 loss 2.9773 6.3 s/step
+{"kl": 2.706059217453003, "agree": 0.267609126984127, "acc": 0.14087301587301587, "ppl": 401.6412048339844, "step": 25, "tokens": 12800, "train_loss": 3.06852924823761, "flips_vs_teacher": 0.261402968418451, "flips_vs_start": 0.004473660315996335, "seconds": 157.5261151790619, "init": "comp", "lr": 0.003, "seed": 0}

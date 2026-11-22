@@ -1,0 +1,78 @@
+                 whole body binary  KL   1.679  agree 0.377  acc 0.210
+                    restore attn_q  KL   1.706  agree 0.377  acc 0.210  KL change +0.027
+                    restore attn_k  KL   2.204  agree 0.316  acc 0.176  KL change +0.525
+                    restore attn_v  KL   2.572  agree 0.284  acc 0.173  KL change +0.893
+               restore attn_output  KL   3.417  agree 0.191  acc 0.109  KL change +1.738
+                  restore ffn_gate  KL   2.906  agree 0.250  acc 0.142  KL change +1.227
+                    restore ffn_up  KL   3.337  agree 0.255  acc 0.147  KL change +1.658
+                  restore ffn_down  KL   2.867  agree 0.236  acc 0.130  KL change +1.189
+  restore attention (q, k, v, out)  KL   2.837  agree 0.261  acc 0.156  KL change +1.159
+restore feed-forward (gate, up, down)  KL   1.115  agree 0.460  acc 0.238  KL change -0.564
+                only attn_q binary  KL   0.384  agree 0.664  acc 0.325
+                only attn_k binary  KL   1.031  agree 0.459  acc 0.261
+                only attn_v binary  KL   1.060  agree 0.474  acc 0.252
+           only attn_output binary  KL   0.794  agree 0.514  acc 0.261
+              only ffn_gate binary  KL   1.539  agree 0.419  acc 0.234
+                only ffn_up binary  KL   4.891  agree 0.128  acc 0.079
+              only ffn_down binary  KL   5.909  agree 0.140  acc 0.078
+                   restore block 0  KL   1.738  agree 0.368  acc 0.215  KL change +0.060
+                   restore block 1  KL   1.713  agree 0.377  acc 0.209  KL change +0.035
+                   restore block 2  KL   1.697  agree 0.374  acc 0.212  KL change +0.018
+                   restore block 3  KL   1.713  agree 0.372  acc 0.208  KL change +0.034
+                   restore block 4  KL   1.722  agree 0.376  acc 0.211  KL change +0.043
+                   restore block 5  KL   1.726  agree 0.367  acc 0.212  KL change +0.047
+                   restore block 6  KL   1.745  agree 0.370  acc 0.210  KL change +0.066
+                   restore block 7  KL   1.751  agree 0.360  acc 0.197  KL change +0.072
+                   restore block 8  KL   1.757  agree 0.367  acc 0.213  KL change +0.078
+                   restore block 9  KL   1.726  agree 0.369  acc 0.212  KL change +0.047
+                  restore block 10  KL   1.747  agree 0.371  acc 0.209  KL change +0.068
+                  restore block 11  KL   1.848  agree 0.364  acc 0.195  KL change +0.170
+                  restore block 12  KL   1.746  agree 0.370  acc 0.206  KL change +0.068
+                  restore block 13  KL   1.721  agree 0.371  acc 0.204  KL change +0.043
+                  restore block 14  KL   1.700  agree 0.372  acc 0.216  KL change +0.022
+                  restore block 15  KL   1.712  agree 0.372  acc 0.209  KL change +0.033
+                  restore block 16  KL   1.734  agree 0.365  acc 0.200  KL change +0.055
+                  restore block 17  KL   1.721  agree 0.376  acc 0.220  KL change +0.043
+                  restore block 18  KL   1.733  agree 0.369  acc 0.214  KL change +0.054
+                  restore block 19  KL   1.755  agree 0.354  acc 0.201  KL change +0.076
+                  restore block 20  KL   1.835  agree 0.346  acc 0.202  KL change +0.157
+                  restore block 21  KL   1.738  agree 0.366  acc 0.203  KL change +0.060
+                  restore block 22  KL   1.758  agree 0.361  acc 0.196  KL change +0.079
+                  restore block 23  KL   1.761  agree 0.364  acc 0.208  KL change +0.082
+                  restore block 24  KL   1.734  agree 0.367  acc 0.201  KL change +0.055
+                  restore block 25  KL   1.729  agree 0.367  acc 0.205  KL change +0.050
+                  restore block 26  KL   1.721  agree 0.373  acc 0.209  KL change +0.042
+                  restore block 27  KL   1.728  agree 0.367  acc 0.204  KL change +0.049
+                  restore block 28  KL   1.729  agree 0.375  acc 0.212  KL change +0.051
+                  restore block 29  KL   1.792  agree 0.379  acc 0.212  KL change +0.114
+               only block 0 binary  KL   0.475  agree 0.669  acc 0.324
+               only block 1 binary  KL   0.166  agree 0.810  acc 0.362
+               only block 2 binary  KL   0.189  agree 0.795  acc 0.353
+               only block 3 binary  KL   0.124  agree 0.835  acc 0.364
+               only block 4 binary  KL   0.111  agree 0.836  acc 0.363
+               only block 5 binary  KL   0.097  agree 0.842  acc 0.361
+               only block 6 binary  KL   0.091  agree 0.837  acc 0.365
+               only block 7 binary  KL   0.086  agree 0.841  acc 0.364
+               only block 8 binary  KL   0.101  agree 0.825  acc 0.364
+               only block 9 binary  KL   0.105  agree 0.834  acc 0.357
+              only block 10 binary  KL   0.099  agree 0.832  acc 0.361
+              only block 11 binary  KL   0.730  agree 0.579  acc 0.289
+              only block 12 binary  KL   0.084  agree 0.829  acc 0.359
+              only block 13 binary  KL   0.108  agree 0.825  acc 0.353
+              only block 14 binary  KL   0.070  agree 0.852  acc 0.368
+              only block 15 binary  KL   0.067  agree 0.854  acc 0.361
+              only block 16 binary  KL   0.080  agree 0.828  acc 0.365
+              only block 17 binary  KL   0.063  agree 0.845  acc 0.358
+              only block 18 binary  KL   0.081  agree 0.826  acc 0.364
+              only block 19 binary  KL   0.086  agree 0.828  acc 0.361
+              only block 20 binary  KL   0.136  agree 0.817  acc 0.356
+              only block 21 binary  KL   0.108  agree 0.840  acc 0.357
+              only block 22 binary  KL   0.129  agree 0.805  acc 0.356
+              only block 23 binary  KL   0.193  agree 0.798  acc 0.339
+              only block 24 binary  KL   0.150  agree 0.813  acc 0.348
+              only block 25 binary  KL   0.118  agree 0.831  acc 0.354
+              only block 26 binary  KL   0.113  agree 0.841  acc 0.350
+              only block 27 binary  KL   0.168  agree 0.796  acc 0.354
+              only block 28 binary  KL   1.420  agree 0.555  acc 0.267
+              only block 29 binary  KL   0.851  agree 0.594  acc 0.313
+restoring one block makes KL worse in 30 of 30 blocks; sum of single-block KLs 6.399 against whole body 1.679
