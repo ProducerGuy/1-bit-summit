@@ -44,7 +44,7 @@ Judgment figures, uncalibrated until real Qwen results exist.
 | U1 | Real column spread and spectral decay | Answered on two real models (sections 2J, 2M): spectral slope near -1, body column spread 0.07 to 0.24, free column factors worth 0.2% to 2.9% of weight error. Qwen and LFM2 themselves remain | C28, C67 |
 | U2 | Binary past 89% on an affordable budget | Open. First curve on a real decoder (section 2M): 48% retention with no training, 65% after 230 thousand tokens, still rising; plain rounding reaches 33% at 77 thousand. The latent state trained from is a factor of its own: 0.06% of signs, all on weights the teacher holds near zero, carry most of the early gain, and they cannot be chosen in one pass. Published binary budgets are four orders of magnitude more tokens per weight | Staged race |
 | U3 | Whether KL ranks recipes as benchmarks do | Answered here: top-token agreement ranks as accuracy does in every set tested (0.97 to 1.00); KL fails in one trained family (0.65) and on one close pair (sections 2K, 2L, 2M). No candidate is cut on KL alone (rule 5). Benchmarks themselves remain | Rule 5 |
-| U4 | How PrismML gets there | Narrowed from public sources (section 2B): the exact rotation the runtime applies, a fixed zero count per group in the second-generation ternary weights, and an open reproduction that matches perplexity and not reasoning. Our compensation reproduces the released 1-bit model's share of changed signs and not its scales, which are 2.26 times the base's mean magnitude (section 2M). The training method is still unpublished; the sign audit of the binary weights still needs them | C59, C76, C88 |
+| U4 | How PrismML gets there | PrismML states no method anywhere: five whitepapers here, and an outside sweep of its documents and repositories in September 2026 found the same (S73). The mechanism family is public: the Caltech application and its theory papers (section 2B). Public forensics separate two generations. First-generation weights, which include the 1-bit 1.7B model, have no rotation, about 28% of signs changed and group scales about 2.26 times naive, a fingerprint the reproduction study reads as error-compensated rounding without retraining (S19). Second-generation ternary weights are rotated with scales near naive, and their last 8% of codes are trained (S73). Mirror-descent maps were run about fifteen times on Qwen3-1.7B by that project and all failed. What stays open is a level, not a mechanism: ordinary training in the rotated basis reaches 64% by perplexity ratio on WikiText in public hands at 1.7B, against 85% to 88% benchmark retention in PrismML's tables, on different rulers | C7, C90, C100 |
 | U5 | Whether errors across layers cancel or compound | Closed. They compound to collapse under independent conversion and cancel only where parts are fitted to each other: two real models here including trained students (section 2M), an outside reviewer's small decoders, the open ternary pipeline on Qwen3.5-9B (section 2I), and a published study on Qwen3-0.6B, 1.7B and 4B in which the combined effect of quantization moves is 26 to 42 times what their separate effects predict (S71). C49 stays as a harness check on Qwen, not as an open question | C49 |
 | U6 | Whether a Qwen recipe carries to LFM2 | Open. Proxy: the same procedure works unchanged on two architectures, and the damage sits in feed-forward matrices with gated products, the kind LFM2 is mostly made of (section 2M). LFM2 weights are not reachable from this workspace | C63 |
 
@@ -67,7 +67,7 @@ What counts as done in this workspace for each item, before any work on Qwen its
 | CH2 | Candidates that lose on the real decoder are cut, leaving a short list | Short list for the first stage: plain straight-through training as control, rotation inside the training loop, the student-input compensating start followed by straight-through training. The vertex penalty enters only as a start for the same training. The shrinking cage is last in line. The frozen-hidden-state tied-embedding fit is cut (section 2L) |
 | CH5, U6 | Proxy: the identical procedure run unchanged on RoBERTa and SmolLM2, two different architectures. The real answer needs LFM2 weights | Proxy done: same ladder and same sign-flip counts on both (section 2K); damage located by kind and compared with LFM2's composition (section 2M) |
 | P1 | Not answerable here: needs Qwen and LFM2 weights | Narrowed by two real models |
-| U4 | Not answerable here: needs PrismML's released weights | Sign audit defined |
+| U4 | The public record read in full (C7, C100), then the fingerprints nobody has computed taken from the released weights by script | Reading open; sign audit defined |
 | CH6 | Not answerable here: legal review | Recorded |
 
 The research phase in this workspace is finished when the ten worked-through items and the proxy pair show "done" in this table and the open reads in section 9 are complete. What then remains is exactly P1, U4, CH6 and the LFM2 answer.
@@ -92,6 +92,36 @@ Tabled by the project owner until the research on problems, challenges and unkno
 ### Needed from the project owner
 
 Nothing blocks the current research. The six decisions in section 10 wait until the tabled work resumes. One limit to know about: this workspace refuses to install a training library, so training here runs on hand-written numpy code on two processor cores (section 2M). Runs past a few hundred thousand tokens on a 135M model belong on the Mac.
+
+## 1B. Milestones and order of work
+
+**Milestones.** Progress on the product is counted in steps of five percentage points of measured benchmark retention at fixed 1-bit precision, on one model and one evaluation suite. The north star is 99%.
+
+| Step | Status |
+|---|---|
+| 70.2%, PrismML's published 1-bit 1.7B on its own ten-benchmark suite | Outside reference, not our measurement |
+| Our own baseline on our suite | Not yet measured |
+| 75%, 80%, 85%, 90%, 95% | Targets |
+| 99% | North star |
+
+Each step records four things: what improved (which previously failed tasks now pass), why (which change to the conversion caused it), what it cost (training tokens, compute, inference overhead, stored bits), and what newly broke. A higher average does not hide a regression. For each step the recipe, weights, evaluation results and failed alternatives are kept.
+
+**Two scoreboards.** Neither substitutes for the other.
+
+| Scoreboard | What advances it |
+|---|---|
+| Product | Every verified step of five points of retained capability |
+| Science | Every mechanism that explains or repairs a measured loss and survives independent replication |
+
+**Order of work.** Documentation comes before tests.
+
+1. Damage table from published scores: retention per benchmark of the released 1-bit and ternary models at each size, from PrismML's own tables (S1 to S5) and model cards. It says which abilities carry the loss at our size. No run is needed.
+2. Full reads, made independently by two reviewers and then compared: the three papers on what quantization breaks and how the last block is fitted (S74 to S76), the outside forensics project (C100), BitDistill, OneBit and BinaryLLM (C5), and the reproduction study (C7).
+3. Ranked repair candidates: for each one the loss it targets, the published evidence, the expected points, a probability, the cost, the named gaps, and the single test that would prove it.
+4. Ruler specification: the tasks, the scoring, the noise, and the smallest step the suite can resolve.
+5. Proof tests, only for candidates the document ranks, each run by a low-cost agent from a written specification.
+
+A test runs only when the document states which milestone it moves, what each outcome changes, and why reading cannot answer it.
 
 ## 2. What is established
 
@@ -126,6 +156,11 @@ Every row below was read at the source. Numbers are copied from the source, not 
 | It gives a joint pruning and quantization potential, `max(|w|^(1+e), b*|w|^q)` per weight, which is sparse below a threshold and large-q above it | S37 equations 23 to 25 |
 | It shows one LLM layer before and after: unimodal near zero, then bimodal with modes near plus and minus 0.3. No model, dataset, token count, learning rate or accuracy number is given | S37 figures 7A and 7B |
 | It contains no mention of ternary levels, rotations, Hadamard transforms, distillation or per-group scales | S37, full text |
+| An outside forensics project on the second-generation 27B ternary model: rounding the rotated base reproduces 92% of the released codes against 33% by chance; replacing all 402 ternary tensors with that rounding raises perplexity from 18.6 to 23,606; error-feedback rounding with real Hessians moves the codes away from the released ones. It concludes that the remaining 8% of codes is trained weight movement | S73 README |
+| Its ledger of about 50 ternary runs on Qwen3-1.7B, scored as student over teacher perplexity: rotation inside the training loop is essential (71% to 90% against 34% without, on its small corpus); a managed learning-rate decay is needed, without it the run peaks and diverges; distillation from the teacher is in every winning run and was never switched off; a higher learning rate, learnable scales, gating by magnitude and re-projection add nothing; every mirror-descent map it tried, one-well and two-well, rotated or not, ends between 7 and 206 times teacher perplexity | S73 recipe ledger |
+| Its results depend on the text: 86% to 90% on one megabyte of Shakespeare, and on WikiText 63.6% for 1.7B at 17,000 steps and 51.9% for 0.6B, rising with model size | S73 retention report |
+| Its reading of the generations: the first (1.7B, 4B, 8B) has no rotation, a zero share of 0.36 to 0.41 in the projections, and on the ternary 1.7B 12.7% of nonzero signs changed with scales 1.96 times naive; the second is rotated, with scales near naive and a uniform zero share of 0.328. It states that the mirror-descent idea entered the public discussion from a forum commenter, not from PrismML | S73 recipe ledger |
+| No PrismML staff member has posted in the community thread on that work | S20 |
 | The second-generation models are ternary only. The 1-bit format is described as the earlier format and not a second-generation packing. Their smallest packing stores 28 bytes per 128 weights, 1.75 bits per weight | S66 |
 | The rotation the runtime applies is now in upstream llama.cpp and is exact: a stored weight is `W*D*H`, with `D` one vector of plus and minus ones per input width, shared by every matrix of that width, and `H` the normalized Sylvester Hadamard matrix in blocks of one power-of-two size. The graph multiplies the input of each such matrix by `D`, then `H`. The token embedding is stored rotated and the rotation is undone after lookup. A tied model stores one rotated table that serves both roles. The loader accepts this only for the Llama and Qwen architecture families | S67 |
 | A third-party audit of the official second-generation 9B ternary file: 202 ternary matrices including embedding and output matrix, 8.95 billion weights, 32.76% zeros, and 96.65% of all groups of 128 hold exactly 42 zeros, none more. All scales are positive, median 0.0142, 1st and 99th percentiles 0.0086 and 0.0235. Not verified here on the weights | S65 |
@@ -237,7 +272,7 @@ Conventions:
 | The network's given parameterization is the one to convert | Exact function-preserving transforms exist and are used at 4 bits (S22, S23) |
 | One-bit models must be pretrained from scratch | BitNet trained from scratch on 4T tokens (S7). PrismML converts pretrained models (S3) |
 
-Outside engineering: PrismML's recipe is undisclosed (2B). S37 is a pending application. Its published independent claims recite training-concurrent pruning, and one-bit quantization appears in its description. Its bearing on any use of mirror-descent candidates beyond research is a legal question, not an engineering one, and each candidate's mathematics and published prior art are recorded so that question can be answered. The LFM Open License limits commercial use (2F).
+Outside engineering: PrismML states no method for Bonsai (2B). S37 is a pending application. Its published independent claims recite training-concurrent pruning, and one-bit quantization appears in its description. Its bearing on any use of mirror-descent candidates beyond research is a legal question, not an engineering one, and each candidate's mathematics and published prior art are recorded so that question can be answered. The LFM Open License limits commercial use (2F).
 
 ### 2I. Published results that set the odds
 
@@ -276,6 +311,9 @@ Outside engineering: PrismML's recipe is undisclosed (2B). S37 is a pending appl
 | In that trainer, with Adam's epsilon at 1e-8, 96% to 98% of trained coordinates had a root second moment below epsilon; 1e-9 lowered first-window error by 24.5% | S65 |
 | Started from PrismML's released ternary 9B weights, 2.1 million tokens of scale-only distillation toward Qwen3.5-9B lowered its development NLL from 3.19 to 2.71 and halved its held-out gap to the teacher (0.298 to 0.156); a rank-16 low-rank update did the same. Its reasoning scores after this were not measured | S65 |
 | Arai and Ichikawa (QEP) define the fit this plan calls student-input compensation, `min ||W X - W_q X_q||`, and add a propagation strength between 0 (correct no earlier error) and 1 (correct all of it). They use 1/2 by default and 0 for the feed-forward matrices of their largest model, because full correction overfits a small fitting set. At 2 bits it does not always help: with GPTQ in groups of 128 on Llama-2-13B perplexity rises from 16.7 to 20.0. No 1-bit results | S72 |
+| Wu, Dhiman and Koshiyama measure the margin between a model's chosen option and its best alternative before and after quantization, on 16 models from 8 down to 2 bits: a compressed agent stops calling tools and then loses about half its refusals while benchmark scores barely move; constants borrowed from another model miss by 18 to 33 points at 3 bits; no label-free repair they tried recovers more than one more bit does. No 1-bit results | S75 abstract |
+| Lotfi and others (Meta): in up to 52% of the failures of 3-bit rounded reasoning models the correct answer appears in the reasoning and is then abandoned; the divergence from the original sits on hesitation words at positions where the original was already uncertain; a penalty on those words lifted a 3-bit 1.5B Qwen distill from 47.0% to 61.2% on MATH-500 with shorter answers. No 1-bit results | S76 abstract and figure 1 |
+| Lee and others (LFQ, ICML 2026): block-wise rounding matches the original on language modeling and falls short on generation tasks, which they trace to leaving the output matrix out of the fit and to fitting hidden states by squared error; fitting only the last block by cross-entropy on the logits improves generation tasks. This is the published form of C99 | S74 abstract |
 | A training method with a trust gradient estimator and Hadamard normalization trains stably down to 1-bit weights and activations, from scratch, with code | S48 |
 | A hard constraint on the weight histogram, applied after each optimizer step, lowers 1-bit perplexity by up to 21 points on models up to 610M trained from scratch | S49 |
 | Pushing weights toward the quantized set by a regularizer whose weight grows during training was published for binary networks in 2018 | S50 |
@@ -1060,6 +1098,11 @@ Status values: `done`, `open`.
 | C97 | Propagation strength in our own conversion (S72, and the target OpenBonsai uses): the body of SmolLM2 converted at strength 0, 1/2 and 1, where 1 is what every result of sections 2K to 2M used, scored on held-out text; then per kind of matrix | open |
 | C98 | Convergence of the sign search in the body: the conversion of section 2K rerun with the search continued until fewer than 1% of signs change in a pass, against the 48% it gave | open |
 | C99 | The body absorbing the output role's error as it absorbs the lookup's: the last block's matrices fitted to the teacher's logits through the binary output matrix instead of to the teacher's activations | open |
+| C100 | Read the outside forensics project (S73) in full: whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, and the scripts behind its Qwen3-1.7B ladder. Its README, recipe ledger and retention report are read (section 2B). Then its newer discussion thread on the model page | open |
+| C101 | Damage table from published scores (section 1B, step 1): retention per benchmark for every released 1-bit and ternary size | open |
+| C102 | Read S74, S75 and S76 in full, including appendices and any released code. Their abstracts are read (section 2I) | open |
+| C103 | Ranked repair candidates document (section 1B, step 3) | open |
+| C104 | Ruler specification (section 1B, step 4) | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
 | C33 | Gauge search script: optimize the exact symmetries of Qwen3-1.7B toward plus or minus group scale and verify identical logits before and after | open |
@@ -1153,6 +1196,10 @@ Status values: `done`, `open`.
 - S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
 - S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
 - S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S76. Lotfi, Kirichenko, Li, Liu, "Quantized Reasoning Models Think They Need to Think Longer, but They Do Not", 2026. https://arxiv.org/abs/2606.00206
+- S75. Wu, Dhiman, Koshiyama, "Which Decisions Low-Bit Quantization Breaks, and How to Predict Them", 2026. https://arxiv.org/abs/2608.06564
+- S74. Lee, Yang, Choi, Yang, "LFQ: Logit-aware Final-block Quantization for Boosting the Generation Quality of Low-Bit Quantized LLMs", ICML 2026. https://arxiv.org/abs/2605.29756
+- S73. sky-is-green, "Bonsai 2 ternary forensics", repository. https://github.com/sky-is-green/bonsai2-ternary-forensics
 - S72. Arai, Ichikawa, "Quantization Error Propagation: Revisiting Layer-Wise Post-Training Quantization", NeurIPS 2025. https://arxiv.org/abs/2504.09629
 - S71. Xiao, Cao, "Contextual Utility of Quantization Moves in Extreme Low-Bit LLMs", 2026. https://arxiv.org/abs/2609.09867
 - S70. Helwegen, Widdicombe, Geiger, Liu, Cheng, Nusselder, "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019. https://arxiv.org/abs/1906.02107
