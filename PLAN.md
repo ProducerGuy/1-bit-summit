@@ -1,6 +1,6 @@
 # 1 Bit Summit: research plan
 
-Status date: 2026-11-22
+Status date: 2026-11-23
 
 ## 1. Purpose
 
@@ -1061,7 +1061,7 @@ Status values: `done`, `open`.
 | C59 | Block swap with PrismML's released binary 1.7B as the specimen: a full precision Qwen block placed in the trained binary network, and a binary block placed in the full precision network, after confirming layout and basis match. A network that gets worse with a restored block has co-adapted | open |
 | C60 | In C28 and C32: sensitivity from sampled gradients of teacher log-probabilities, input side and output side; spectra at rising sample counts; and the energy a calibration subspace misses on separate text. A rank no larger than the sample count is not evidence of redundancy | open |
 | C61 | Two-layer network test of the vertex penalty against straight-through training at equal steps (`exp_vertex_ml.py`) | done |
-| C62 | Read in full: S52 and S53 with code, "Model-Preserving Adaptive Rounding" (YAQA), "Linger and Lose: Knowledge Collapse in Low-Bit Language Models", "When Calibration Data Matter in Sub-4-Bit Language Model Quantization", and LR-QAT | open |
+| C62 | S53 read through an extraction of its tables 1, 2 and 4, method and limits (`docs/repair-candidates.md`, section 1). Still to read in full: S52 and S53 with code, "Model-Preserving Adaptive Rounding" (YAQA), "Linger and Lose: Knowledge Collapse in Low-Bit Language Models", "When Calibration Data Matter in Sub-4-Bit Language Model Quantization", and LR-QAT | open |
 | C63 | LFM2: equivalence test of the convolution gauge on the real checkpoint; tensor counts from the checkpoint; LFM2-350M as the engineering check before the 1.2B transfer test; confirm the reported IQ1 builds of LFM2 derivatives and any published scores for them | open |
 | C64 | Teacher target cache: top-k logits plus the remaining probability mass as one bucket, which gives an exact coarse KL and a lower bound on the full KL; compare against full-vocabulary KL on a sample. Check `mlx_lm/quant/dwq.py`, which already caches teacher targets, as the starting point | open |
 | C65 | Format acceptance tests for T1: all-positive and all-negative groups, single-bit changes, zero groups, FP16 extremes, real tensor round trip, tied matrix not duplicated, cached decoding against a dense reference, file bytes against declared rate. MLX's affine 1-bit layout stores two values per group, 1.25 bits per weight, so the 1.125 claim is checked on the symmetric packed file | open |
@@ -1101,8 +1101,8 @@ Status values: `done`, `open`.
 | C100 | Read the outside forensics project (S73) in full: whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, and the scripts behind its Qwen3-1.7B ladder. Its README, recipe ledger and retention report are read (section 2B). Then its newer discussion thread on the model page | open |
 | C101 | Damage table from published scores (section 1B, step 1): `docs/damage-table.md`. At 1.7B and 1 bit, MATH-500 and BFCL v3 carry 44% of the loss and MMLU-Redux another 14%; instruction following is nearly intact | done |
 | C102 | Read S74, S75 and S76 in full. S74 and S76 read in whole; S75 read to 200,000 of 277,669 characters. What each establishes is in `docs/repair-candidates.md`, section 1 | open |
-| C103 | Ranked repair candidates document (section 1B, step 3): `docs/repair-candidates.md`, first reviewer's version. The second reviewer's version and the comparison are open | open |
-| C104 | Ruler specification (section 1B, step 4) | open |
+| C103 | Ranked repair candidates document (section 1B, step 3): `docs/repair-candidates.md`, first reviewer's version. The second reviewer's version is returned and compared: it confirms the damage ranking on the six benchmarks it could read, misses MATH-500, and starts every candidate from a conversion of our own. Adopted from it: the category guardrail and the per-item gained and lost lists, now in `docs/ruler-spec.md` | done |
+| C104 | Ruler specification (section 1B, step 4): `docs/ruler-spec.md`. Three decisions in its section 11 are the project owner's | written, decisions open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
 | C33 | Gauge search script: optimize the exact symmetries of Qwen3-1.7B toward plus or minus group scale and verify identical logits before and after | open |

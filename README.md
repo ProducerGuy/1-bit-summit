@@ -11,6 +11,8 @@ This is research, not a product. No trophy has been claimed yet.
 - `scripts/real/`: experiments on real pretrained models that are fetched from public packages, not stored here: RoBERTa-base (from spaCy's `en_core_web_trf` release) and SmolLM2-135M (from the `llm-smollm2` package).
 - `docs/damage-table.md`: where the released 1-bit and ternary models lose their benchmark points, from PrismML's published tables.
 - `docs/repair-candidates.md`: reading record and ranked candidates for the next five points of retention.
+- `docs/ruler-spec.md`: the one measurement every model is scored on, and when a step counts.
+- `docs/ranked-work.md`: runs and research, each ranked by its probability of moving the ladder.
 - `docs/reviewer-prompt.md`, `docs/directive-ledger.md`: the task given to the second reviewer and its verification status.
 - `scripts/real/smol_c85.py`, `smol_c85b.py`, `smol_c84.py`: the tied embedding conversion order of `PLAN.md` section 2L.
 - `scripts/real/smol_train_tied.py`: training of the fully binary model, tied matrix in both roles.
