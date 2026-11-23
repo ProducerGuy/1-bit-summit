@@ -1099,9 +1099,9 @@ Status values: `done`, `open`.
 | C98 | Convergence of the sign search in the body: the conversion of section 2K rerun with the search continued until fewer than 1% of signs change in a pass, against the 48% it gave | open |
 | C99 | The body absorbing the output role's error as it absorbs the lookup's: the last block's matrices fitted to the teacher's logits through the binary output matrix instead of to the teacher's activations | open |
 | C100 | Read the outside forensics project (S73) in full: whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, and the scripts behind its Qwen3-1.7B ladder. Its README, recipe ledger and retention report are read (section 2B). Then its newer discussion thread on the model page | open |
-| C101 | Damage table from published scores (section 1B, step 1): retention per benchmark for every released 1-bit and ternary size | open |
-| C102 | Read S74, S75 and S76 in full, including appendices and any released code. Their abstracts are read (section 2I) | open |
-| C103 | Ranked repair candidates document (section 1B, step 3) | open |
+| C101 | Damage table from published scores (section 1B, step 1): `docs/damage-table.md`. At 1.7B and 1 bit, MATH-500 and BFCL v3 carry 44% of the loss and MMLU-Redux another 14%; instruction following is nearly intact | done |
+| C102 | Read S74, S75 and S76 in full. S74 and S76 read in whole; S75 read to 200,000 of 277,669 characters. What each establishes is in `docs/repair-candidates.md`, section 1 | open |
+| C103 | Ranked repair candidates document (section 1B, step 3): `docs/repair-candidates.md`, first reviewer's version. The second reviewer's version and the comparison are open | open |
 | C104 | Ruler specification (section 1B, step 4) | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
