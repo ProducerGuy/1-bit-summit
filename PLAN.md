@@ -1019,7 +1019,7 @@ Status values: `done`, `open`.
 | C2 | Read the Bonsai-demo README, MODEL-FORMATS and Bonsai 1 guide | done |
 | C3 | Read the Qwen3-1.7B model card directly: architecture numbers, license file, recommended decoding, base versus instruct variant | open |
 | C4 | Establish the evaluation harness for Apple Silicon: can EvalScope score an OpenAI-compatible local server, are PrismML's hotfix scripts public, what is needed for sandboxed code benchmarks | open |
-| C5 | Read BitDistill, OneBit and BinaryLLM in full, including appendices and any released code, and extract exact losses, schedules and data | open |
+| C5 | Read BitDistill, OneBit and BinaryLLM in full, including appendices and any released code, and extract exact losses, schedules and data. Done in batch 2 (`docs/research/batch-2-findings.md`, section 3). Not available: training code for BitDistill and BinaryLLM | done |
 | C6 | Read PrismML's MLX and llama.cpp forks for the 1-bit and Hadamard kernel code paths. Done for the Hadamard path as merged into upstream llama.cpp (graph, loader, converter) and for the demo repository's format and backend documents (S66, S67). The MLX fork and the 1-bit kernels remain | open |
 | C7 | Read the independent Bonsai reproduction study (ThakiCloud/bonsai-1bit-repro) in full: REPORT.md, the paper and the fingerprint scripts. Its README is read | open |
 | C8 | Confirm which upstream MLX and mlx-lm versions load 1-bit g128 checkpoints | open |
@@ -1061,7 +1061,7 @@ Status values: `done`, `open`.
 | C59 | Block swap with PrismML's released binary 1.7B as the specimen: a full precision Qwen block placed in the trained binary network, and a binary block placed in the full precision network, after confirming layout and basis match. A network that gets worse with a restored block has co-adapted | open |
 | C60 | In C28 and C32: sensitivity from sampled gradients of teacher log-probabilities, input side and output side; spectra at rising sample counts; and the energy a calibration subspace misses on separate text. A rank no larger than the sample count is not evidence of redundancy | open |
 | C61 | Two-layer network test of the vertex penalty against straight-through training at equal steps (`exp_vertex_ml.py`) | done |
-| C62 | S53 read through an extraction of its tables 1, 2 and 4, method and limits (`docs/repair-candidates.md`, section 1). Still to read in full: S52 and S53 with code, "Model-Preserving Adaptive Rounding" (YAQA), "Linger and Lose: Knowledge Collapse in Low-Bit Language Models", "When Calibration Data Matter in Sub-4-Bit Language Model Quantization", and LR-QAT | open |
+| C62 | S53 read through an extraction of its tables 1, 2 and 4, method and limits (`docs/repair-candidates.md`, section 1). Still to read in full: S52 and S53 with code, "Model-Preserving Adaptive Rounding" (YAQA), and LR-QAT. "Linger and Lose" was read in full in batch 2 and "When Calibration Data Matter" in batch 1 | open |
 | C63 | LFM2: equivalence test of the convolution gauge on the real checkpoint; tensor counts from the checkpoint; LFM2-350M as the engineering check before the 1.2B transfer test; confirm the reported IQ1 builds of LFM2 derivatives and any published scores for them | open |
 | C64 | Teacher target cache: top-k logits plus the remaining probability mass as one bucket, which gives an exact coarse KL and a lower bound on the full KL; compare against full-vocabulary KL on a sample. Check `mlx_lm/quant/dwq.py`, which already caches teacher targets, as the starting point | open |
 | C65 | Format acceptance tests for T1: all-positive and all-negative groups, single-bit changes, zero groups, FP16 extremes, real tensor round trip, tied matrix not duplicated, cached decoding against a dense reference, file bytes against declared rate. MLX's affine 1-bit layout stores two values per group, 1.25 bits per weight, so the 1.125 claim is checked on the symmetric packed file | open |
@@ -1107,8 +1107,12 @@ Status values: `done`, `open`.
 | C106 | Ideas register: `docs/ideas.md`. Every unproven idea with its evidence, odds and cheapest proof | open, kept current |
 | C107 | Trials register: `docs/trials.md`. Every intended script or run with its justification. None has a written specification except M1 | open |
 | C108 | Open and check three sources the second reviewer surfaced from search excerpts: a second fingerprint analysis of the 1-bit 1.7B, a second discussion thread on the 27B model page, and the config files of the released 1.7B | open |
+| C109 | Batch 2 of the two-reviewer research (knowledge loss, optimizers for discrete weights, BitDistill with OneBit and BinaryLLM): `docs/research/batch-2-findings.md`, `docs/research/batch-2-second-reviewer.md`, `docs/research/batch-2-comparison.md`. Ideas I12 to I16 and trial S4 came out of it | done |
+| C110 | Paired damage map of the released 1-bit 1.7B against the teacher, forward passes only (`docs/trials.md`, S4): where the loss sits, whether the layers still line up, whether arithmetic width changes answers | open |
+| C111 | Settle on paper, for the sign-and-scale trial's specification: the learning-rate schedule (S73 against S85), the form of a budget on sign changes (I13), and the handling of the tied matrix's two roles (I12) | open |
+| C112 | Read the body of S33 and the PRISM article on recall under quantization (https://link.springer.com/article/10.1007/s10791-026-10580-5), both cited by the second reviewer and not opened by the first | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
-| C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
+| C37 | Read S33 and S34 in full, with released code. Done in batch 2 (`docs/research/batch-2-findings.md`, section 2). S33 is a refiner of error-compensated rounding at 3 and 4 bits with no 1-bit result. S34's one comparison with straight-through training is 100 steps on a 0.13B ternary checkpoint; its models up to 2.7B are trained from scratch with no straight-through baseline. Neither is a candidate optimizer. S34's code is not released | done |
 | C33 | Gauge search script: optimize the exact symmetries of Qwen3-1.7B toward plus or minus group scale and verify identical logits before and after | open |
 
 ### Build and trials
@@ -1200,6 +1204,15 @@ Status values: `done`, `open`.
 - S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
 - S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
 - S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S93. FujitsuResearch, OneCompression repository: JointQ source, benchmark reports and column-swap module. https://github.com/FujitsuResearch/OneCompression
+- S92. Hunyuan Team, "AngelSlim: A more accessible, comprehensive, and efficient toolkit for large model compression", 2026. https://arxiv.org/abs/2602.21233
+- S91. Wang, Yu, Zhao, Wang, Han, "LC-QAT: Data-Efficient 2-Bit QAT for LLMs via Linear-Constrained Vector Quantization", ICML 2026. https://arxiv.org/abs/2606.10531
+- S90. "Through a Compressed Lens", 2025. https://arxiv.org/abs/2505.13963
+- S89. "From Signal Degradation to Computation Collapse", Findings of ACL 2026. https://arxiv.org/abs/2604.19884
+- S88. Lv, Zhang, Xia, Ni, Yan, Yu, Hou, Yuan, Bai, "What Makes Low-Bit Quantization-Aware Training Work for Reasoning LLMs? A Systematic Study", 2026. https://arxiv.org/abs/2601.14888
+- S87. Okoshi, Otsuka, Fujiki, Motomura, "Towards Quantization-Aware Training for Ultra-Low-Bit Reasoning LLMs", ICLR 2026. https://proceedings.iclr.cc/paper_files/paper/2026/hash/209423f076b6479ab3a4f45886e30306-Abstract-Conference.html Code: https://github.com/yasu0001/ReasoningQAT
+- S86. "Train Where the Quantized Model Goes: On-Policy Distillation for Low-Bit Reasoning", 2026. https://arxiv.org/abs/2609.26708
+- S85. "Linger and Lose: Knowledge Collapse in Low-Bit Language Models", 2026. https://arxiv.org/abs/2609.32902
 - S84. Discussion thread on the second-generation 27B model page, "I took Bonsai 2 27B apart". https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/44
 - S83. Berkeley Function Calling Leaderboard release posts. https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html and https://gorilla.cs.berkeley.edu/blogs/12_bfcl_v2_live.html
 - S82. "APIGen: Automated Pipeline for Generating Verifiable and Diverse Function-Calling Datasets". https://arxiv.org/abs/2406.18518
