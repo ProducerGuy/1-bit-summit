@@ -35,7 +35,7 @@ The suite is PrismML's ten benchmarks, run the way its whitepaper states (append
 | MATH-500 | 500 | 8,192 | Exact match |
 | HumanEval+ | 164 | 8,192 | Pass at first attempt, augmented tests, code executed in isolation |
 | MBPP+ | 378 | 4,096 | Pass at first attempt, EvalPlus tests, code executed in isolation |
-| BFCL v3 | 13 single-turn subsets of the 17 | 4,096 | Mean over the 13 subsets, by syntax-tree match and execution |
+| BFCL v3 | 3,641 in the 13 single-turn subsets of the 17 | 4,096 | Mean over the 13 subsets, by syntax-tree match and execution |
 
 Settings for every model:
 
@@ -71,13 +71,13 @@ The outcome of acceptance is the row the ladder is missing: our own baseline on 
 
 ## 6. What the ruler can resolve
 
-Sampling error from the number of items alone, at the released 1-bit model's published scores. Item counts for MMLU-Redux (5,700), IFBench (300) and BFCL v3 (2,600) are assumptions to be replaced by the counts in the dataset files.
+Sampling error from the number of items alone, at the released 1-bit model's published scores. Item counts for MMLU-Redux (5,700) and IFBench (300) are assumptions to be replaced by the counts in the dataset files. BFCL v3 is the unweighted mean of 13 subsets of 16 to 1,053 items, so its error is set by the smallest subsets.
 
 | Quantity | Standard error |
 |---|---|
 | MMLU-Redux score | 0.7 points |
-| BFCL v3 score | 0.9 |
 | GSM8K score | 1.3 |
+| BFCL v3 score | 1.7 |
 | MuSR score | 1.8 |
 | IFBench score | 2.0 |
 | IFEval score | 2.1 |
@@ -91,7 +91,7 @@ Sampling error from the number of items alone, at the released 1-bit model's pub
 
 - A five-point step is 2.9 standard errors of the difference before pairing. Both models answer the same questions, so the paired comparison is tighter than this.
 - The whole suite resolves a step. A single small benchmark does not: a 5-point move on HumanEval+ alone is inside its noise.
-- A three-benchmark screen (MATH-500, BFCL v3, GSM8K) has a standard error of 3.8 summed points on a difference. Candidate 1 aims at 29 summed points, most of them on these three. The screen is for choosing between settings. A step is only ever counted on the full suite.
+- A three-benchmark screen (MATH-500, BFCL v3, GSM8K) has a standard error of 4.3 summed points on a difference. Candidate 1 aims at 29 summed points, most of them on these three. The screen is for choosing between settings. A step is only ever counted on the full suite.
 
 ## 7. Records kept for every scored model
 
@@ -102,7 +102,7 @@ Sampling error from the number of items alone, at the released 1-bit model's pub
 | Benchmark | Each failed item is sorted into one of |
 |---|---|
 | MATH-500, GSM8K | Correct answer never appears; correct answer appears and is not the final answer; output cut at the limit; answer not extractable |
-| BFCL v3 | No call where one was required; a call where none was required; wrong function; right function with wrong or malformed arguments; output not parseable as a call |
+| BFCL v3 | No call where one was required; a call where none was required; wrong function; right function with wrong or malformed arguments; output not parseable as a call. Reported for each of the 13 subsets |
 | HumanEval+, MBPP+ | Does not parse; fails at run; runs and returns wrong results; cut at the limit |
 | MMLU-Redux, GPQA Diamond, MuSR | Wrong choice; no choice extractable. Reported per subject for MMLU-Redux |
 | IFEval, IFBench | Which constraint types failed |
@@ -148,6 +148,6 @@ What the split decides:
 ## 12. Gaps
 
 - PrismML's exact dataset revisions and its two harness patches are named in the whitepaper and not published with it. Acceptance (section 5) is the test of whether this matters.
-- IFBench's item count and the 13 BFCL subset names must be read from the datasets.
+- IFBench's item count must be read from the dataset. Two BFCL subsets have 16 and 18 items and each carries one thirteenth of the BFCL score.
 - The suite is scored with thinking off. A thinking-mode suite would measure different damage and is not part of this ruler.
 - The standard errors of section 6 are from item counts alone. They do not include run-to-run drift, which acceptance requires to be zero.

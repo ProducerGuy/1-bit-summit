@@ -1,6 +1,6 @@
 # 1 Bit Summit: research plan
 
-Status date: 2026-11-23
+Status date: 2026-11-24
 
 ## 1. Purpose
 
@@ -1103,6 +1103,10 @@ Status values: `done`, `open`.
 | C102 | Read S74, S75 and S76 in full. S74 and S76 read in whole; S75 read to 200,000 of 277,669 characters. What each establishes is in `docs/repair-candidates.md`, section 1 | open |
 | C103 | Ranked repair candidates document (section 1B, step 3): `docs/repair-candidates.md`, first reviewer's version. The second reviewer's version is returned and compared: it confirms the damage ranking on the six benchmarks it could read, misses MATH-500, and starts every candidate from a conversion of our own. Adopted from it: the category guardrail and the per-item gained and lost lists, now in `docs/ruler-spec.md` | done |
 | C104 | Ruler specification (section 1B, step 4): `docs/ruler-spec.md`. Three decisions in its section 11 are the project owner's | written, decisions open |
+| C105 | Batch 1 of the two-reviewer research (tool-calling data, ScaleQ and CAT-Q with code, the public record on PrismML's method): `docs/research/batch-1-findings.md`, `docs/research/batch-1-second-reviewer.md`, `docs/research/batch-1-comparison.md` | done |
+| C106 | Ideas register: `docs/ideas.md`. Every unproven idea with its evidence, odds and cheapest proof | open, kept current |
+| C107 | Trials register: `docs/trials.md`. Every intended script or run with its justification. None has a written specification except M1 | open |
+| C108 | Open and check three sources the second reviewer surfaced from search excerpts: a second fingerprint analysis of the 1-bit 1.7B, a second discussion thread on the 27B model page, and the config files of the released 1.7B | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. S34 reports a discrete-weight optimizer that outperforms straight-through training on language models up to 2.7B parameters and is a candidate optimizer for the race | open |
 | C33 | Gauge search script: optimize the exact symmetries of Qwen3-1.7B toward plus or minus group scale and verify identical logits before and after | open |
@@ -1196,6 +1200,14 @@ Status values: `done`, `open`.
 - S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
 - S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
 - S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S84. Discussion thread on the second-generation 27B model page, "I took Bonsai 2 27B apart". https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/44
+- S83. Berkeley Function Calling Leaderboard release posts. https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html and https://gorilla.cs.berkeley.edu/blogs/12_bfcl_v2_live.html
+- S82. "APIGen: Automated Pipeline for Generating Verifiable and Diverse Function-Calling Datasets". https://arxiv.org/abs/2406.18518
+- S81. "Hammer: Robust Function-Calling for On-Device Language Models via Function Masking". https://arxiv.org/abs/2410.04587
+- S80. "ToolFlow". https://arxiv.org/abs/2410.18447
+- S79. Roshaan, Aaliyan, Bin Zubair, "Compression Breaks Discipline", NeurIPS 2026 workshop. https://neurips.cc/virtual/2026/171153
+- S78. "SAGE", 2026. https://arxiv.org/abs/2610.14745
+- S77. "ThinkBit: Search Codewords, Recalibrate Scales, Select by Reasoning", 2026. https://arxiv.org/abs/2610.34886
 - S76. Lotfi, Kirichenko, Li, Liu, "Quantized Reasoning Models Think They Need to Think Longer, but They Do Not", 2026. https://arxiv.org/abs/2606.00206
 - S75. Wu, Dhiman, Koshiyama, "Which Decisions Low-Bit Quantization Breaks, and How to Predict Them", 2026. https://arxiv.org/abs/2608.06564
 - S74. Lee, Yang, Choi, Yang, "LFQ: Logit-aware Final-block Quantization for Boosting the Generation Quality of Low-Bit Quantized LLMs", ICML 2026. https://arxiv.org/abs/2605.29756
