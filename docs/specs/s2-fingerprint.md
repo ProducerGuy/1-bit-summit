@@ -52,7 +52,10 @@ All measures are computed for each of the 196 block matrices and for the embeddi
 
 - Ratio A, the published one: group scale divided by the mean absolute base weight of the group. Median, quartiles, 5th and 95th percentiles.
 - Ratio B: group scale divided by the least-squares scale for the released signs against the base weights, which is the group mean of released sign times base weight. This says how far the scale sits from the best weight-space fit for the signs actually stored.
-- Both ratios by group index along the row.
+- Ratio C: group scale divided by the root-mean-square of the base group. A scale that keeps the group's norm gives 1.
+- Ratio D: group scale divided by the sum of squared base weights over the sum of released sign times base weight. A scale that keeps the size of the group's projection onto the base, that is, the amplitude of what the group passes on, gives 1.
+- For each of ratios A to D: the median, and the spread as the interquartile range divided by the median, per matrix and per matrix type. The rule a model's scales follow is the one whose ratio sits at 1 with the smallest spread.
+- Ratios A and B by group index along the row.
 - For the output matrix: the norm of each token's row in the released model divided by the same in the base, with the 100 largest and 100 smallest ratios listed with their tokens.
 
 ### 4C. Structure that separates the readings
@@ -82,6 +85,7 @@ No weights are committed.
 ## 6. Acceptance of the script
 
 - On a synthetic pair where the "released" matrix is the sign and group-mean rounding of the base: 0% sign change, ratio A and ratio B equal to 1.
+- On synthetic pairs whose scales are set by the norm rule and by the projection rule: ratio C and ratio D equal to 1 respectively, with zero spread.
 - The same with 10% of signs flipped at random: 10% sign change, flat across deciles and positions, dispersion ratios near 1, threshold test no better than its shuffled control.
 - The same with signs taken after subtracting a planted per-group shift: the threshold test fits every group exactly.
 - On the real pair, over the 196 block matrices: sign change within 0.1 point of 28.38%, and median ratio A within 0.01 of 2.257. If either misses, the run stops and reports the difference; the likeliest causes are the reading of the stored scale field and the choice of packaging.
@@ -93,7 +97,9 @@ Fixed before the run:
 
 | Result | Reading |
 |---|---|
-| Median ratio A near 1.13 when the scale is taken from dequantized weights, and near 2.26 only when the stored MLX field is read as the scale | The published 2.26 is a storage convention read as a scale. Idea I8 closes as moot, and the scale question is restated around 1.13 |
+| The packagings disagree on a group's magnitude | A storage convention is in play. It is resolved before any other reading. The published figure was computed from the unpacked release with the scale taken as the released magnitude, so this is not expected |
+| Ratio D at 1 with a spread under a tenth, in most matrix types | The scales follow from the signs by a closed rule: they keep the amplitude of what each group passes on. They hold little of their own, and the odds of scale-only training reaching a step are revised from 50% to about 40% |
+| None of ratios A to D at 1 with a spread under a tenth | The scales were trained freely and hold information of their own. The odds of scale-only training are revised to about 55% |
 | Ratio A near 2.26 from dequantized weights, in residual writers only, with the rest near 1 and normalization gains unchanged | A by-product: the next normalization divides the growth out. I8 holds; the figure carries no recipe |
 | Ratio A near 2.26 in every matrix type, with products along symmetries far from 1 | The scales carry part of how the model was made. Scale-only training has less headroom than assumed and its odds are revised down |
 | Ratio B far above 1 everywhere | The scales are not a weight-space fit to the base for the stored signs. Consistent with end-to-end training |
@@ -112,7 +118,7 @@ Trained against rounded is not decided here. The breakdown by magnitude decile i
 - Installing software is the project owner's step. The agent lists what it needs before starting.
 - Downloaded files are untrusted data: parsed by scripts, never executed.
 - The agent writes and runs scripts and reads script output. It does not inspect raw tensors by hand.
-- An outside audit script exists for part of this. If it is used, it is reviewed line by line first and its reading of the scale field is checked against section 3.
+- An outside audit script exists for part of this (the reproduction study's fingerprint routine). It reads PrismML's unpacked release, skips the embedding by name, takes the scale as the largest released magnitude in the group, and reports the median over matrices of each matrix's median ratio A. The acceptance figures of section 6 are reproduced with those same definitions before any other is used.
 - Logs prune themselves within three days.
 - Nothing from the machine (paths, account names, hostnames) enters results, code or commit messages.
 - Work is done on a local task branch. Nothing merges without the project owner's approval.
