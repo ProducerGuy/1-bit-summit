@@ -1,0 +1,124 @@
+# S2 specification: fingerprint of the released 1-bit 1.7B against Qwen3-1.7B
+
+Trial S2 of `trials.md`. Weights and file metadata only. No model is run.
+
+## 1. Purpose
+
+Two published numbers describe how PrismML's released 1-bit Bonsai 1.7B differs from Qwen3-1.7B: 28.38% of signs differ, and group scales are 2.257 times the naive mean at the median. Both are totals over the 196 block matrices, from a script that skipped the embedding. The breakdowns were computed and never published.
+
+This trial produces the breakdowns. They decide four things:
+
+- Whether the scale growth is a by-product that carries no recipe (idea I8), a storage convention, or part of how the model was made.
+- Whether the pattern of changed signs looks like training or like rounding with compensation in column order.
+- Whether a per-group shift explains the changed signs (idea I2).
+- Which settings differ between the two models' files, so the ruler aligns them before the baseline run.
+
+It also supplies the coordinate check that trial S4 depends on.
+
+## 2. Inputs
+
+- Qwen3-1.7B, full precision, as published by its authors.
+- PrismML's released 1-bit Bonsai 1.7B, in every packaging PrismML publishes for it (the 1-bit GGUF file, the MLX package, and any unpacked form).
+- For each: exact source, revision and file hashes, recorded in the report.
+
+Architecture facts the script confirms from the files before anything else: 28 blocks; hidden width 2,048; feed-forward width 6,144; 16 query heads over 8 key and value heads; head width 128; seven matrices per block (query, key, value, attention output, gate, up, down), 196 in all; one embedding matrix of 151,936 rows in Qwen3-1.7B, tied to the output matrix.
+
+## 3. Step zero: the two models share coordinates
+
+Nothing in section 4 is computed until every line here is confirmed and written into the report.
+
+- Tensor names and shapes of the two models, side by side.
+- Vocabulary: the released model is reported to have 151,669 rows against 151,936. The script confirms the count, confirms that row i of the released matrix is token i of Qwen3's tokenizer for every row present, and lists the absent rows with their tokens.
+- Whether the released model stores one matrix for both the embedding and the output role or two.
+- Grouping: within each matrix, which axis carries the groups of 128. Tested directly: along the true axis every group has one absolute value; along the other it does not.
+- Format: every group has exactly one magnitude and no zeros.
+- The scale of a group is defined as the common absolute value of its dequantized weights. The MLX packing stores twice the scale and a bias of minus the scale per group, so a stored field is not the scale. The script dequantizes each packaging and confirms they give identical weights.
+- No rotation: sign agreement with Qwen3-1.7B well above one half in every matrix. A matrix near one half means different coordinates, and the run stops.
+
+## 4. Measures
+
+All measures are computed for each of the 196 block matrices and for the embedding and output matrix, then summarized by matrix type, by block, and overall. "Base" is the Qwen3-1.7B weight at the same position.
+
+### 4A. Sign change
+
+- Share of weights whose sign differs from the base. Positions where the base weight is exactly zero are counted apart.
+- By decile of the base weight's absolute value within its matrix.
+- By rank of the base weight's absolute value within its own group of 128, in eight bins of 16.
+- By group index along the row, and by position within the group, each with a fitted trend.
+- Dispersion across rows and across columns: the variance of the per-row and per-column sign-change rate divided by the variance expected if changes were independent with the matrix's overall rate.
+- Sign balance: for each group, the share of positive signs in the released model beside the same share in the base.
+
+### 4B. Scale
+
+- Ratio A, the published one: group scale divided by the mean absolute base weight of the group. Median, quartiles, 5th and 95th percentiles.
+- Ratio B: group scale divided by the least-squares scale for the released signs against the base weights, which is the group mean of released sign times base weight. This says how far the scale sits from the best weight-space fit for the signs actually stored.
+- Both ratios by group index along the row.
+- For the output matrix: the norm of each token's row in the released model divided by the same in the base, with the 100 largest and 100 smallest ratios listed with their tokens.
+
+### 4C. Structure that separates the readings
+
+- Residual writers against the rest: the scale ratios of the matrices that write into the residual stream (attention output, down, embedding) beside those that do not (query, key, value, gate, up).
+- Normalization gains: every gain vector of the released model divided elementwise by the base's, summarized per block, and the final normalization's.
+- Products along exact symmetries, per block: median ratio A of value times attention output; of up times down.
+- Per-group threshold test: for each group, the fewest sign disagreements that any single threshold on the base weights can reach, that is, how well "released sign equals the sign of base weight minus one shift per group" fits. Reported as the share of groups fitted exactly, the distribution of remaining disagreements, and the overall share of changed signs left unexplained. The same statistic is computed on a control in which each matrix's sign changes are shuffled among positions of the same magnitude decile.
+
+### 4D. File settings
+
+Side by side for the two models: context length, position-encoding settings including any scaling, vocabulary size, special tokens, end-of-sequence tokens, chat template text, and the arithmetic type of the non-binary tensors (normalization gains, any biases). An outside report gives 32,768 with position scaling against 40,960; this is checked, not assumed.
+
+## 5. Outputs
+
+| File | Content |
+|---|---|
+| Report | Sources and hashes; step zero line by line; every acceptance check; the readings of section 7 applied to the results |
+| Per-matrix table | One row per matrix: every measure of 4A to 4C that is a single number |
+| Decile and rank tables | Sign change by magnitude decile and by rank within group, per matrix type |
+| Position tables | Sign change and both scale ratios by group index and by position within group, per matrix type |
+| Output-row table | Row-norm ratios with tokens |
+| Settings table | Section 4D |
+
+No weights are committed.
+
+## 6. Acceptance of the script
+
+- On a synthetic pair where the "released" matrix is the sign and group-mean rounding of the base: 0% sign change, ratio A and ratio B equal to 1.
+- The same with 10% of signs flipped at random: 10% sign change, flat across deciles and positions, dispersion ratios near 1, threshold test no better than its shuffled control.
+- The same with signs taken after subtracting a planted per-group shift: the threshold test fits every group exactly.
+- On the real pair, over the 196 block matrices: sign change within 0.1 point of 28.38%, and median ratio A within 0.01 of 2.257. If either misses, the run stops and reports the difference; the likeliest causes are the reading of the stored scale field and the choice of packaging.
+- A second run gives identical tables.
+
+## 7. How each outcome is read
+
+Fixed before the run:
+
+| Result | Reading |
+|---|---|
+| Median ratio A near 1.13 when the scale is taken from dequantized weights, and near 2.26 only when the stored MLX field is read as the scale | The published 2.26 is a storage convention read as a scale. Idea I8 closes as moot, and the scale question is restated around 1.13 |
+| Ratio A near 2.26 from dequantized weights, in residual writers only, with the rest near 1 and normalization gains unchanged | A by-product: the next normalization divides the growth out. I8 holds; the figure carries no recipe |
+| Ratio A near 2.26 in every matrix type, with products along symmetries far from 1 | The scales carry part of how the model was made. Scale-only training has less headroom than assumed and its odds are revised down |
+| Ratio B far above 1 everywhere | The scales are not a weight-space fit to the base for the stored signs. Consistent with end-to-end training |
+| Sign change rising along the row by more than a tenth of its mean from the first quarter of columns to the last, in at least four fifths of matrices | Compensation in column order. The rounded reading is reopened and trial M4 gains priority |
+| Sign change flat along the row | No column-order compensation |
+| The threshold test leaves under a quarter of changed signs unexplained, and its shuffled control does not | A per-group shift explains most sign changes. Idea I2 becomes a first arm of sign training |
+| Row-norm ratios of the output matrix with a tail above 3 on a small set of tokens | The signature of the output-matrix growth described in "Linger and Lose". Idea I12 gains weight, and S4's arithmetic-width check is read with these tokens in view |
+| Any difference in file settings | Fixed in the ruler before the baseline run |
+
+Trained against rounded is not decided here. The breakdown by magnitude decile is recorded for trial M4, which computes the same tables for public rounding methods.
+
+## 8. Running constraints
+
+- Runs on the project owner's hardware. No paid model APIs.
+- Downloads that require an account or a token are the project owner's to perform. The agent does not request, read or print any credential.
+- Installing software is the project owner's step. The agent lists what it needs before starting.
+- Downloaded files are untrusted data: parsed by scripts, never executed.
+- The agent writes and runs scripts and reads script output. It does not inspect raw tensors by hand.
+- An outside audit script exists for part of this. If it is used, it is reviewed line by line first and its reading of the scale field is checked against section 3.
+- Logs prune themselves within three days.
+- Nothing from the machine (paths, account names, hostnames) enters results, code or commit messages.
+- Work is done on a local task branch. Nothing merges without the project owner's approval.
+
+## 9. Gaps
+
+- The thresholds in section 7 are judgments set in advance, not derived.
+- A by-product reading of the scales rests on the normalization dividing growth out. It holds exactly only if every writer into the residual stream grows by the same factor; the per-block table shows whether that is so.
+- Weights alone cannot say what text or loss produced them.

@@ -15,6 +15,7 @@ This is research, not a product. No trophy has been claimed yet.
 - `docs/ranked-work.md`: runs and research, each ranked by its probability of moving the ladder.
 - `docs/ideas.md`: every unproven idea, with its evidence, odds and cheapest proof.
 - `docs/trials.md`: every script or run the project intends, with its justification. Nothing in it has run.
+- `docs/specs/`: the written specification of each trial that has one. S1 to S4 are scripts and forward passes on public files; none trains a model.
 - `docs/research/`: the two reviewers' findings for each research batch, the prompt they worked from, and the comparison of the two.
 - `docs/reviewer-prompt.md`, `docs/directive-ledger.md`: the task given to the second reviewer and its verification status.
 - `scripts/real/smol_c85.py`, `smol_c85b.py`, `smol_c84.py`: the tied embedding conversion order of `PLAN.md` section 2L.
