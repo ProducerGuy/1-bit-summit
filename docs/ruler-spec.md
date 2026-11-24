@@ -146,6 +146,8 @@ What the split decides:
 | Category guardrail | Proposed: a step does not count if any one benchmark falls by more than twice the standard error of its paired difference. Alternative: no benchmark may fall below the previous step at all | Whether a step can be bought by trading one ability for another |
 | Starting model of the first step | PrismML's released 1-bit 1.7B, or only models converted by us | With the released model, the first step is a repair of an existing model at our exact format and the baseline is already published. Without it, the ladder starts at our own conversion, which has no measured baseline |
 | Rotation | Inside the format, or a format change | A fixed rotation adds no stored bits and adds a transform at inference. PrismML's first-generation 1-bit format has none; its second-generation ternary format has one |
+| A second set of scales for the tied matrix | Inside the format (1.148 bits per weight, as Boole-1.7B ships), or not (1.125, as PrismML ships) | Whether Boole counts as a model at our format and can be a starting model, and whether the tied matrix's two roles may be separated by added scales or only within one set |
+| Which model the steps count from | PrismML's 1-bit 1.7B as now, or the best released model at the format that this ruler confirms | Where the next five points start. By its maker's run Boole-1.7B is about nine points above PrismML's model |
 
 ## 12. Gaps
 

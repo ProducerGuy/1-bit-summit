@@ -16,6 +16,8 @@ Two lists. Runs are ranked by the probability that each earns a step of five poi
 
 Ranks 1 and 2 together: about 74%. The evidence for each is in the findings of batches 1 to 4 under `research/`. A stage of on-policy distillation after rank 1 is judged at 52% to add at least a third of a step (`ideas.md`, I14); it is not ranked as a step of its own.
 
+A second released 1-bit conversion of Qwen3-1.7B exists: Boole-1.7B, published at 85.9% by its maker's run, where that run gives PrismML's model 76.4% (`research/batch-4-pair-search-comparison.md`). If the ruler confirms it and the owner admits its second set of tied-matrix scales, ranks 1 and 2 start from it and the line they must beat moves up by about nine points.
+
 Two runs earn no step and decide what the others are worth:
 
 | Run | Probability | What it gives |
