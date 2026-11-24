@@ -12,7 +12,9 @@ Reference figures: the released 1-bit 1.7B keeps 70.2% of Qwen3-1.7B on the ten-
 |---|---|---|
 | The outside reproduction study, https://github.com/ThakiCloud/bonsai-1bit-repro | REPORT.md, results.json, paper/main.tex, README, and all five scripts, each in full | Repository read directly |
 | PrismML's launch press release, https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model | The technical-details passage as returned by search | Search result |
-| A second fingerprint analysis (Kalaris Labs), a second discussion thread on the 27B model page, the config files of the released 1.7B | Not opened. See section 7 | |
+| A second fingerprint analysis, Kalaris Labs, "PrismML Bonsai: the team and how to reverse-engineer 1-bit LLMs", 28 October 2026, https://kalarislabs.com/blog/prismml-bonsai-team-1-bit-reverse-engineering | The whole page, two extractions | Direct |
+| Discussion 62 on the 27B model page, "I took Bonsai 2 27B apart, part 2", https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/62 | The whole thread, one extraction | Direct |
+| The config files of prism-ml/Bonsai-1.7B-unpacked and Qwen/Qwen3-1.7B | Both in full | Direct |
 
 ### 1B. Facts: how the two published numbers were computed
 
@@ -23,6 +25,25 @@ Reference figures: the released 1-bit 1.7B keeps 70.2% of Qwen3-1.7B on the ten-
 - "Identical to naive": 0.03% of released weights equal the plain sign-and-mean conversion of the base.
 - Structure check: on one matrix, the first 2,000 groups each hold exactly one magnitude and no zeros.
 - No breakdown is published. The script prints the first four and last four matrices and stores only totals. Nothing by kind of matrix, by weight magnitude or by position exists in this source.
+
+### 1B2. Facts: the second analysis
+
+It reads PrismML's unpacked 16-bit files against Qwen3-1.7B, Qwen3-1.7B-Base and Qwen3-8B. Its sample is the seven matrices of blocks 0, 14 and 27 of the 1.7B, 8,192 embedding rows taken at several places in the vocabulary, and for the 8B two matrices of one block plus embedding and output rows. Its script is printed in the page; no repository.
+
+- The tied embedding and output matrix of the 1-bit 1.7B is not trained. Its signs agree with the base in 99.9% of places and its scales are within about 1% of the group mean. It is the plain sign-and-mean conversion.
+- In the 8B, where the two matrices are separate, the embedding is the same plain conversion (99.8% to 99.95%, scale ratio 1.000) and the output matrix is trained: the rows of the first 128 token numbers agree in 80% of signs with a median scale of 1.70 times the plain value; 128 rows starting at token 100,000 agree in 90% with scales within 1%.
+- The body of the 1.7B is trained. Sign agreement is 71% on average and 64% to 79% by matrix. Within each group, 6.7% of the largest tenth of weights changed sign and 47.5% of the smallest tenth. Its cosine to the base is 0.50, against 0.79 for the plain conversion.
+- Body scales: the median ratio to the group mean is 2.1 in this sample, about 1.2 in the query matrices and above 3 in the value and up matrices. The scale's correlation with the base group's mean is about 0.9 in some attention matrices and about zero in the last block's feed-forward matrices.
+- Normalization gains barely moved: under 0.1% in blocks 14 and 27. The first block's input gain moved 12%.
+- Every matrix checked is closer to the post-trained Qwen3-1.7B than to Qwen3-1.7B-Base.
+- The first-generation ternary 1.7B: embedding 100% plain conversion; body 86% agreement on non-zeros, scale ratio 1.9, 39% zeros.
+
+### 1B3. Facts: the thread and the config files
+
+- The thread is about the ternary 27B and matches the forensics repository read in batch 1. No PrismML staff reply. It states independently that the reproduction study's "2.1 times" result is produced by scoring on the calibration passage, and that the same settings collapse by a thousand to thirty-five thousand times on held-out text.
+- Its 1.7B ternary table: a mirror map at two settings is 23.01 times the teacher's perplexity against 2.93 for the straight-through control; the rotation inside training takes 2.09 to 1.37; a managed decay of the rate reaches 1.14 and 1.11 on two seeds; a constant rate diverges past 16,000 steps; 32-bit weights behind the codes change nothing (23.94 to 23.79).
+- One new experiment: on a frozen ternary model with routed experts, 6.29M correction parameters placed on the residual stream recover 158 times in perplexity, and 52M placed inside the experts recover 6 times. Where a correction sits mattered more than its size. It uses extra full-precision parameters, so it is outside our format.
+- Config files, released 1-bit 1.7B against Qwen3-1.7B: vocabulary 151,669 against 151,936; maximum positions 32,768 against 40,960; position scaling of the YaRN kind with factor 4.0 over an original length of 8,192 against none; both tie the embedding to the output matrix; the same 28 blocks, widths and head counts.
 
 ### 1C. Facts: what the study's quality claims rest on
 
@@ -46,27 +67,36 @@ This is inference, not a measurement.
 | Root-mean-square of the base group | The group's norm | About 1.25 for bell-shaped weights, 1.41 for heavier tails |
 | Sum of squared base weights divided by the sum of sign times base weight | The size of the group's projection onto the base, that is, the amplitude of the signal the group passes on | 1.57 for bell-shaped weights and 2.0 for heavier tails with no flips; 2.0 to 2.3 with 5% to 15% of weight mass flipped |
 
-- Only the third rule lands near 2.26. So the published figure is about what scales look like when they keep the amplitude of what each group passes on, not when they minimize weight error. End-to-end training against a teacher would push scales the same way.
+- Only the third rule lands near 2.26. So the published total is about what scales look like when they keep the amplitude of what each group passes on, not when they minimize weight error. End-to-end training against a teacher would push scales the same way.
+- The second analysis shows the total hides a wide spread: about 1.2 in query matrices, above 3 in value and up matrices. No single rule gives 1.2: the third rule's floor is 1.57. And in the last block's feed-forward matrices the scale has no correlation with the base group's size. So the body's scales were trained freely, at least in part.
 - This is testable from weights alone, per group: divide the released scale by each of the three closed forms and see which ratio clusters tightly at 1.
 - If the third rule fits tightly, the scales carry little that is specific to PrismML's recipe: they follow from the signs. That would lower the headroom of scale-only training. If no rule fits tightly, the scales were trained freely and hold information of their own.
 
 ### 1E. Answer
 
-- Two numbers exist, both totals over the 196 block matrices, both from PrismML's own unpacked release, with the scale defined as released magnitude over mean absolute base weight. No breakdown, no embedding figure, no file-settings comparison in this source.
+- The released 1-bit 1.7B is two different things. Its body, 82% of the weights, is trained: signs and scales both moved far from the plain conversion. Its tied embedding and output matrix, 18% of the weights and the whole of the last decision, is the plain conversion and was never trained.
+- PrismML did train the output matrix where it was a separate matrix, in the 8B. Of the two row ranges sampled there, the first 128 token numbers moved far more than rows near token 100,000.
+- The two published totals (28.38% and 2.257) are over the 196 block matrices from PrismML's unpacked release. The second analysis adds breakdowns on a sample of three blocks: by matrix type for scales, and the top and bottom tenth by magnitude for signs. Nothing exists by position, and nothing for all 28 blocks.
+- The file settings differ in vocabulary size, maximum length and position scaling. Each model has to be run with its own.
 - The study's reading (rounding with error compensation, no retraining) is not supported by its own evidence. Its error-compensated conversions never reach a working model out of sample, and its argument from sign agreement does not separate training from rounding.
 - PrismML's press release says a first-generation 1-bit model was trained.
-- The S2 specification already asks for every missing breakdown. This reading adds one test to it: the three closed-form scale rules.
+- The S2 specification already asks for every missing breakdown. This reading adds one test to it, the three closed-form scale rules, and one expectation: the tied matrix should come out as the plain conversion.
+- Inference, to be tested: in Qwen's vocabulary the lowest token numbers are single characters, among them digits, quotes, brackets and braces. Those are the output rows that moved in the 8B sample. In the 1.7B they were not moved at all, and the 1.7B's two largest losses are mathematics and tool calling, where the 8B keeps 78% and 81% against 46% and 49%. Part of the 1.7B's loss may sit in output rows that were never trained.
 
 ### 1F. What it means for the next five points
 
-- First-generation 1-bit trained end to end: 90% before, 93% after.
-- Scale-only training reaches a step: 50% before, 50% after. The three-rule test in S2 will move it. A tight fit to the third rule lowers it to about 40%; no tight fit raises it to about 55%.
+- The body of the first-generation 1-bit 1.7B was trained: 90% before, 97% after.
+- The tied embedding and output matrix of the 1.7B was left as the plain conversion: 85%. One source, a sample of rows, supported by the first block's input gain being the only gain that moved.
+- Scale-only training reaches a step: 50% before, 58% after. The body's scales are already trained, which takes headroom away. The tied matrix's scales, 16 per token, have never been trained, and they sit at the last decision, which adds headroom of a kind nobody has used.
+- The paired damage map (S4) gains a sharp question: with the teacher's full-precision matrix put in the output role of the released model, and nothing else changed, how many lost items return.
 - The reproduction study's error-compensated conversion is the reference implementation for "rounded with compensation" in trial M4. Its scale is the mean of the error-updated block and its signs are those of the error-updated weights, column by column, so its sign changes should rise along each row. S2 already measures that trend on the released model.
 
 ### 1G. Still unknown
 
-- Everything the three unopened sources hold: sign change by magnitude decile, scale by kind of matrix, and the file settings.
-- Any figure for the tied embedding and output matrix.
+- Which 8,192 rows of the tied matrix were sampled, and whether all rows are the plain conversion.
+- The breakdowns over all 28 blocks, by position, and by matrix type for sign changes.
+- Whether the released model was trained with its declared position scaling or had it added afterwards.
+- Whether the 4B, which keeps 61% of tool calling, ties its matrices and how they were treated.
 
 ## 2. Bringing reasoning back with the model's own text
 
@@ -147,7 +177,7 @@ This is inference, not a measurement.
 |---|---|---|
 | WinQ, https://arxiv.org/abs/2605.17471 | Abstract page and the whole paper, one extraction | Direct |
 | WinQ's code, https://github.com/facebookresearch/WinQ | The reset routine, the quantizer file, the sample training script and the README, in full | Repository read directly |
-| "Latent Weights Do Not Exist" (Bop), https://arxiv.org/abs/1906.02107 | Abstract and method summary as returned by search | Search result |
+| "Latent Weights Do Not Exist" (Bop), https://arxiv.org/abs/1906.02107 | The whole paper, one extraction | Direct |
 | "Error Diffusion Replaces Latent Weights: Training Binary-Weight Language Models on a Few Bits of Dithered State", https://arxiv.org/abs/2610.34566 | The whole paper, one extraction | Direct |
 
 ### 3B. Facts
@@ -173,7 +203,7 @@ This is inference, not a measurement.
 
 ### 3B2. Facts: training binary weights with nothing behind the sign but a small counter
 
-- Bop (2019, vision models) is an optimizer whose only action is to flip a weight, when a gradient signal that stays consistent over steps passes a threshold. It reads the size of the weight behind a sign as inertia against flipping, nothing more.
+- Bop (2019, vision models) is an optimizer whose only action is to flip a weight, when a gradient signal that stays consistent over steps passes a threshold. It reads the size of the weight behind a sign as inertia against flipping, nothing more. It proves that the binary weights are unchanged when the learning rate and the starting size are scaled together, so only their ratio matters. Settings that flip aggressively learn fast and then level off at worse accuracy; a threshold that filters weak signals helps most; settings that flip too rarely barely learn. On ImageNet it is 0.2 to 1.7 points above ordinary training.
 - The error-diffusion paper (2026) applies the idea to language models. Each weight keeps its sign and a counter of 2 to 8 bits. The gradient, divided by the scale and multiplied by one rate, accumulates in the counter; the sign flips when the counter points away from it and reaches the threshold. Scales are fixed per layer; embeddings, normalizations and the output matrix are full precision. Models are trained from scratch, up to a 19M binary core, on byte-level and tokenized text.
 - Against ordinary training with full-precision weights behind the signs, its loss is within 0% to 3% at every size when a cap is on.
 - It measures sign changes. In a 19M run about 37 to 38 thousand signs flip per step (0.2% of the core). In an avalanche the count doubles to 79 thousand, validation loss rises by 0.6 to 1.4 nats within 100 steps, and the core then runs at a tenth of its flip rate. Two of five uncapped runs stalled this way. A cap on each weight's movement per step (a quarter of the distance to the threshold) removed every stall: the gap to ordinary training fell from 10.2% and 16.5% to 1.0% and 0.3%.
@@ -208,22 +238,26 @@ This is inference, not a measurement.
 - The scale-only trial can carry the on-policy arm from its start. The loss needs no rewards, so the arm needs no answer checkers.
 - The question of what the released model's scales are has a sharper form: do they follow from the signs by a closed rule, or were they trained freely. One added table in S2 answers it and moves the odds of scale-only training in a stated direction either way.
 - Starting from a binary model with nothing behind its signs is now supported from three directions: OneBit starts there, WinQ shows moving toward that state helps, and the error-diffusion paper resumes training from it and matches the run that kept everything.
+- The largest fact of this batch is about where PrismML did not train. The tied matrix of the 1.7B is the plain conversion. Scale training there, with its two roles handled separately (idea I12), is the least explored part of the released model and the cheapest to try, because it is 2.4 million scales.
 - The reproduction study should no longer be cited for "no retraining" or for "public methods reach twice the perplexity". Neither survives a reading of its scripts.
 
 ## 5. Probabilities after this batch
 
 | Candidate | Before | After | Reason |
 |---|---|---|---|
-| Scale-only training from the released 1-bit 1.7B reaches a step | 50% | 50% | Waits for the three-rule test in S2: about 40% if scales follow from the signs, about 55% if not |
-| Sign and scale training from the same model reaches a step | 63% | 65% | Second paper on the teacher for on-policy training; starting from bare signs supported again |
-| Either of the two | 70% | 72% | |
+| Scale-only training from the released 1-bit 1.7B reaches a step | 50% | 58% | The tied embedding and output matrix was never trained; the body's scales already were |
+| Sign and scale training from the same model reaches a step | 63% | 67% | Second paper on the teacher for on-policy training; starting from bare signs supported again; an untrained output matrix to train |
+| Either of the two | 70% | 75% | |
+| The tied matrix of the released 1.7B is the plain conversion | Not held | 85% | One analysis on a sample of rows |
 | An on-policy stage adds at least a third of a step | 45% | 55% | Matched comparison on the teacher; rewards not needed |
-| The first-generation 1-bit models were trained end to end | 90% | 93% | PrismML's press release says the 8B was trained |
+| The body of the first-generation 1-bit models was trained | 90% | 97% | Second analysis: half the smallest weights changed sign, scales uncorrelated with the base in places; PrismML's press release says the 8B was trained |
 | The published 2.257 is a storage convention | Not held as a number | Under 10% | The script reads written-out weights |
 
 ## 6. Sources found in this batch that the plan does not yet hold
 
 - PrismML's launch press release, https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model
+- Kalaris Labs, "PrismML Bonsai: the team and how to reverse-engineer 1-bit LLMs", https://kalarislabs.com/blog/prismml-bonsai-team-1-bit-reverse-engineering
+- Discussion 62 on the 27B model page, https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/62
 - DiscQuant's code, https://github.com/jerry-chee/DiscQuant
 - WinQ's code, https://github.com/facebookresearch/WinQ
 - Helwegen et al., "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019, https://arxiv.org/abs/1906.02107
@@ -231,5 +265,4 @@ This is inference, not a measurement.
 
 ## 7. Not read
 
-- The Kalaris Labs analysis, the second discussion thread on the 27B model page, and the config files of the released 1.7B. The fetch tool refuses an address that appears only inside an uploaded file. They open once the project owner pastes the three addresses into a chat message.
-- The Bop paper beyond its abstract and method summary.
+- Nothing listed for this batch is left unread. The Kalaris page and the thread were read through extractions that condense; the numbers above are every number those extractions returned.

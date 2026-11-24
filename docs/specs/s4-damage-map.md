@@ -75,6 +75,7 @@ At the answer position of every multiple-choice presentation, and at every posit
   - For each block b, the teacher completes the pass from the 1-bit model's state after block b. Accuracy as a function of b.
   - For each block b, the 1-bit model completes the pass from the teacher's state after block b. Accuracy as a function of b.
   - b ranges from the embedding to the last block.
+- Exchange of the tied matrix alone. An outside analysis found the released model's tied embedding and output matrix to be the plain sign-and-mean conversion, never trained. The released model is run with the teacher's full-precision matrix (a) in the output role only, (b) in the lookup role only, (c) in both, and nothing else changed. For each: accuracy, teacher-only items returned, both-right items lost. On the general, mathematics and code text, for each of the three and for the released model as it is: the share of positions where the top next token equals the teacher's, split by the class of the teacher's token (digit; quote, bracket, brace or other punctuation; letter or word piece; other).
 
 ### 3E. Arithmetic width
 
@@ -113,6 +114,9 @@ Fixed before the run:
 | The teacher completing from the 1-bit model's state in the last quarter of depth recovers half or more of teacher-only items | The loss sits at the last decision: the last blocks, the final normalization or the output matrix |
 | That recovery is reached only when the exchange is made in the first quarter of depth | The loss is made early. The same matrices are the first to examine in S2's tables |
 | The 1-bit model completing from the teacher's late states fails where the teacher succeeds | The 1-bit model's last blocks and output matrix are themselves damaged |
+| The teacher's matrix in the output role alone returns a third or more of teacher-only items | The untrained output matrix carries a large part of the loss. Scale training of the tied matrix, with its output role handled separately, is the first arm of the scale-only trial, and the odds of that trial are revised upward |
+| The teacher's matrix in either role returns almost nothing | The body was trained around the plain conversion and absorbed its error. The loss sits in the body, and the tied matrix is not the first arm |
+| Agreement with the teacher on digits and on brackets and braces is far below agreement on other classes, and the output-role exchange closes that gap | The mathematics and tool-calling losses sit partly in output rows that were never trained |
 | A three-number letter bias returns a quarter or more of teacher-only items with a net gain | A moved decision in its narrowest form. The output role of the tied matrix is where scale training should have the most effect |
 | The letters together receive under half the probability on a tenth or more of presentations for the 1-bit model and not for the teacher | The 1-bit model is failing to answer in the asked form. Part of its knowledge loss is format, as its GPQA score suggests, and the baseline run's "no choice extractable" class is expected to be large |
 | Mean cosine of 0.8 or more in at least three quarters of the blocks, on every kind of text | The layers line up. Hidden-state matching enters sign-and-scale training as an arm |

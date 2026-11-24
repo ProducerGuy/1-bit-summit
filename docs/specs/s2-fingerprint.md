@@ -67,7 +67,7 @@ All measures are computed for each of the 196 block matrices and for the embeddi
 
 ### 4D. File settings
 
-Side by side for the two models: context length, position-encoding settings including any scaling, vocabulary size, special tokens, end-of-sequence tokens, chat template text, and the arithmetic type of the non-binary tensors (normalization gains, any biases). An outside report gives 32,768 with position scaling against 40,960; this is checked, not assumed.
+Side by side for the two models: context length, position-encoding settings including any scaling, vocabulary size, special tokens, end-of-sequence tokens, chat template text, and the arithmetic type of the non-binary tensors (normalization gains, any biases). The published config files give, for the released model against Qwen3-1.7B: vocabulary 151,669 against 151,936; maximum positions 32,768 against 40,960; position scaling of the YaRN kind with factor 4.0 over an original length of 8,192 against none. The script confirms these from the files it loads and reports the same fields from the GGUF and MLX packagings.
 
 ## 5. Outputs
 
@@ -107,7 +107,9 @@ Fixed before the run:
 | Sign change flat along the row | No column-order compensation |
 | The threshold test leaves under a quarter of changed signs unexplained, and its shuffled control does not | A per-group shift explains most sign changes. Idea I2 becomes a first arm of sign training |
 | Row-norm ratios of the output matrix with a tail above 3 on a small set of tokens | The signature of the output-matrix growth described in "Linger and Lose". Idea I12 gains weight, and S4's arithmetic-width check is read with these tokens in view |
-| Any difference in file settings | Fixed in the ruler before the baseline run |
+| The tied matrix shows sign agreement near 100% and ratio A near 1 over all rows | It is the plain sign-and-mean conversion, as an outside analysis found on a sample of rows. It was never trained. Scale training of that matrix, its two roles handled separately, becomes the first arm of the scale-only trial |
+| The tied matrix is the plain conversion in most rows and not in a set of rows | The set is listed with its tokens. Those rows were trained or patched, and they are read beside the output-row table |
+| Any difference in file settings | Fixed in the ruler before the baseline run. Each model runs with its own position settings |
 
 Trained against rounded is not decided here. The breakdown by magnitude decile is recorded for trial M4, which computes the same tables for public rounding methods.
 
