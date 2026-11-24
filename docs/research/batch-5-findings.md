@@ -16,12 +16,13 @@ For every item the plain outside question was asked first: who else has built, r
 | CAT-Q, arXiv 2606.26650 | Whole paper | Direct |
 | YAQA, arXiv 2505.22988 v3 | Whole paper | Direct |
 | LR-QAT, arXiv 2406.06385 v3 | First 200 thousand of 227 thousand characters, two extractions | HTML mirror of the same paper |
-| JointQ, arXiv 2611.20384 v1 | Abstract page. The body was refused by the site's rate limit three times | Direct |
+| JointQ, arXiv 2611.20384 v1 | Abstract page. The body was refused by the site's rate limit five times, on two occasions | Direct |
 | JointQ in code: `docs/algorithms/jointq.md`, `benchmark/jointq_benchmark/README.md`, `model_validation/jointq/README.md` of github.com/FujitsuResearch/OneCompression | Each in full | Repository read directly |
 | github.com/IntelChina-AI/BitTern, README | In full | Repository read directly |
 | GSQ: README of github.com/IST-DASLab/GSQ (42.7 thousand characters) and the abstract page of arXiv 2604.18556 v3 | README in full. Paper body not read | Repository read directly; direct |
 | huggingface.co/ProCreations/bonsai-2-27b-gsq-rco-gguf | Whole card, one extraction | Direct |
 | huggingface.co/taniii1234/Permea2.0-1.7B | Whole card, one extraction | Direct |
+| EdgeRazor, arXiv 2605.04062 v2 | Abstract page; the body to the end of its 120 thousand characters, in two extractions | Direct |
 | huggingface.co/zhangsq-nju/Qwen3-1.7B-EdgeRazor-1.58bit, and github.com/zhangsq-nju/EdgeRazor: README, `example/edgerazor-llm/README.md`, the 1.58-bit run script for Qwen3-1.7B | Card: one extraction. Repository files in full | Direct; repository read directly |
 | huggingface.co/kusakana/ReasoningQAT-Qwen3-1.7B-2bit, shreyanshp/bitcoin-news-1.7b, qtj1999/quip-qat-ternary-qwen3-1p7b, 1bit-MONSTER/Qwen3-1.7B-GGUF | Each whole card, one extraction | Direct |
 | The list of models that declare prism-ml/Bonsai-1.7B-unpacked as their base | Full list, four entries | The host's listing interface |
@@ -38,7 +39,7 @@ For every item the plain outside question was asked first: who else has built, r
 - ScaleQ-1.58 on Qwen3-1.7B, ternary, four million tokens (full precision against ternary): MATH-500 90.80 against 38.60; GSM8K 84.08 against 54.35; HumanEval+ 76.22 against 34.14; MBPP+ 53.97 against 33.33. A full-precision MATH-500 of 90.80 means thinking was on. PrismML's thinking-off teacher scores 74.0.
 - Neither paper states how the embedding and output matrix are treated. Neither tests 1 bit. CAT-Q's training code is not released; its checkpoints are, including Qwen3-1.7B (BitTern README, 22 July 2026).
 
-### 1C. Facts: rounding, low-rank and code-search methods
+### 1C. Facts: rounding, low-rank and code-search methods, and one open training recipe
 
 - YAQA is one-shot rounding with an estimate of how each layer's error reaches the final output, built from input-side and output-side statistics of each layer. Lowest width 2 bits, smallest model 1B. At 2 bits on Qwen3-8B: GSM8K 56.31 to 66.07 (full precision 84.31), MMLU 63.94 to 66.75 (72.99). Nothing at 1 bit.
 - LR-QAT freezes the pretrained weights and trains a low-rank term placed inside the rounding, plus the scale. After training the low-rank term folds into the integer codes, so nothing is added at inference. Rank 32 is about 1.2% of the parameters. Memory 20.5 GB against 62 to 98 GB for full training on a 7B model.
@@ -47,6 +48,18 @@ For every item the plain outside question was asked first: who else has built, r
 - GSQ is layer-by-layer. Each weight gets learnable preferences over its few allowed values, trained through a sampled soft choice that hardens over ten epochs, with per-group scales learned at the same time. Loss: squared error between the full-precision and quantized layer outputs. It starts from an error-compensated rounding.
 - GSQ's code has a 1-bit quantizer ("The binary case uses a single logit"), a Qwen3 wrapper and groups of 128. Its paper's abstract reports 2 and 3 bits only.
 - GSQ can improve somebody else's released low-bit file without changing its format: Qwen3-8B, a public 2-bit file, average 50.03 to 56.28.
+
+**EdgeRazor: the one open end-to-end training recipe with scores on our parent.**
+
+- The student is trained by distillation from the full-precision model. Blocks are ternary with one scale per group of 256, the scale a tunable multiple of the group mean magnitude. The paper says in one place that the embedding and output matrix stay at 4 bits and in another that they are quantized with the blocks; the model card says 4 bits.
+- Loss, three terms: next-token loss on the training text (weight 0.10), squared error on hidden states at three layers (0.10), and a logit term (2.0).
+- The logit term mixes the two directions of KL by the teacher's own uncertainty. Its weight on the teacher-to-student direction is the batch mean of the teacher's entropy over response tokens, capped at log 16 and divided by it. Where the teacher is unsure the student is asked to cover the teacher's distribution; where the teacher is sure the student is asked to commit.
+- The three hidden-state layers are chosen from the teacher: those whose output differs most from the previous layer's.
+- Training text for Qwen3: five instruction sets, 11.16 million samples cut at 1,024 tokens. One set of 0.24 million samples is the training splits of the scored tasks. A set of 1.40 million comes from a stronger model's answers, with its reasoning traces stripped.
+- Budget for the ternary 1.7B: two passes, batch 1,536, AdamW at a constant 2e-5 with 5% warmup, eight 80 GB cards. That is about 14,500 updates and at most 22.9 billion tokens (samples shorter than the cut make it less; the paper gives no token count).
+- Result at ternary on Qwen3-1.7B: sixteen-task average 43.89 of 58.64. On the four harder tasks the paper also reports alone (MMLU, IFEval, GSM8K, HumanEval): 32.69 against a full-precision mean of 64.61, which is 50.6%.
+- Ablations, Qwen3-0.6B at 1.88 bits, sixteen-task average: the entropy-weighted mix 41.60; teacher-to-student KL alone 40.40; a fixed choice of hidden-state layers 40.40 against the adaptive choice 41.60.
+- No limitations section. Nothing on thinking mode. No ablation on training text, length, or the precision of the tied matrix.
 
 ### 1D. Facts: who has released a low-bit Qwen3-1.7B
 
@@ -57,14 +70,14 @@ For every item the plain outside question was asked first: who else has built, r
 | PrismML Ternary-Bonsai-1.7B | Ternary | Not stated | 49.58 of 58.24 (85.1%) | Ternary |
 | alllwang reproduction | Ternary, rotated | Distillation, 164 million tokens | GSM8K 54.7 of 68.8, MMLU 34.5 of 60.2 | Ternary |
 | Permea2.0-1.7B | Ternary, PrismML's grid | Repair of PrismML's ternary file (section 1E) | 61.8 against 59.3 before, on 550 items | Frozen |
-| EdgeRazor 1.58-bit | Ternary blocks, groups of 256 | Mixed-precision distillation training, code public, eight GPUs in its script | 43.89 of 58.64 on 16 tasks (74.8%): GSM8K 29.49 of 68.76, IFEval 32.72 of 67.10, HumanEval 33.54 of 67.07 | 4 bits |
+| EdgeRazor 1.58-bit | Ternary blocks, groups of 256 | Distillation training on 11.16 million samples, two passes, eight GPUs, code public | 43.89 of 58.64 on 16 tasks (74.8%): GSM8K 29.49 of 68.76, IFEval 32.72 of 67.10, HumanEval 33.54 of 67.07, MMLU 35.00 of 55.49 | 4 bits |
 | Intel CAT-Q checkpoint | Ternary | Post-training, one million tokens | 51.01 of 61.42 on five tasks | Not stated |
 | Forensics project student | Ternary blocks | Distillation, 10 million tokens (section 2) | Perplexity ratio 1.57 | Full precision |
 | ReasoningQAT 2-bit | 2 bits, groups of 128 | Distillation with a confidence-weighted loss | None on the card | Not stated |
 | bitcoin-news-1.7b | 1-bit blocks | Domain fine-tune, method not stated | A domain score only | Kept at 4 bits on purpose |
 
 - Every outside release that trains this model keeps the tied embedding and output matrix above 1 bit, freezes it, or leaves it in full precision. PrismML and Precision Numerics are the only two with a 1-bit output matrix. One author states why: at 1 bit the matrix that produces every logit would be 1 bit, and 130 MB bought it back.
-- No outside release reaches PrismML's ternary retention by an open recipe. The best open training recipe with scores, EdgeRazor, sits at 74.8% on its own sixteen tasks with a 4-bit tied matrix.
+- No outside release reaches PrismML's ternary retention by an open recipe. The best open training recipe with scores, EdgeRazor, sits at 74.8% on its own sixteen tasks and 50.6% on the four harder ones, with a 4-bit tied matrix, after up to 22.9 billion tokens.
 - Not opened: benzeng/tritfold-1.7b (the page returned an error), Trillim/Qwen3-1.7B-TRNQ, AsadIsmail/Qwen3-1.7B-ternary, ActionPower/elli-nipa, Genrius-AI/Qwen3-1.7B-Pingala8-2bit, jkim96/Qwen3-1.7B-DASHQ-Q2-GGUF, the card of Intel's CAT-Q 1.7B checkpoint.
 
 ### 1E. Facts: three outside attempts to improve a released PrismML model
@@ -104,6 +117,8 @@ For every item the plain outside question was asked first: who else has built, r
 - An on-policy stage adds at least a third of a step: 52% before, 58% after. Both strong repairs of the small end use the student's own text: ScaleQ's own answers (31.80 to 58.40 against a stronger model's answers) and Permea's self-repair pairs.
 - A layer-local repair stage on the released model adds points: not held before, 10% now. The one test of it on a PrismML model changed 10 of 402 matrices.
 - What repair must be judged on: the Permea pattern (gain where there was task text, zero elsewhere) is the failure the ruler exists to catch. A repair counts as a step only if benchmarks that supplied no training text also move. The ruler's data rules already forbid test items; training splits of the scored benchmarks are allowed by section 9 of the ruler specification, so this is the case to watch in M2's records, per benchmark, with the source of every training prompt logged.
+- One loss setting for sign training (M3), from EdgeRazor: mixing the two directions of KL by the teacher's entropy gained 1.2 points over the teacher-to-student direction alone, at 1.88 bits on a 0.6B model. Batch 4 found that the KL a damaged model shows tracks the teacher's entropy; this is a recipe that acts on the same quantity. One source, one model size, not at 1 bit.
+- The cost of an open recipe is now known and large: eight 80 GB cards and up to 22.9 billion tokens for half of the teacher's score on hard tasks at ternary. This is the measured reason that our own conversion stays under 5%, and that starting from a released model is the route.
 - One rule for any sign search (M3), from JointQ: a candidate sign change is scored with its group's scale re-solved, never with the scale held fixed.
 - One memory-cheap arm for sign training, from LR-QAT: a low-rank term inside the sign function, folded into the signs afterward. It cannot flip arbitrary sets of signs. Untested at 1 bit.
 - The gated correction of the ten-percent entry is outside the storage format and is not a route to the goal. It is evidence about one loss class: on the 1-bit 1.7B a wrong output token was moved by a margin-sized push at layer 20, and a gate on the layer-20 state kept everything else. Batch 4 found that an ungated bias on the call token trades calls for refusals one for one. The gate is the difference.
@@ -113,7 +128,7 @@ For every item the plain outside question was asked first: who else has built, r
 - Any of these methods at 1 bit with one scale per 128 weights.
 - Permea's steps, loss and learning rate, and whether its gain survives a benchmark it had no text for.
 - How the CAT-Q and ScaleQ papers treat the tied matrix.
-- EdgeRazor's token budget and losses (paper not opened, section 8).
+- Whether EdgeRazor's entropy-weighted loss helps at 1 bit, and how much of its score comes from the scored tasks' own training splits.
 
 ## 2. The outside forensics project in full
 
@@ -376,7 +391,8 @@ Both runs state EvalScope 1.4.2, thinking off and PrismML's settings.
 | Our rule-only ruler puts the released 1-bit model within 3.5 points of 70.2% retention | Not held | 50% | Section 3E |
 | A learned schedule drop helps sign training at our format | Not held | 40% | One seed of three (section 2D) |
 | The mirror step helps at 1 bit where it failed at ternary | Not held | 25% | Untested by anyone outside PrismML; the shape argument favors it; the forensics note that the step works against distillation does not depend on the bit width |
-| Our own conversion by a published route beats the released model | Under 5% | Under 5% | The best open training recipe on this parent is at 74.8% at ternary with a 4-bit tied matrix |
+| Our own conversion by a published route beats the released model | Under 5% | Under 5% | The best open training recipe on this parent is at 74.8% on sixteen tasks and 50.6% on four hard ones, at ternary with a 4-bit tied matrix, after up to 22.9 billion tokens on eight cards |
+| An entropy-weighted mix of the two KL directions beats one direction in sign training at our format | Not held | 45% | One ablation, +1.2 points at 1.88 bits on a 0.6B model |
 
 ## 6. What this batch asks of the registers
 
@@ -386,7 +402,7 @@ To be applied when the two reviews are compared.
 - S4: the forensics capability figures as a second reference for the margin table; damage reported per matrix class.
 - M1 and the ruler specification: the settings list of section 3G; the item counts confirmed (IFBench 300, BFCL 3,641); the acceptance note on rule-only scoring; the runtime versions.
 - M2: the source of every training prompt logged per benchmark, and the per-benchmark record that separates a general gain from a task-specific one.
-- M3: the scale re-solve rule for sign search; the low-rank arm as a memory-cheap option; three seeds per schedule; the plain straight-through pass as baseline; the six acceptance checks of section 2I.
+- M3: a loss arm that mixes the two KL directions by teacher entropy; the scale re-solve rule for sign search; the low-rank arm as a memory-cheap option; three seeds per schedule; the plain straight-through pass as baseline; the six acceptance checks of section 2I.
 - Ideas: Permea's result under the repair idea; the gated correction as evidence only; the mirror step's implementation notes under idea I5.
 - Plan checklist: C3, C8 and C100 done; C56 done (token counts in section 2B); C4 and C6 done as far as the first run needs, with the open parts in section 3H; C62 done except the unread paper bodies of section 8; C112 open for the article of section 8.
 
@@ -410,9 +426,8 @@ To be applied when the two reviews are compared.
 
 ## 8. Not read
 
-- The PRISM article on recall under quantization, https://link.springer.com/article/10.1007/s10791-026-10580-5. Opening it needs the owner's approval, and the request went unanswered.
-- The EdgeRazor paper, https://arxiv.org/abs/2605.04062. Same reason. Its repository and model card were read.
-- The body of the JointQ paper, https://arxiv.org/html/2611.20384v1. Refused by the site's rate limit three times. Its documentation and result tables in code were read.
+- The PRISM article on recall under quantization, https://link.springer.com/article/10.1007/s10791-026-10580-5. The publisher's site refuses the article page and its PDF address, and a search by its identifier found no other copy. It can be read if the owner pastes its text or a copy of the file.
+- The body of the JointQ paper, https://arxiv.org/html/2611.20384v1. Refused by the site's rate limit five times, on two occasions. Its documentation and result tables in code were read.
 - The last 27 thousand characters of LR-QAT, and the code of YAQA and LR-QAT.
 - The body of the GSQ paper.
 - The ReasoningQAT paper's page, which answers with a browser check.
