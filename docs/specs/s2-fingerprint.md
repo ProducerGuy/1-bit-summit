@@ -47,6 +47,7 @@ All measures are computed for each of the 196 block matrices and for the embeddi
 - By group index along the row, and by position within the group, each with a fitted trend.
 - Dispersion across rows and across columns: the variance of the per-row and per-column sign-change rate divided by the variance expected if changes were independent with the matrix's overall rate.
 - Sign balance: for each group, the share of positive signs in the released model beside the same share in the base.
+- Curve test: sign change in twenty bins of the base weight's absolute value divided by its group's root-mean-square, each bin's rate passed through the inverse of the bell curve's cumulative function. Reported per matrix: the fitted slope and intercept of that transformed rate against weight size, the largest departure of any bin from the line, and r, the reciprocal of the slope's magnitude. An independent bell-shaped displacement of the base weights gives a straight line through zero (`research/fingerprint-displacement-reading.md`).
 
 ### 4B. Scale
 
@@ -56,6 +57,8 @@ All measures are computed for each of the 196 block matrices and for the embeddi
 - Ratio D: group scale divided by the sum of squared base weights over the sum of released sign times base weight. A scale that keeps the size of the group's projection onto the base, that is, the amplitude of what the group passes on, gives 1.
 - For each of ratios A to D: the median, and the spread as the interquartile range divided by the median, per matrix and per matrix type. The rule a model's scales follow is the one whose ratio sits at 1 with the smallest spread.
 - Ratios A and B by group index along the row.
+- Ratio test: for each matrix, the median of ratio A multiplied by the cosine of pi times that matrix's share of changed signs. Under a scale read off displaced weights by a fixed rule this is one constant for all matrices, between 1 (mean magnitude) and 1.25 (root-mean-square).
+- Group test: per matrix, the fitted line of released scale squared against the base group's mean square, over groups: slope, intercept, and the share of variance explained.
 - For the output matrix: the norm of each token's row in the released model divided by the same in the base, with the 100 largest and 100 smallest ratios listed with their tokens.
 
 ### 4C. Structure that separates the readings
@@ -109,6 +112,10 @@ Fixed before the run:
 | Row-norm ratios of the output matrix with a tail above 3 on a small set of tokens | The signature of the output-matrix growth described in "Linger and Lose". Idea I12 gains weight, and S4's arithmetic-width check is read with these tokens in view |
 | The tied matrix shows sign agreement near 100% and ratio A near 1 over all rows | It is the plain sign-and-mean conversion, as an outside analysis found on a sample of rows. It was never trained. Scale training of that matrix, its two roles handled separately, becomes the first arm of the scale-only trial |
 | The tied matrix is the plain conversion in most rows and not in a set of rows | The set is listed with its tokens. Those rows were trained or patched, and they are read beside the output-row table |
+| The curve test is a straight line through zero in most matrices | The body's signs are those of the base weights after an independent bell-shaped displacement of size r: the shape of long training behind a sign function. Nothing picked which signs to change. r per matrix is recorded as the unit for the budget on sign changes (I13) |
+| The curve test bends: more changes among small weights than the line allows, or a floor among large ones | Signs were chosen by a rule that depends on weight size. The displacement reading falls and the threshold test is read first |
+| The ratio test gives one constant across matrices, and the group test a slope near 1 with a positive intercept | The scales were read off the displaced weights by a fixed rule and hold little of their own. Read with ratio D's row above |
+| The ratio test scatters across matrices | The scales were trained freely |
 | Any difference in file settings | Fixed in the ruler before the baseline run. Each model runs with its own position settings |
 
 Trained against rounded is not decided here. The breakdown by magnitude decile is recorded for trial M4, which computes the same tables for public rounding methods.
