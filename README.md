@@ -13,6 +13,7 @@ This is research, not a product. No trophy has been claimed yet.
 - `docs/repair-candidates.md`: reading record and ranked candidates for the next five points of retention.
 - `docs/ruler-spec.md`: the one measurement every model is scored on, and when a step counts.
 - `docs/ranked-work.md`: runs and research, each ranked by its probability of moving the ladder.
+- `docs/research-queue.md`: every open piece of research, what it helps, its batch, and an account of every open checklist row. It says when research is finished.
 - `docs/ideas.md`: every unproven idea, with its evidence, odds and cheapest proof.
 - `docs/trials.md`: every script or run the project intends, with its justification. Nothing in it has run.
 - `docs/specs/`: the written specification of each trial that has one. S1 to S4 are scripts and forward passes on public files; none trains a model.

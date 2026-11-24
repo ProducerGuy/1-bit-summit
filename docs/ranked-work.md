@@ -41,5 +41,5 @@ Two runs earn no step and decide what the others are worth:
 
 ## 3. What the two lists say together
 
-- Research ranks 1 to 6 are done and all fed runs 1 and 2. The next five points are there. Ranks 7 to 10 are the third batch.
+- Research ranks 1 to 6 are done and all fed runs 1 and 2. The next five points are there. The table above is not the whole of the open research: the full queue, with what each part helps and its batch, is `research-queue.md`.
 - No run is launched from this list. A run needs its written specification and the ruler accepted first. Each run's justification is in `trials.md`, and ideas not yet tied to a run are in `ideas.md`.
