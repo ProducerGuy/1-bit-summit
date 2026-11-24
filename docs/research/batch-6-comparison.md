@@ -10,7 +10,7 @@ The first reviewer's findings are `batch-6-findings.md`. The second reviewer's d
 - It showed, with a two-weight example, that lowering a cap cannot by itself bring every weight onto the cap, and gave a condition that does: hold the group's norm and lower the cap to that norm over the square root of the group size. This changes how the hypothesis is stated.
 - The first reviewer found what the second did not: MagR, the published form of the equal-magnitude idea for language model weights; a result on our own parent at 2 bits; the Caltech group's own one-bit linear theory; INQ; a conversion-only result on Qwen3-4B; and the content of the factorization code.
 - The first reviewer made one factual error that reached the plan and is reversed here: the damage-structure paper does have a second version.
-- The two disagree by a wide margin on the odds of a conversion of our own. The events are not the same; section 7 sets them side by side.
+- On the odds of a conversion of our own both stand at 45%. The project sets no limit on training, so no figure is conditioned on a budget; section 7 sets the judgments side by side.
 
 ## 2. Depth of the second reviewer's read
 
@@ -130,14 +130,14 @@ Each was checked against the paper itself through the text mirror.
 - The brief asked for full reads with code. None was delivered, and ten sources were read from abstracts or index entries. Stated openly.
 - SDQ-LLM is presented at "nominal 1.58 bits" with a warning. The stored size, 3.16 bits per original weight, is in the paper.
 - It presents "Linger and Lose" as a new discovery. The project has held it since batch 2. A reviewer new to the project could not know.
-- Its overall odds, 45% for a conversion of our own reaching 70.2%, rest on a budget it assumed (a billion processed tokens) and sit well above anything its own evidence shows at small size: the only 1-bit result on a model of this size in either review is 9.56 times the teacher's perplexity with the tied matrix exempt.
+- Its overall odds, 45% for a conversion of our own reaching 70.2%, are conditioned on a budget it chose (a billion processed tokens). The project sets none. The figure is a judgment in both reviews: the only 1-bit result on a model of this size in either is 9.56 times the teacher's perplexity with the tied matrix exempt.
 - It raised the odds of the mirror-centred route (25% to 30%) on the application's plateau geometry while its own section shows the method does not move from the teacher.
 
 ## 7. Disagreements, held open
 
 | Subject | First reviewer | Second reviewer | Note |
 |---|---|---|---|
-| A conversion of our own from the full-precision parent reaches 70.2% | 12%, at a budget this project can afford; 20% if a billion processed tokens are allowed | 45%, given a billion processed tokens | Different conditions. Neither is backed by a 1-bit result at this size with the tied matrix converted |
+| A conversion of our own from the full-precision parent reaches 70.2% | 45%, with no cap on training: the plan's standing figure for matching the released model | 45%, given a billion processed tokens | The same figure. Neither is backed by a 1-bit result at this size with the tied matrix converted; what limits it is the recipe |
 | The mirror or greedy family as the route | 8% that the mirror step is the missing piece | 30% that this route reaches 70.2% | Different events |
 | Global compensation as the route | A final-state term helps any end-to-end training: 60% | 38% that this route reaches 70.2% | Different events; both favor it as the loss |
 | The 99% goal | 5% | No number: no figure from a count of states is defensible | The first reviewer's move to 4% is withdrawn |
@@ -158,7 +158,7 @@ Each was checked against the paper itself through the text mirror.
 |---|---|---|---|
 | Sign and scale training from the released model reaches a step | 72% | 72% | |
 | Scale-only training reaches a step | 55% | 55% | AF1 is a second source using it as a stage; its isolated effect is not known |
-| Our own conversion reaches 70.2%, at an affordable budget | 12% | 12% | |
+| Our own conversion reaches 70.2% | 45% | 45% | The plan's figure for matching the released model. Time and compute are not limits on this project |
 | The shrinking cage as a whole is unpublished | 65% | 55% | ASkewSGD shares its central move |
 | The shrinking cage, with a closure rule, beats straight-through training at equal tokens | 15% | 15% | The closure rule makes it complete; ASkewSGD's own margin over BinaryConnect is about one point |
 | The mirror step is the missing piece of our own conversion | 8% | 8% | |

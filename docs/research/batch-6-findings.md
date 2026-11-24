@@ -371,7 +371,7 @@ Judgments.
 
 | Subject | Before | After | Why |
 |---|---|---|---|
-| A conversion of our own from the full-precision parent, with end-to-end training this project can afford, reaches the released model's 70.2% | 12% | 12% | The batch says what to put in the loss and the schedule and gives no cheaper route. Published budgets for a rebuild are far above ours |
+| A conversion of our own from the full-precision parent, trained end to end, reaches the released model's 70.2% | 45% | 45% | The plan's figure for matching the released model. The batch says what to put in the loss and the schedule and gives no cheaper route. Time and compute are not limits on this project; the recipe is |
 | The same by a published conversion-only route | Under 5% | Under 3% | Near chance at 2 bits on our parent with the best such route |
 | The large-power mirror step is the missing piece of a conversion of our own | 15% to 20% | 8% | It stays at its start; a different force is needed first. Open only as a from-scratch method |
 | The mirror step helps training from the released 1-bit model | 25% | 5% | From equal magnitudes it is an ordinary step |
