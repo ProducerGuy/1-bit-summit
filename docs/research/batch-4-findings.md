@@ -141,7 +141,7 @@ Probabilities:
 - Margin survival by decision kind on the released 1-bit 1.7B. S4's added table answers it with forward passes.
 - The shares of each failure kind on our suite with thinking off. M1's records answer it.
 - Whether the full-precision margin predicts flips on a trained 1-bit model as it does on rounded ones. The same S4 pass answers it.
-- The body of Shah's paper and its per-question files. The page that holds them needs an approval that went unanswered.
+- The body of Shah's paper and its per-question files. The page that holds them sits behind a browser check that a read-only fetch cannot pass.
 
 ## 2. Published recipes for training at 1 bit and ternary
 
@@ -153,6 +153,7 @@ Probabilities:
 | ParetoQ code, https://github.com/facebookresearch/ParetoQ | README, the training script, the run script, each in full | Repository read directly |
 | Panferov and others, "QuEST: Stable Training of LLMs with 1-Bit Weights and Activations", https://arxiv.org/abs/2502.05003 | Whole paper, version 2, in two extractions | HTML |
 | QuEST code, https://github.com/IST-DASLab/QuEST | README, the quantizer file in full, the run script | Repository read directly |
+| ParetoQ's released files, https://huggingface.co/collections/facebook/mobilellm-6722be18cb86c20ebe113e95 | The collection page, the model card of the 1.5B 1-bit file and its file list | Direct |
 
 ### 2B. Facts: ParetoQ
 
@@ -189,7 +190,10 @@ Results at 3B and below. Mean of eight zero-shot tasks, then WikiText-2 perplexi
 
 - These are recognition tasks with a guess rate near 35. Above the guess rate the 1-bit 1B keeps 69% and the 1.5B 75%.
 - The embedding and output matrix are in full precision in every row.
-- The full-precision parents and the 1-bit, 1.58-bit, 2-bit, 3-bit and 4-bit children are published as model files.
+- The full-precision parents and the 1-bit, 1.58-bit, 2-bit, 3-bit and 4-bit children are published as model files, 30 in all, at 125M, 350M, 600M, 1B and 1.5B.
+- The code's README states that every quantized file was fine-tuned on top of the full-precision file of the same size ("MobileLLM-ParetoQ-BF16"), and that those parents were trained on newer data than the original MobileLLM files.
+- The 1.5B 1-bit repository holds one weights file of 3.02 GB in BF16, in pickle format, and no model code of its own. It loads with the standard classes.
+- Access to the files is gated. The file list is public; the files need a login, agreement to the FAIR Noncommercial Research License, and a form asking for full legal name, date of birth and organization.
 
 ### 2C. Facts: QuEST
 
@@ -244,8 +248,11 @@ What carries to one sign per weight, one scale per 128, tied matrix included:
   - Alike: the body is ordinary training at that budget. Headroom from more of the same is small, and the next points come from what PrismML did not do: the tied matrix, task text, on-policy text.
   - Fewer changes in ParetoQ's children: PrismML moved signs further than ordinary training does, by method or by budget, and the flip budget of sign training has a second reference point.
 - Either way it gives the budget on sign changes (idea I13) a measured total: how many signs a full training run changes, by magnitude.
-- It needs two checks first: that the published full-precision file is the parent the child was trained from, and whether the child's file stores signs and scales or the weights behind them.
-- It is a script on public files and trains nothing. It is proposed as a fifth script trial.
+- The parent question is settled: the README states each child was trained from the full-precision file of its size.
+- What the child's file stores is nearly settled: 3.02 GB is 1.5 billion values at 16 bits, and it loads without a quantizer, so it holds the quantized values, one magnitude for each row. The script's first step confirms it by counting distinct magnitudes in a row.
+- The embedding and output matrix of these files were not converted, so the comparison is with PrismML's body only.
+- The weights file is a pickle, so it is read with a loader that accepts tensors only.
+- It trains nothing. Its one cost is access: the files sit behind a form that asks for a legal name and a date of birth. Whether to submit that form is the owner's decision. It is proposed as a fifth script trial, conditional on that decision.
 
 ### 2F. What it means for the next five points
 
@@ -258,7 +265,7 @@ What carries to one sign per weight, one scale per 128, tied matrix included:
 
 - The fingerprint of ordinary 1-bit training from a pretrained model. Section 2E's script answers it.
 - Whether any published run trains a binary tied matrix. None in the sources of batches 2 to 4.
-- ParetoQ's training data. The paper does not name it.
+- ParetoQ's training data. Neither the paper nor the model card names it.
 
 ## 3. Training scales alone, and transformations that change nothing
 
@@ -400,7 +407,7 @@ Probabilities:
 | Either of the two | 74% | 75% | |
 | An on-policy stage adds at least a third of a step | 50% | 52% | Section 1G |
 | The tool-calling loss of the released 1.7B is mainly a one-sided shift on the decision to call | Not held | 30% | Section 1G |
-| The published full-precision ParetoQ files are the true parents of the 1-bit files, so a reference fingerprint can be computed | Not held | 70% | The README lists them side by side; the model cards are unread |
+| A reference fingerprint of ordinary 1-bit training can be computed from ParetoQ's files, once access is granted | Not held | 90% | The README names the parents; the 1-bit file is dense BF16 with no code of its own. What remains is the row-magnitude check |
 | A better choice of groups adds points on its own | Under 5% | Under 5% | |
 | Our own conversion by a published 1-bit route beats the released model | Under 5% | Under 5% | |
 
@@ -419,7 +426,7 @@ Probabilities:
 
 ## 7. Not read
 
-- The body of "Same Score, Different Model" and its per-question files. Only the abstract page opened; the page holding the paper needs an approval that was not answered.
+- The body of "Same Score, Different Model" and its per-question files. Only the abstract page opened. The page holding the paper answers with a browser check, and its PDF address returns an error.
 - "One Model, Two Precisions" (https://arxiv.org/abs/2611.16478), surfaced by the same search. It uses disagreement between two precisions of one model to detect wrong answers, which is a use of the damage and not a study of it. Not opened.
-- The model cards of ParetoQ's released files. They decide the two checks in section 2E, and the model host is not reachable from this workspace.
+- The weights of ParetoQ's released files. They are gated (section 2B).
 - Every source listed for the batch was read whole. All were read through extractions that condense; where an extraction marked a table as garbled, the numbers from that table are left out above.
