@@ -10,7 +10,7 @@ Reference figures: the released 1-bit 1.7B keeps 70.2% of Qwen3-1.7B on the ten-
 
 | Source | How much | Route |
 |---|---|---|
-| The outside reproduction study, https://github.com/ThakiCloud/bonsai-1bit-repro | REPORT.md, results.json, paper/main.tex, README, and the scripts bonsai_repro.py, gptq_1bit.py and quip.py, each in full. Not read: billm_1bit.py and rotate_quant.py, which use the same harness | Repository read directly |
+| The outside reproduction study, https://github.com/ThakiCloud/bonsai-1bit-repro | REPORT.md, results.json, paper/main.tex, README, and all five scripts, each in full | Repository read directly |
 | PrismML's launch press release, https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model | The technical-details passage as returned by search | Search result |
 | A second fingerprint analysis (Kalaris Labs), a second discussion thread on the 27B model page, the config files of the released 1.7B | Not opened. See section 7 | |
 
@@ -75,7 +75,7 @@ This is inference, not a measurement.
 | Source | How much | Route |
 |---|---|---|
 | "Right On Q" (the method is called OnQ), https://arxiv.org/abs/2610.29378 | Abstract page and the whole paper, one extraction | Direct |
-| DiscQuant, https://arxiv.org/abs/2501.06417 | Abstract page; the code repository's README in full, https://github.com/jerry-chee/DiscQuant | Direct; repository read directly |
+| DiscQuant, https://arxiv.org/abs/2501.06417 | The whole paper, one extraction; the code repository's README in full, https://github.com/jerry-chee/DiscQuant | Direct; repository read directly |
 | On-policy distillation (arXiv 2609.26708) and "What Makes Low-Bit QAT Work" (arXiv 2601.14888) | Read in batch 2; figures reused | |
 
 ### 2B. Facts: OnQ
@@ -112,7 +112,9 @@ This is inference, not a measurement.
 
 - It only chooses, for each weight, the grid point above or below it. The grid and its scales are given. Each weight gets a variable between 0 and 1; the variables are trained with distillation to the original model plus a term that pushes them to 0 or 1; the few left in between are rounded greedily.
 - Its theory: with m data samples, all but a number of weights proportional to m can be rounded with small expected error, if the model's gradients lie close to a low-dimensional space.
-- Evidence: Phi-3-mini 3.8B and Llama-3.1-8B at 3 and 4 bits. At 3.25 bits per weight on Phi-3-mini, GSM8K 64% against 54% for error-compensated rounding and 31% for nearest rounding; the original scores 84%. Nothing under 3 bits.
+- Evidence: Phi-3-mini 3.8B and Llama-3.1-8B at 3 to 4.5 bits, 8,192 samples of 2,048 tokens, 1,024 iterations. GSM8K on Phi-3-mini, nearest rounding, error-compensated rounding, DiscQuant: at 3.0 bits 1.0, 2.3, 26.8; at 3.25 bits 31.0, 54.3, 64.2; at 4.0 bits 62.2, 71.5, 77.3; the original scores 84.4. On Llama-3.1-8B at 3.0 bits 0.5, 3.6, 14.3 of 77.0. Nothing under 3 bits.
+- Its loss is the divergence to the original model's next-token distribution. In its own ablation that plain loss beat losses on intermediate layers and mixtures of the two. OneBit found the opposite for hidden states (batch 2); the two results are at different bit widths and starts.
+- Its theory is proven for a linear stand-in for the loss, and the shipped algorithm is a heuristic. It does not report how many weights end away from nearest rounding. Scales are not optimized in its reported runs.
 
 ### 2D. Answer
 
@@ -143,7 +145,10 @@ This is inference, not a measurement.
 
 | Source | How much | Route |
 |---|---|---|
-| WinQ, https://arxiv.org/abs/2605.17471 | Abstract page and the whole paper, one extraction. Its code, https://github.com/facebookresearch/WinQ, was not opened | Direct |
+| WinQ, https://arxiv.org/abs/2605.17471 | Abstract page and the whole paper, one extraction | Direct |
+| WinQ's code, https://github.com/facebookresearch/WinQ | The reset routine, the quantizer file, the sample training script and the README, in full | Repository read directly |
+| "Latent Weights Do Not Exist" (Bop), https://arxiv.org/abs/1906.02107 | Abstract and method summary as returned by search | Search result |
+| "Error Diffusion Replaces Latent Weights: Training Binary-Weight Language Models on a Few Bits of Dithered State", https://arxiv.org/abs/2610.34566 | The whole paper, one extraction | Direct |
 
 ### 3B. Facts
 
@@ -164,6 +169,17 @@ This is inference, not a measurement.
 - Ablations at 1 bit on LLaMA-3-1B, perplexity: no pull 16.5; pull of 0.2, 0.4, 0.6, 0.8 gives 15.5, 15.3, 15.5, 16.0; pull without noise 16.0; noise at half, one, two and four times the chosen size gives 15.7, 15.3, 16.3, 18.5.
 - The best settings change with model, bit width and batch size. Gains on Qwen are small.
 - It does not use a teacher, and it does not measure how many codes change.
+- From its code: the 1-bit quantizer is the sign with one learned scale per output row; the gradient reaches a weight only while its size is under that scale, so it is a clipped estimator whose clip is the learned scale; noise is added to the weights behind the codes and to the scales. The reset in code keeps a fraction alpha of the weight and takes the rest from its quantized value, the reverse of the paper's formula as extracted, and the sample script uses alpha 0.2. Whichever convention the tables use, pulls of 0.6 to 0.8 toward the quantized value beat none.
+
+### 3B2. Facts: training binary weights with nothing behind the sign but a small counter
+
+- Bop (2019, vision models) is an optimizer whose only action is to flip a weight, when a gradient signal that stays consistent over steps passes a threshold. It reads the size of the weight behind a sign as inertia against flipping, nothing more.
+- The error-diffusion paper (2026) applies the idea to language models. Each weight keeps its sign and a counter of 2 to 8 bits. The gradient, divided by the scale and multiplied by one rate, accumulates in the counter; the sign flips when the counter points away from it and reaches the threshold. Scales are fixed per layer; embeddings, normalizations and the output matrix are full precision. Models are trained from scratch, up to a 19M binary core, on byte-level and tokenized text.
+- Against ordinary training with full-precision weights behind the signs, its loss is within 0% to 3% at every size when a cap is on.
+- It measures sign changes. In a 19M run about 37 to 38 thousand signs flip per step (0.2% of the core). In an avalanche the count doubles to 79 thousand, validation loss rises by 0.6 to 1.4 nats within 100 steps, and the core then runs at a tenth of its flip rate. Two of five uncapped runs stalled this way. A cap on each weight's movement per step (a quarter of the distance to the threshold) removed every stall: the gap to ordinary training fell from 10.2% and 16.5% to 1.0% and 0.3%.
+- It recommends a drive of 1.0 to 1.3 thousandths of the flip distance per step, found by a 250-step probe.
+- One experiment matches our starting point in miniature: a trained binary model has everything behind its signs thrown away and is then adapted to new text for 5,000 steps. Loss falls from 2.32 to 1.520, against 1.533 for continuing with the full state kept.
+- Limits: 19M at most, losses only, no benchmark, no teacher, no conversion of a pretrained model. Code: https://github.com/pierreolivierbonin/error-diffusion-binary-weight-lms
 
 ### 3C. Answer
 
@@ -171,25 +187,27 @@ This is inference, not a measurement.
 - Its steps assume full-precision weights behind the codes. Read for a model that has none, they say two useful things:
   - A full pull puts every weight behind the codes exactly on its quantized value. That is the state a released binary model is in. Partial pulls toward that state help, and a pull of 0.8 still beats none. Starting sign training from bare signs is therefore a strong form of something that helps, not a handicap.
   - Noise at the right size helps and at four times that size destroys the gain. When every weight behind the signs has the same magnitude, the noise size relative to that magnitude sets how many signs move in a step. That is the budget on sign changes in another form, and it has to be set, not left to chance.
-- No published work was found in this reading that measures the number of code changes per step and controls it directly, apart from ΣΔ-Sampler's cap read in batch 2. This is a statement about what was read, not about what exists.
+- Controlling sign changes directly is published and measured, at small scale. The error-diffusion paper shows the failure a budget prevents (an avalanche of flips, then a stall), the control that prevents it (a cap on movement per step), a working range for the drive, and that training can resume from a binary model with nothing behind its signs. ΣΔ-Sampler's cap (batch 2) is the same finding at larger scale with thinner evidence.
 
 ### 3D. What it means for the next five points
 
 - The risk that sign training cannot start from a model with only signs and scales: lowered again. OneBit starts there (batch 2), and WinQ shows moving toward that state helps.
 - The flat landscape at 1 bit is a measured reason for slow sign training and for giving scales a much higher rate than signs, as the published recipes do.
-- The budget on sign changes (idea I13) stays a required setting of sign and scale training. Its natural form with equal magnitudes behind the signs is the ratio of step size and noise to that magnitude.
+- The budget on sign changes (idea I13) stays a required setting of sign and scale training, and now has a measured form: a cap on each weight's movement per step, a drive near a thousandth of the flip distance per step set by a short probe, and the count of flips per step logged as the health signal. With equal magnitudes behind the signs this is the ratio of step size and noise to that magnitude.
+- Two sources conflict on the estimator. "Linger and Lose" finds the clipped estimator collapses on tiny models from scratch. ParetoQ and WinQ train 1-bit LLaMA-1B with a clipped estimator whose clip is the learned scale. This joins the schedule conflict as a point the sign-and-scale specification has to settle.
 - Probabilities do not move on this item.
 
 ### 3E. Still unknown
 
-- WinQ's code, and whether its noise step helps under a distillation loss.
-- Any direct measurement of sign changes per step in a 1-bit language model during training.
+- Whether WinQ's noise step helps under a distillation loss.
+- Sign changes per step in a model above 19M, and in one converted from a pretrained model.
 
 ## 4. Across the three items
 
 - Three papers on Qwen3-1.7B now agree on the shape of a working repair: calibrate, then train on the student's own answers with the same-size teacher scoring every token. None is at 1 bit, none has a converted embedding or output matrix, none measures tool calling.
 - The scale-only trial can carry the on-policy arm from its start. The loss needs no rewards, so the arm needs no answer checkers.
 - The question of what the released model's scales are has a sharper form: do they follow from the signs by a closed rule, or were they trained freely. One added table in S2 answers it and moves the odds of scale-only training in a stated direction either way.
+- Starting from a binary model with nothing behind its signs is now supported from three directions: OneBit starts there, WinQ shows moving toward that state helps, and the error-diffusion paper resumes training from it and matches the run that kept everything.
 - The reproduction study should no longer be cited for "no retraining" or for "public methods reach twice the perplexity". Neither survives a reading of its scripts.
 
 ## 5. Probabilities after this batch
@@ -208,9 +226,10 @@ This is inference, not a measurement.
 - PrismML's launch press release, https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model
 - DiscQuant's code, https://github.com/jerry-chee/DiscQuant
 - WinQ's code, https://github.com/facebookresearch/WinQ
+- Helwegen et al., "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019, https://arxiv.org/abs/1906.02107
+- "Error Diffusion Replaces Latent Weights: Training Binary-Weight Language Models on a Few Bits of Dithered State", 2026, https://arxiv.org/abs/2610.34566, code https://github.com/pierreolivierbonin/error-diffusion-binary-weight-lms
 
 ## 7. Not read
 
 - The Kalaris Labs analysis, the second discussion thread on the 27B model page, and the config files of the released 1.7B. The fetch tool refuses an address that appears only inside an uploaded file. They open once the project owner pastes the three addresses into a chat message.
-- Two scripts of the reproduction study, billm_1bit.py and rotate_quant.py.
-- WinQ's code.
+- The Bop paper beyond its abstract and method summary.
