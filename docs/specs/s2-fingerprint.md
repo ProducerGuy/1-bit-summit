@@ -35,6 +35,8 @@ Nothing in section 4 is computed until every line here is confirmed and written 
 - The scale of a group is defined as the common absolute value of its dequantized weights. The MLX packing stores twice the scale and a bias of minus the scale per group, so a stored field is not the scale. The script dequantizes each packaging and confirms they give identical weights.
 - No rotation: sign agreement with Qwen3-1.7B well above one half in every matrix. A matrix near one half means different coordinates, and the run stops.
 
+- The parent's files store the tied matrix twice, as the embedding and as the output head. The two copies are compared first. If they differ, every later table says which copy it used.
+
 ## 4. Measures
 
 All measures are computed for each of the 196 block matrices and for the embedding and output matrix, then summarized by matrix type, by block, and overall. "Base" is the Qwen3-1.7B weight at the same position.
@@ -67,6 +69,8 @@ All measures are computed for each of the 196 block matrices and for the embeddi
 - Normalization gains: every gain vector of the released model divided elementwise by the base's, summarized per block, and the final normalization's.
 - Products along exact symmetries, per block: median ratio A of value times attention output; of up times down.
 - Per-group threshold test: for each group, the fewest sign disagreements that any single threshold on the base weights can reach, that is, how well "released sign equals the sign of base weight minus one shift per group" fits. Reported as the share of groups fitted exactly, the distribution of remaining disagreements, and the overall share of changed signs left unexplained. The same statistic is computed on a control in which each matrix's sign changes are shuffled among positions of the same magnitude decile.
+- Row position, second ordering: the row-position measure of 4A repeated with columns taken in order of parent column size, largest first. A compensation that visits columns by importance hides from file order and shows here.
+- Stored precision: the share of stored scales that are exactly BF16 values.
 
 ### 4D. File settings
 
@@ -116,6 +120,9 @@ Fixed before the run:
 | The curve test bends: more changes among small weights than the line allows, or a floor among large ones | Signs were chosen by a rule that depends on weight size. The displacement reading falls and the threshold test is read first |
 | The ratio test gives one constant across matrices, and the group test a slope near 1 with a positive intercept | The scales were read off the displaced weights by a fixed rule and hold little of their own. Read with ratio D's row above |
 | The ratio test scatters across matrices | The scales were trained freely |
+| Sign change rising along columns ordered by parent column size and flat in file order | Compensation in an importance order. Read as the row above for column order |
+| The group test gives a slope near zero: stored scale does not track the parent's group size within a matrix | A shell: training pushed magnitudes to one level per matrix. Idea I5 gains weight |
+| Nearly every stored scale is a BF16 value | The scales were produced in BF16, as an outside study found. Our export rounds scales the same way before any comparison |
 | Any difference in file settings | Fixed in the ruler before the baseline run. Each model runs with its own position settings |
 
 Trained against rounded is not decided here. The breakdown by magnitude decile is recorded for trial M4, which computes the same tables for public rounding methods.

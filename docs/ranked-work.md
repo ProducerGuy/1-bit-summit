@@ -6,7 +6,7 @@ Two lists. Runs are ranked by the probability that each earns a step of five poi
 
 | Rank | Run | Probability of a five-point step | Why |
 |---|---|---|---|
-| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 67% | Highest odds and highest cost. It runs after rank 2. Training from signs with nothing behind them is published practice (OneBit) and has a measured control for sign changes |
+| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 72% | Highest odds and highest cost. It runs after rank 2. Training from signs with nothing behind them is published practice (OneBit) and has a measured control for sign changes |
 | 2 | Scale-only training on the same-size teacher's own answers to mathematics, code and tool-calling prompts, signs frozen, on a ladder of token budgets | 55% | The cheapest candidate that can move the two largest losses. It runs first. The released model's tied embedding and output matrix was never trained |
 | 3 | Rank 2 with a larger teacher's logits as the target | 25% | Two sources find the same-size teacher equal or better at 1.7B |
 | 4 | Last block fitted to the teacher's logits (C99) | 10% | Published gains are 1 to 3 points at 3 and 4 bits on 7B models |
@@ -40,6 +40,7 @@ Two runs earn no step and decide what the others are worth:
 | 8 | ParetoQ and QuEST read in full, with code (C53) | Done, batch 4. Settings for run 1: a gated gradient, scales as computed times learned. Their budgets price a rebuild from full precision. Run odds unchanged | Run 1 |
 | 9 | Mirror-descent theory (C26, C27, C42, C43) | 15% to 20% | Our own conversion. Outside tests failed for ternary only, for a reason specific to three levels. No public test exists at 1 bit |
 | 10 | LFM2: published low-bit work and checkpoint facts (C9, C11, C18, C63) | 0% for this step | The LFM2 goal, 30% overall |
+| 11 | Batch 5: recipes and repairs not read to the end, the outside forensics project in full, the facts under the first benchmark run | Done, batch 5. An outside repair of a PrismML 1.7B inside its format gained 3.3 points of retention on a slice, only where it had task text. An outside study measured the 1-bit file: tied matrix untrained, end-to-end training in the first generation. Two published runs of the starting model differ by 6.2 points. Run 1 rose from 67% to 72%; run 2 stays at 55% | Runs 1 and 2; M1 |
 
 ## 3. What the two lists say together
 

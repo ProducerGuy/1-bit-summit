@@ -83,6 +83,12 @@ At the answer position of every multiple-choice presentation, and at every posit
 - Items whose choice changes between widths. The largest absolute output score and the largest residual-state norm in each width. The same for the teacher as the reference.
 - The tokens with the 100 largest output scores, set beside the output rows that S2 lists as most grown.
 
+### 3F. Voice and answer format
+
+- Opening line: for a fixed set of mathematics prompts from training splits, the first line of each model's greedy answer with thinking off, for the parent, the released 1-bit model and Boole-1.7B. Reported: each model's five commonest openings with counts, and the share of prompts on which two models open identically. An outside study found PrismML's ternary 1.7B opening unlike its parent on most GSM8K items and unlike any larger Qwen3 (`research/batch-5-comparison.md`, section 3A). The same count on the 1-bit model says whether its training targets also held more than the parent's distribution (idea I23).
+- Answer format: items whose correct option is stated in the prompt, scored apart from closed-book items. A model that cannot copy a stated answer has a broken read-out, not missing knowledge. The same outside study measured this on its own ternary student (27.2% against 99.25% for full precision) and repaired most of it with a small share of formatted teacher answers.
+- Matrix class: every table of section 3D is also reported with the attention matrices and the MLP matrices apart. Two sources place most rounding damage in the MLP matrices (`research/batch-5-findings.md`, sections 1C and 2C).
+
 ## 4. Outputs
 
 | File | Content |
@@ -123,6 +129,9 @@ Fixed before the run:
 | Mean cosine under 0.5 in most blocks | The layers do not line up. Hidden-state matching is dropped |
 | Cosine holding on general text and falling on mathematics or code | The parting is specific to those abilities, and the depth where it starts is where their repair is aimed |
 | More than 0.5% of choices change between widths, or an output score above 1,000 in size | Arithmetic matters for this model. The ruler fixes the arithmetic type before the baseline run, and the handling of the output role (I12) becomes a required setting of sign training |
+| The 1-bit model's openings differ from the parent's on most prompts, as the ternary model's do | Its training targets were not only the parent's distribution. A next-token term on response text becomes an arm of M3 |
+| The 1-bit model keeps the parent's openings | Its training matched the parent's distribution at least at the start of an answer. The next-token arm loses priority |
+| Copying a stated answer fails far more often than for the parent | The read-out for that answer format is broken. M2's text carries teacher answers in that format before anything else is concluded about knowledge |
 
 ## 7. Running constraints
 
