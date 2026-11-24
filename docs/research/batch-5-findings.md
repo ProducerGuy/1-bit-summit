@@ -17,7 +17,7 @@ For every item the plain outside question was asked first: who else has built, r
 | YAQA, arXiv 2505.22988 v3 | Whole paper | Direct |
 | LR-QAT, arXiv 2406.06385 v3 | First 200 thousand of 227 thousand characters, two extractions | HTML mirror of the same paper |
 | JointQ, arXiv 2611.20384 v1 | Abstract page direct. Whole paper, 49 pages with appendices, in two extractions | A read-only mirror of the same paper (alphaxiv.org), after the original site's rate limit refused the body five times |
-| PRISM, Discover Computing 29, article 700, doi 10.1007/s10791-026-10580-5 | Abstract and record only: the publisher's record at Crossref, the Semantic Scholar record, and the passages a search engine shows from the article. The publisher's site refuses the article page and its PDF address | Two indexing services and a search |
+| PRISM, Discover Computing 29, article 700, doi 10.1007/s10791-026-10580-5 | Whole article: 38 pages, all 18 tables, every figure caption | The article's file, supplied by the project owner |
 | JointQ in code: `docs/algorithms/jointq.md`, `benchmark/jointq_benchmark/README.md`, `model_validation/jointq/README.md` of github.com/FujitsuResearch/OneCompression | Each in full | Repository read directly |
 | github.com/IntelChina-AI/BitTern, README | In full | Repository read directly |
 | GSQ: README of github.com/IST-DASLab/GSQ (42.7 thousand characters) and the abstract page of arXiv 2604.18556 v3 | README in full. Paper body not read | Repository read directly; direct |
@@ -50,11 +50,21 @@ For every item the plain outside question was asked first: who else has built, r
 - Its gain over error-compensated rounding grows as the grid gets coarser: a mean of 0.0044 at 4 bits with groups of 128, 0.1559 at 3 bits with one scale per row. Their reason: with scales frozen, each group has fewer usable levels as the width drops or the group grows, so choosing codes without moving the scale costs more.
 - Its regularization strengths were tuned on data that overlaps the reported benchmarks, which the authors flag. It takes 2.6 to 15.7 times as long as error-compensated rounding. Nothing at ternary or 1 bit, in the body or the appendices.
 
-**PRISM: where recall is lost, at abstract level only.**
+**PRISM: which ability rounding removes first, and where.** Full account in `batch-5-prism-comparison.md`.
 
-- A diagnostic study, not a method. Models: Qwen2.5 at 3B and 7B, Llama-3.2-3B, Gemma-2-2B, all post-training quantized by four schemes. Bit widths were not visible in what could be read.
-- Its stated findings: open-ended recall of memorized facts degrades at low widths while copying an answer from supplied context stays intact; quantizing the MLP matrices alone erodes recall far more than quantizing the attention matrices alone, and this holds under a calibrated quantizer and in three model families; multi-hop reasoning stays vulnerable.
-- No numbers could be read.
+- A diagnostic study, not a method. Nothing is trained or repaired. Models: Qwen2.5-3B and 7B, Llama-3.2-3B, Gemma-2-2B, all instruction-tuned, converted after training by plain rounding (8, 4, 3 and 2 bits, a scale and an offset per 32 weights), bitsandbytes (8-bit and NF4), GPTQ (groups of 128) and GGUF files (Q6 to Q2 on the 7B model). The output matrix stays at 16 bits in every configuration. Nothing at ternary or 1 bit.
+- Probes: one fact asked with no passage, with the true value stated, with a false value stated, and with an irrelevant passage, scored into three outcomes; items kept only where the 16-bit model knows the fact. Reading probes over invented entities, where nothing can be recalled.
+- Recall goes first. Qwen2.5-3B keeps 0.84 of anchored facts at 4 bits by plain rounding and 0.95 by NF4; the 7B model keeps 0.88 at Q2. On rarer facts (PopQA) a third are gone at 8 bits.
+- Copying one stated fact from a short passage stays at 1.00 down to Q2. Two-hop composition over supplied facts: 0.98 at 16 bits, 0.97 at 8, 0.74 at 4, 0.15 at 3.
+- Component test at 3 bits, loss of anchored recall with only the MLP matrices converted against only the attention matrices: Qwen2.5-3B 0.84 against 0.14; Llama 0.38 against 0.03; Gemma 0.36 against 0.02. Under GPTQ on Qwen2.5-3B: 0.615 against 0.083.
+- The MLP matrices are about 88% of the converted weights, and the article's own per-weight figures for the two components are about equal. Its claim is about whole components.
+- At equal weight count (about 340 million) under plain rounding, the first five MLP layers lose 0.667, all attention 0.135, five middle MLP layers 0.010. Under GPTQ the first five MLP layers lose 0.000. On Gemma they lose 0.019. The article withdraws the early-layer finding for any converter but plain rounding and any model but this one.
+- The loss is not confined to facts: the MLP-only configuration at 3 bits also halves MMLU (0.657 to 0.306) and multiplies perplexity by 4.46, and it destroys reading in a long passage (0.01 against 0.78 for attention-only). With the MLP at 2 bits the model stops functioning.
+- A rise in following a stated false fact after conversion is mostly lost competition: 25 of the 26 items that newly follow the passage had also lost their own answer.
+- Its code address returns not found, and the appendix its text refers to is not in the published file.
+
+**GSQ: layer-by-layer code search.**
+
 - GSQ is layer-by-layer. Each weight gets learnable preferences over its few allowed values, trained through a sampled soft choice that hardens over ten epochs, with per-group scales learned at the same time. Loss: squared error between the full-precision and quantized layer outputs. It starts from an error-compensated rounding.
 - GSQ's code has a 1-bit quantizer ("The binary case uses a single logit"), a Qwen3 wrapper and groups of 128. Its paper's abstract reports 2 and 3 bits only.
 - GSQ can improve somebody else's released low-bit file without changing its format: Qwen3-8B, a public 2-bit file, average 50.03 to 56.28.
@@ -130,7 +140,7 @@ For every item the plain outside question was asked first: who else has built, r
 - One loss setting for sign training (M3), from EdgeRazor: mixing the two directions of KL by the teacher's entropy gained 1.2 points over the teacher-to-student direction alone, at 1.88 bits on a 0.6B model. Batch 4 found that the KL a damaged model shows tracks the teacher's entropy; this is a recipe that acts on the same quantity. One source, one model size, not at 1 bit.
 - The cost of an open recipe is now known and large: eight 80 GB cards and up to 22.9 billion tokens for half of the teacher's score on hard tasks at ternary. This is the measured reason that our own conversion stays under 5%, and that starting from a released model is the route.
 - One rule for any sign search (M3), from JointQ: a candidate sign change is scored with its group's scale re-solved, never with the scale held fixed. Its own trend says why this matters most for us: the cost of holding scales fixed grows as the grid coarsens and as groups grow, and 1 bit with groups of 128 is the coarsest case of both.
-- The MLP matrices are now named as the main site of damage by two independent sources: the forensics rounding test on our parent (section 2C) and PRISM's component test on three other families. Both are post-training rounding, not a trained 1-bit model. Any sign-change budget and any damage table should be split by matrix class from the start.
+- Converting all MLP matrices costs far more than converting all attention matrices in two independent sources: the forensics rounding test on our parent (section 2C) and PRISM's component test on three other families. Both are post-training rounding, not a trained 1-bit model, and in both the MLP is most of the weights (75% of the block weights on our parent). PRISM's per-weight figures for the two components are about equal, and its one equal-count result reverses under a calibrated converter. What holds: a damage table is reported by matrix class, and a comparison between classes is made at equal weight count. What does not hold: that a sign-change budget should favor the MLP per weight.
 - One memory-cheap arm for sign training, from LR-QAT: a low-rank term inside the sign function, folded into the signs afterward. It cannot flip arbitrary sets of signs. Untested at 1 bit.
 - The gated correction of the ten-percent entry is outside the storage format and is not a route to the goal. It is evidence about one loss class: on the 1-bit 1.7B a wrong output token was moved by a margin-sized push at layer 20, and a gate on the layer-20 state kept everything else. Batch 4 found that an ungated bias on the call token trades calls for refusals one for one. The gate is the difference.
 
@@ -139,7 +149,7 @@ For every item the plain outside question was asked first: who else has built, r
 - Any of these methods at 1 bit with one scale per 128 weights.
 - Permea's steps, loss and learning rate, and whether its gain survives a benchmark it had no text for.
 - How the CAT-Q and ScaleQ papers treat the tied matrix.
-- PRISM's numbers, bit widths and any layer-range result.
+- Whether the released 1-bit model lost recall, read-out or composition. PRISM separates the three for rounding at 3 bits and above only.
 - Whether EdgeRazor's entropy-weighted loss helps at 1 bit, and how much of its score comes from the scored tasks' own training splits.
 
 ## 2. The outside forensics project in full
@@ -416,7 +426,7 @@ To be applied when the two reviews are compared.
 - M2: the source of every training prompt logged per benchmark, and the per-benchmark record that separates a general gain from a task-specific one.
 - M3: a loss arm that mixes the two KL directions by teacher entropy; the scale re-solve rule for sign search; the low-rank arm as a memory-cheap option; three seeds per schedule; the plain straight-through pass as baseline; the six acceptance checks of section 2I.
 - Ideas: Permea's result under the repair idea; the gated correction as evidence only; the mirror step's implementation notes under idea I5.
-- Plan checklist: C3, C8 and C100 done; C56 done (token counts in section 2B); C4 and C6 done as far as the first run needs, with the open parts in section 3H; C62 done except the unread paper bodies of section 8; C112 done at abstract level, with the article's full text open (section 8).
+- Plan checklist: C3, C8 and C100 done; C56 done (token counts in section 2B); C4 and C6 done as far as the first run needs, with the open parts in section 3H; C62 done except the unread paper bodies of section 8; C112 done.
 
 ## 7. Sources found in this batch that the plan does not yet hold
 
@@ -438,7 +448,6 @@ To be applied when the two reviews are compared.
 
 ## 8. Not read
 
-- The full text of the PRISM article, https://link.springer.com/article/10.1007/s10791-026-10580-5. It is open access under CC BY 4.0, but the publisher's site refuses the article page and its PDF address, and its records list no preprint or other copy. Its abstract was read through two indexing services. The full text can be read if the owner pastes it or a copy of the file.
 - The last 27 thousand characters of LR-QAT, and the code of YAQA and LR-QAT.
 - The body of the GSQ paper.
 - The ReasoningQAT paper's page, which answers with a browser check.

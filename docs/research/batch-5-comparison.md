@@ -82,7 +82,8 @@ Each was checked at source.
 - It gives the demo's default as the first-generation ternary 27B. The default is the second-generation 27B; earlier families are selected through a separate guide. Its warning stands: the demo does not select the 1-bit 1.7B unless told to.
 - It states the gap between the two published runs as 7.02 points of retention, dividing one run's student score by the other run's teacher. Within each run the figures are 70.2% and 76.4%: 6.2 points.
 - Item 2 was not done. The document says so and marks its figures as secondary, which is the right way to fail. Its table repeats this project's earlier figures.
-- Not verified here, and held as unconfirmed: PRISM's figures (recall 1.00 to 0.16 with only the MLP matrices at 3 bits, against 0.86 with only attention, on Qwen2.5-3B), taken from an index of the article; YAQA's figures, taken from a third party's summary; the list of fixes in later releases of the harness.
+- PRISM's figures (recall 1.00 to 0.16 with only the MLP matrices at 3 bits, against 0.86 with only attention, on Qwen2.5-3B) were taken from an index of the article. They match the article (`batch-5-prism-comparison.md`).
+- Not verified here, and held as unconfirmed: YAQA's figures, taken from a third party's summary; the list of fixes in later releases of the harness.
 
 **The first reviewer's.**
 
@@ -121,12 +122,11 @@ Registers:
 - M1 and the ruler: the settings list; the four kinds of score, with steps counted on the third; the prompt token sequence hashed per item.
 - M2: text that covers every task family plus general text; formatted teacher answers for each answer format the suite uses; the source of every prompt logged; unique and processed tokens both recorded.
 - M3: the movement record at every checkpoint (share of signs changed, scale ratio, change by size of parent weight) set against the released model's own figures; the I22 starting point as an arm; a loss arm mixing the two directions of KL by teacher entropy; the scale re-solve rule; three seeds per schedule; normalization gains frozen as the default.
-- Plan: C3, C8, C56, C100 done; C4, C6 done for the first run; C62 done; C112 done at abstract level; C119 added (the rest of the study in 3A: its research log and its 0.8B reports not yet read).
+- Plan: C3, C8, C56, C100 done; C4, C6 done for the first run; C62 done; C112 done (`batch-5-prism-comparison.md`); C119 added (the rest of the study in 3A: its research log and its 0.8B reports not yet read).
 
 ## 8. Still open after both reviews
 
 - Whether the 1-bit 1.7B also changed voice. The finding is on the ternary model.
 - Which settings separate the two published runs.
 - Any 1-bit result for the methods of item 1.
-- The full text of the PRISM article.
 - The schedule question (checklist row C111): one outside source finds a late drop in rate necessary on one seed of three; another finds short trials biased against higher rates.

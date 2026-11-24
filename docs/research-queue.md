@@ -28,7 +28,7 @@ Every piece of reading and paper work the project still owes, what each helps, a
 
 ## 3. Open, for the next five points
 
-Ten parts, three batches. Batches 3, 4 and 5 are done, except part O of batch 5 (Precision Numerics' releases), which was not one of batch 5's three items. A new reading row, C119, came out of batch 5. Within a batch the order does not matter. Batches are ordered so that what a specification already written depends on comes first.
+Ten parts, three batches. Batches 3, 4 and 5 are done, except part O of batch 5 (Precision Numerics' releases), which was not one of batch 5's three items. Two new reading rows, C119 and C122, came out of batch 5. Within a batch the order does not matter. Batches are ordered so that what a specification already written depends on comes first.
 
 | Batch | Part | Checklist rows | What is read | What it helps | Status |
 |---|---|---|---|---|---|
@@ -38,7 +38,7 @@ Ten parts, three batches. Batches 3, 4 and 5 are done, except part O of batch 5 
 | 4 | D. The decisions paper | C102 | The last 78 thousand characters of S75. S74 and S76 are read in whole | M1: the failure split. S4: how its outcomes are read. Idea I7 | Done. `research/batch-4-findings.md`, `batch-4-comparison.md` |
 | 4 | E. Published low-bit training recipes | C53, C57 | ParetoQ (S47) to the end with its result tables and code; QuEST with code | M3: schedule, estimator and token budget. M2: the token ladder | Done. `research/batch-4-findings.md`, `batch-4-comparison.md` |
 | 4 | F. Scale-only precedent and exact symmetries | C31 | EfficientQAT (S21), whose second stage trains scales alone; FPTQuant (S22); exact gauges (S23); STBLLM (S24); with code | M2: the nearest published precedent for training scales alone. S3 and idea I1: which reorderings and rescalings are exact. M3 | Done. `research/batch-4-findings.md`, `batch-4-comparison.md` |
-| 5 | G. Leftovers of batches 1 and 2 | C62, C112 | ScaleQ-1.58 and CAT-Q in full with code; YAQA; LR-QAT; the body of the JointQ paper; the PRISM article on recall under quantization | M2 and M3: training text and reconstruction settings. Idea I2. S4 and idea I16 | Done by both reviewers. `research/batch-5-findings.md`, `research/batch-5-comparison.md`. Unread: the full text of the PRISM article |
+| 5 | G. Leftovers of batches 1 and 2 | C62, C112 | ScaleQ-1.58 and CAT-Q in full with code; YAQA; LR-QAT; the body of the JointQ paper; the PRISM article on recall under quantization | M2 and M3: training text and reconstruction settings. Idea I2. S4 and idea I16 | Done by both reviewers. `research/batch-5-findings.md`, `research/batch-5-comparison.md`. The PRISM article in full: `research/batch-5-prism-comparison.md` |
 | 5 | N. A reference pair for the fingerprint | C116 | A public full-precision parent and its 1-bit child trained by a known recipe, not behind an access form: mirrors of ParetoQ's files, or another released pair | S5 and idea I20: how PrismML's fingerprint is read, and the total for the budget on sign changes | Done. `research/batch-4-pair-search-comparison.md` |
 | 5 | O. Precision Numerics' releases in full | C118 | Both Boole model cards, its blog posts, the runtime repository, its llama.cpp fork, the 32B preview: any statement of method, data or budget | M1's third model, S5, the starting-model decision | Open |
 | 5 | H. The outside forensics project in full | C100, C56 | Whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, the scripts behind its Qwen3-1.7B ladder, its newer discussion thread; token count, batch size and step count of each 1.7B run | M3: the learning-rate schedule, where it conflicts with "Linger and Lose" (C111). M4. S2 | Done. `research/batch-5-findings.md`, `research/batch-5-comparison.md` |
@@ -69,6 +69,7 @@ Code announced and not released. Each is checked again when its part comes up.
 | What | Would help |
 |---|---|
 | ThinkBit's training code | M2, M3 |
+| The PRISM article's code, probes and per-item results. The address the article gives returns not found | S4's probe of recall, copying and composition |
 | CAT-Q's training code | M3 |
 | On-policy distillation's code | Idea I14 |
 | ΣΔ-Sampler's code | Idea I13 |
@@ -80,7 +81,7 @@ Code announced and not released. Each is checked again when its part comes up.
 
 | Kind | Rows | Where they are tracked |
 |---|---|---|
-| Reading and paper work, 14 rows | C11, C18, C26, C27, C38, C41, C43, C46, C47, C52, C111, C112, C118, C119 | Sections 3, 4 and 5 of this document |
+| Reading and paper work, 14 rows | C11, C18, C26, C27, C38, C41, C43, C46, C47, C52, C111, C118, C119, C122 | Sections 3, 4 and 5 of this document |
 | Scripts and runs, 32 rows | C9, C10, C28, C29, C32, C33, C42, C49, C50, C55, C58, C59, C60, C63, C64, C65, C67, C69, C75, C76, C79, C81, C89, C90, C92, C93, C95, C96, C97, C98, C99, C110 | `trials.md` for those with a trial (C76, C90 and C92 are S2; C67 and C50 are S3 in part; C110 is S4); the plan for the rest |
 | Registers, kept current | C106, C107, C113 | `ideas.md`; `trials.md` and `specs/`; this document |
 | Written, with decisions open | C104 | `ruler-spec.md`, section 11: five decisions for the project owner |
