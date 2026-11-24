@@ -2,7 +2,7 @@
 
 Source: Vaish, Gautam, Tiwari, Yadav, "PRISM a diagnostic framework for parametric recall degradation in quantized large language models", Discover Computing 29, article 700 (2026), doi 10.1007/s10791-026-10580-5, CC BY 4.0. Received 4 July 2026, accepted 8 September 2026.
 
-How it was read here: the article's PDF, 38 pages, supplied by the project owner. Every page of text, all 18 tables and every figure caption were read. Sample sizes that the PDF's text layer garbles were read from the page images. The plots were read through their captions and the tables behind them; no value was measured off a plot.
+How it was read here: the article's PDF, 38 pages, supplied by the project owner. Every page of text, all 18 tables and all 11 figures were read, the figures as page images. Sample sizes that the PDF's text layer garbles were read from the page images. A value printed on a figure is used as given. A value that is only plotted is marked as read from the plot.
 
 The second reviewer's audit is filed beside this document as `batch-5-prism-second-reviewer.md`. It was written without the PDF, from passages of the article that a search index returns, and says so.
 
@@ -26,7 +26,7 @@ The second reviewer's audit is filed beside this document as `batch-5-prism-seco
 | Llama-3.2-3B-Instruct | Component test in a second family; one case with no loss | 92 |
 | Gemma-2-2B-it | Component test in a third family | 105 |
 
-- One laptop graphics card with 8 GB, forward passes only. Greedy decoding, 32 new tokens for conflict and copy items, 96 for three-hop items. MMLU on a 1,995-item subset scored by letter log-probability. WikiText-2 perplexity with a 512-token window.
+- One laptop graphics card with 8 GB, forward passes only. One configuration of one model takes five to fifteen minutes on it, and the whole study a few hours of that card. Greedy decoding, one answer per item through the model's chat template, 32 new tokens for conflict and copy items, 96 for three-hop items. MMLU on a 1,995-item subset scored by letter log-probability. WikiText-2 perplexity with a 512-token window.
 - Plain rounding (torchao, weights only): 8, 4, 3 and 2 bits, one scale and one zero point per group of 32 weights.
 - bitsandbytes: 8-bit integers, and NF4 at 4 bits with double quantization.
 - GPTQ (gptqmodel): groups of 128, 256 calibration samples of WikiText-2, no probe item in calibration, a width per module.
@@ -58,7 +58,7 @@ The second reviewer's audit is filed beside this document as `batch-5-prism-seco
 
 | Probe | Construction | Items | 16-bit score |
 |---|---|---|---|
-| Two-hop | Invented entities; the answer needs two supplied facts chained and appears nowhere in the passage | 160 | 0.98 |
+| Two-hop | Invented entities in a chain of company, city and nation, with two distractor chains in the passage; the answer needs two supplied sentences chained and never stands next to the entity asked about | 160 | 0.98 |
 | Three-hop | Three supplied facts, not adjacent, among distractor sentences; scored on the final answer after free reasoning | 80 | 0.912 |
 | Long single-hop copy | One fact among about sixty distractor sentences, about 570 words | 120 | 0.97 |
 | Long multi-hop | A three-hop chain scattered among ten distractor chains and filler | 100 | 0.75 |
@@ -72,8 +72,9 @@ Closed-book accuracy on all four is 0.00 by construction, so any correct answer 
 - Memory: the share that assert the true value or reject the false one.
 - Other: neither. Above 0.20 the configuration is treated as broken and its other figures are not interpreted.
 - Support accuracy: correct when the true value is in the passage.
-- The classifier agreed with a second annotator on 60 of 60 responses and with the first author on 45 of 46.
-- Intervals are 95% Wilson intervals, with a paired bootstrap where two conditions share items. A check on one configuration with three sampled seeds beside the greedy run: closed-book accuracy 0.146 to 0.156, context-following 0.781 to 0.854.
+- The classifier is a fixed rule on normalized text (lower case, punctuation and articles removed). It looks for the true value and the false value as whole tokens and treats a value as denied when a negation word precedes it in the same clause. Labels are tried in order: follows the passage; asserts the true value; denies the false value; otherwise the third outcome.
+- The classifier agreed with a second annotator on 60 of 60 responses and with the first author on 45 of 46. The one disagreement was a garbled answer from a broken configuration. The authors note that these are short templated answers and that agreement would be lower on free text.
+- The tables carry 95% Wilson intervals. The methods section also names percentile bootstrap intervals over items, with a paired bootstrap where two conditions share items. A check on one configuration with three sampled seeds beside the greedy run: closed-book accuracy 0.146 to 0.156, context-following 0.781 to 0.854.
 
 ## 4. Results
 
@@ -123,7 +124,9 @@ Rarer facts go earlier: a third of them are gone at 8 bits. The whole-model and 
 | Probe | 16-bit | 8-bit | 4-bit | Whole model, 3 bits | MLP only, 3 bits | Attention only, 3 bits |
 |---|---|---|---|---|---|---|
 | Two-hop, 160 items (Table 8) | 0.98 | 0.97 | 0.74 | 0.15 | 0.43 | 0.94 |
+| Two-hop, a false chain in the passage followed | 0.96 | 0.94 | 0.78 | 0.13 | 0.44 | 0.91 |
 | Three-hop, 80 items (Table 15) | 0.912 | 0.850 | 0.812 | 0.013 | 0.138 | 0.637 |
+| Three-hop, a false chain followed | 0.95 | | 0.80 | 0.08 | | |
 | Long single-hop copy, 120 items (Table 18) | 0.97 | 0.94 | 0.88 | 0.00 | 0.01 | 0.78 |
 | Long multi-hop, 100 items (Table 18) | 0.75 | 0.64 | 0.54 | 0.00 | 0.03 | 0.30 |
 
@@ -148,9 +151,12 @@ Plain rounding against a calibrated converter, Qwen2.5-3B at 3 bits (Table 9). L
 - First six MLP layers under plain rounding: 0.677 of the 0.844 that all MLP layers lose. First six layers of attention: 0.021. The first five attention layers hold only about 47 million weights, so no equal-count attention comparator exists at that depth.
 - No single layer contributes more than 0.021.
 - The article's own per-weight figure under plain rounding: about 0.015 per 100 million MLP weights against about 0.022 for attention. It calls them comparable.
+- The cumulative sweep (Figure 5, plain rounding). MLP layers converted from the first layer up: 0.677 after six layers, then between about 0.72 and 0.77 through thirty layers (read from the plot), 0.844 with all 36. Thirty more layers add a quarter of what the first six cost. Attention layers converted from the first up: near zero through the first half of the layers and rising to 0.135 at the end (read from the plot), so what attention loses sits in its later layers.
+- The article's account of why GPTQ removes the hotspot: rounding error is largest where a matrix's weights have heavy tails, which it says the first MLP layers of this model have, and calibration protects the weights that matter to the layer's output. No measurement of the weights' tails is given. It credits GPTQ with fitted scales and offsets; GPTQ's published mechanism is a choice of codes that compensates error. The measured reversal stands under either description.
 - Harder width on attention: attention at 2 bits keeps 0.354, the MLP at 3 bits keeps 0.156.
 - Equal measured error: at 3 bits both components have a relative weight error of 0.177, and the losses are still 0.844 against 0.135.
 - The MLP at 2 bits: closed-book, context-following and support all 0. The model no longer functions.
+- The same test at 4 bits, values printed on Figure 8 and given nowhere in the text or tables: MLP only keeps 0.93 with context-following 0.74; attention only keeps 0.99 with context-following 0.65. At 3 bits the figure repeats Table 11 (0.16 with 0.82; 0.86 with 0.52).
 
 Three families, plain rounding at 3 bits (Table 11):
 
@@ -228,7 +234,7 @@ Every one of these was checked against the article's tables and matches:
 ### 5B. One slip and two things it could not have known
 
 - It gives the third-outcome rate of NF4 on CounterFact as about 0.25. The table has 0.25 for the 16-bit model and 0.22 for NF4. The article's prose rounds the set as a whole to that figure.
-- It reports that the appendices could not be reached. There are none to reach. The text refers to an appendix on activation patching and to full-set tables, and the published file ends at the references with neither. Section 4H is everything the article gives on activation patching.
+- It reports that the appendices could not be reached. There are none to reach. The methods section says two analyses are deferred to appendices, the activation-patching study and a full-set table for every anchored result, and the published file ends at the references with neither. Section 4H is everything the article gives on activation patching. The annotators' labels and the validation script are said to be released with the code, which cannot be found (section 10).
 - It gives 6 October 2026 as the publication day from the publisher's page. The file carries only the received and accepted dates.
 
 ### 5C. Cells it marked as not recovered, filled from the article
@@ -243,7 +249,8 @@ Every one of these was checked against the article's tables and matches:
 | The values of the harder-width and equal-error controls | Attention at 2 bits keeps 0.354 against 0.156 for the MLP at 3 bits; both components at relative error 0.177 |
 | The number of seeds | Three sampled seeds at temperature 0.7 beside the greedy run |
 | The five rows of the relation table | Section 4E |
-| Software versions | PyTorch 2.11 with CUDA 12.8 is the one this read recorded |
+| Software versions | Only PyTorch's is given (2.11, CUDA 12.8). The other libraries are named without versions |
+| Any figure image | All eleven viewed. One result exists only on a figure: the component test at 4 bits (section 4E) |
 
 None of these was reported wrongly. Each was marked as missing, and its document states at the top that it is not a verified full read.
 
@@ -265,6 +272,7 @@ None of these was reported wrongly. Each was marked as missing, and its document
 - The article's weight counts reproduce from the public configuration of Qwen2.5-3B (36 layers, width 2,048, MLP width 11,008, 16 query heads and 2 key and value heads of 128): 67.6 million MLP weights and 9.44 million attention weights per layer, 2,435 million and 340 million in all, 87.8% in the MLP; five MLP layers are 338 million; five attention layers are 47 million.
 - The article's per-weight figures (0.015 and 0.022 per 100 million) do not follow from its own table. Dividing the two whole-component losses by the weights converted gives 0.035 for the MLP and 0.040 for attention. The ordering is the same in both: per weight, attention is not the more robust component.
 - The same count for Qwen3-1.7B (28 layers, width 2,048, MLP width 6,144, 16 query heads and 8 key and value heads of 128): 37.7 million MLP weights and 12.6 million attention weights per layer, 1,057 million and 352 million in all. The MLP is 75% of the block weights, not 88%. All attention matrices together equal 9.3 MLP layers, so an equal-count comparator on our model is nine MLP layers (340 million) against all attention (352 million).
+- Damage does not add up across classes. At 4 bits by plain rounding the whole model loses 0.16 of anchored recall (Table 7). The MLP alone loses 0.07 and attention alone 0.01 (Figure 8), 0.08 together. Converting both costs twice the sum of converting each. On 96 items the intervals are wide, so the size is uncertain; the direction says that a table of damage by class understates the whole.
 - Relative weight error. The article's 3-bit point is 0.177 for both components, and at that error the MLP conversion loses 84% of anchored recall. A sign with the group's mean magnitude on weights with a normal distribution has a relative error of the square root of (1 minus 2 over pi), 0.603. A 1-bit model made by conversion alone starts at more than three times the error at which this article's model lost most of its recall, and well past the point where its 2-bit MLP stopped functioning. This agrees with what batch 5 already holds: the released model's signs were moved by training, and an outside one-shot ternary fit of our parent scores 0.0% on GSM8K (`batch-5-comparison.md`, section 3A).
 
 ## 8. What transfers to our case
@@ -276,6 +284,8 @@ None of these was reported wrongly. Each was marked as missing, and its document
 - The warning on context-following. A converted model that follows a stated fact more often than its parent may only have lost its own answer. A repair that raises a context score is read beside the closed-book score for the same items.
 - The whole-component ordering as a prior, with its confound stated: converting all MLP matrices costs more recall than converting all attention matrices, in three families and under two converters, and the MLP is most of the weights.
 - The MLP is where reading under load fails too (section 4D). A budget of sign changes split by matrix class is not a split between knowledge and everything else.
+- The authors' own instruction: the numbers are for the pairings measured, and the probes are to be run on the model and converter in hand. Llama at 4 bits lost nothing under the same procedure.
+- The cost. Their whole study ran on an 8 GB laptop card at five to fifteen minutes per configuration. The same probes on two 1.7B models are small beside any training run.
 
 ### 8B. Does not transfer
 
@@ -304,7 +314,7 @@ Whether the released 1-bit 1.7B lost recall, read-out or composition. Its tied m
 
 ### 9B. Registers
 
-- S4 specification: a recall, copy and composition probe added as section 3G, with five reading rows; the matrix-class line of 3F restated with the confound and the equal-count comparator for our model; a gap line that the map describes this model under this training only.
+- S4 specification: a recall, copying and composition probe added as section 3G, with five reading rows; the matrix-class line of 3F restated with the confound and the equal-count comparator for our model; two gap lines: the map describes this model under this training only, and damage by class does not add up to the whole.
 - Trials: the S4 row carries the probe; the M2 row carries the rule that a context score is read beside the closed-book score for the same items.
 - Ideas: a limit added to I16.
 - `batch-5-findings.md`: the article's block, the line on matrix class, and the unread list.

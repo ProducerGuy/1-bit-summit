@@ -176,5 +176,6 @@ Whether to accept the access agreement for GPQA so that its items outside the Di
 - The exchange of states assumes the two models share coordinates. S2 and the cosine at the embedding test that, and the exchange is skipped if they fail.
 - The lens reading is known to be unreliable in early blocks. It is reported for every block and relied on only where the exchange curves agree with it.
 - Every threshold in section 6 is a judgment set in advance.
+- Damage by class need not add up. In an outside study the whole model converted at 4 bits lost twice the sum of what the MLP matrices and the attention matrices lost when converted alone. Every table by matrix class is reported beside the whole-model figure and is not summed.
 - An outside study found the place where conversion damage shows moving with the converter and with the model. Every table of this trial describes this released model under its own training. None is carried to another model or another recipe.
 - Mathematics, code and tool calling, which are most of the lost points, are measured here only through hidden-state agreement. Their failures are sorted by the baseline run's failure split, not by this trial.
