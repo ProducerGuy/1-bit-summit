@@ -41,7 +41,7 @@ Each was checked at source before it was adopted.
   - the call token's fall measured against the rest of the vocabulary, 8.7 logits below its class on Qwen3-1.7B;
   - the bias repair in numbers: all lost calls returned, all correct refusals lost, nothing returned in 12 of 41 conditions.
 - ParetoQ's released files: full-precision parents and 1-bit children at 125M to 1.5B, with scores the paper does not tabulate (1-bit keeps 86% to 90% of an eight-task mean) and a stated parentage. The second reviewer reports that no 1-bit scores exist below 3B.
-- The idea those files allow: a reference fingerprint of ordinary 1-bit training, to set beside PrismML's. The files are gated behind a form asking for a legal name and date of birth, which the owner declines. An ungated pair is being sought.
+- The idea those files allow: a reference fingerprint of ordinary 1-bit training, to set beside PrismML's. The files are gated behind a form asking for a legal name and date of birth, which the owner declines, and no open copy exists. Two open pairs were found in their place: a short 1-bit run on TinyLlama 1.1B in groups of 128, and ternary runs on Llama-3-8B at 10 and 100 billion tokens.
 - QuEST's quantizer code: its scale is computed at every step, not learned, and its gate passes gradient up to about 2.3 times the scale.
 - EfficientQAT's code: the scale stage is 128 optimizer steps of plain next-token loss, no teacher.
 - "All for 1-Bit" (arXiv 2609.06161): scale-only training with frozen signs at 1.00 bit, 34.85 to 40.79 on a 3B model with a quarter of a million tokens. The only scale-only measurement at 1 bit in the batch.
@@ -97,6 +97,6 @@ First reviewer:
 - Into the scale-only trial: the tied-matrix arm keeps its condition on S4's exchange test and gains weight from this batch; the middle blocks' scales become a named arm if S4 places the call damage there; acceptance checks: signs unchanged by checksum, scales rounded to FP16 and stored before scoring, bit count unchanged; a short ladder of budgets, since published scale training flattens within a few million tokens.
 - Into the sign-and-scale trial's settings: a gate on the gradient set wider than the scale; scales as a computed value times a learned factor starting at 1; magnitudes behind the signs started inside the gate; a rule for an exact zero behind a sign; estimator arms compared at an equal rate of sign changes.
 - S3 is unchanged. It already holds both controls the second reviewer asks for: a random-order arm, and a check on a running model that opens when a class of matrices gains 5% or more, since weight error alone has misled before.
-- A fifth script trial, the reference fingerprint of ordinary 1-bit training, conditional on finding a parent and child pair that is not gated.
+- A fifth script trial, the reference fingerprint, on the two open pairs.
 - New ideas I19 (margin survival as the health number that sorts repairs) and I20 (reference fingerprint). The second reviewer's joint program of grouping and scale fitting is recorded under I1 with its 24%, to be settled by S3.
 - Odds after the batch: scale-only training 55%, sign and scale training 67%, either 74%, an on-policy stage 52%, the tool-calling loss mainly a one-sided shift 30%, a better choice of groups alone under 5%.

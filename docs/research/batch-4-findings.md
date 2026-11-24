@@ -260,7 +260,10 @@ What carries to one sign per weight, one scale per 128, tied matrix included:
 - What the child's file stores is nearly settled: 3.02 GB is 1.5 billion values at 16 bits, and it loads without a quantizer, so it holds the quantized values, one magnitude for each row. The script's first step confirms it by counting distinct magnitudes in a row.
 - The embedding and output matrix of these files were not converted, so the comparison is with PrismML's body only.
 - The weights file is a pickle, so it is read with a loader that accepts tensors only.
-- It trains nothing. Its one cost is access: the files sit behind a form that asks for a legal name and a date of birth. Whether to submit that form is the owner's decision. It is proposed as a fifth script trial, conditional on that decision.
+- It trains nothing. Its one cost is access: the files sit behind a form that asks for a legal name and a date of birth, which the owner declines.
+- No open copy of these files was found: the code repository holds no weights, the model host lists no third-party copy or conversion of any ParetoQ file, and a search of other hosts returned none.
+- Two open pairs exist. (a) TinyLlama v1.1, 1.1B, Apache-2.0, and a 1-bit child trained from it with BitDistiller (asymmetric clipping, self-distillation) in groups of 128, 400 steps at batch 16 and rate 2e-5, scoring near chance (https://huggingface.co/fredericowieser/TinyLlama_v1.1_mix_wikitext_alpaca_1bit_BitDistiller_baseline). It is the fingerprint of a short run, at our group size. (b) Three ternary children of Llama-3-8B-Instruct trained by the BitNet 1.58 fine-tuning recipe for 10 billion tokens (two schedules) and 100 billion tokens (https://huggingface.co/HF1BitLLM/Llama3-8B-1.58-100B-tokens): the same recipe at two budgets, so sign changes can be read against budget. Ternary, 8B, embedding and output matrix in full precision; the parent is gated at its publisher and an open copy has to be confirmed.
+- Neither replaces the ParetoQ pair, which is the only one at 1 bit, at our size, with a long budget. The fifth script trial is defined on pair (a) first and pair (b) second, and its reading is weaker for it.
 
 ### 2F. What it means for the next five points
 
@@ -417,7 +420,8 @@ Probabilities:
 | Either of the two | 74% | 74% | |
 | An on-policy stage adds at least a third of a step | 50% | 52% | Section 1G |
 | The tool-calling loss of the released 1.7B is mainly a one-sided shift on the decision to call | Not held | 30% | Section 1G |
-| A reference fingerprint of ordinary 1-bit training can be computed from ParetoQ's files, once access is granted | Not held | 90% | The README names the parents; the 1-bit file is dense BF16 with no code of its own. What remains is the row-magnitude check |
+| A reference fingerprint can be computed from an open parent and child pair | Not held | 90% | Two open pairs found. Whether each child's file holds finished values or the weights behind them is the script's first check |
+| That fingerprint changes how PrismML's is read | Not held | 30% | The open pairs are a short 1-bit run and a long ternary run at 8B. The long 1-bit run at our size is behind a form |
 | A better choice of groups adds points on its own | Under 5% | Under 5% | |
 | Our own conversion by a published 1-bit route beats the released model | Under 5% | Under 5% | |
 
