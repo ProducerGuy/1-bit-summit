@@ -1032,7 +1032,7 @@ Status values: `done`, `open`.
 | C28 | Redundancy map and feasibility check on real weights: for every matrix of Qwen3-1.7B and the LFM2 checkpoint, the input covariance spectrum, and on sampled rows the three errors of `exp_realistic.py` (naive, jointly solved scales, optimized signs). Rotation leaves the spectrum unchanged, so raw and rotated bases are compared on the three errors only. For attention, the input statistics are those of the attention-mixed tokens, and each head also reports the spectrum of its covariance-weighted value-output operator against its head dimension. The sign search uses the variable-projection rule of `exp_varpro.py`. Each matrix also reports its within-group magnitude dispersion, `sum(w^2) - (sum|w|)^2 / n` per group as a share of the group's energy, which bounds weight-space error from below and equals 0.363 for Gaussian weights. A layer that converts locally needs no training budget. A layer that does not is not thereby ruled out, since PrismML's released codes fit local activation statistics worse than plain rounding and still work (S20) Spectra are computed per stratum of the data as well as pooled, because a direction that carries little average energy can carry a rare capability | open |
 | C29 | Block-gain script: measure each block's kept contribution after naive snapping on both real checkpoints | open |
 | C30 | Toy tests of the theory (`exp_nullspace.py`, `exp_gain.py`, `exp_twosided.py`) | done |
-| C31 | Read S21, S22, S23 and S24 in full, with released code | open |
+| C31 | Read S21, S22, S23 and S24 in full, with released code. Done in batch 4: `docs/research/batch-4-findings.md`, section 3 | done |
 | C32 | Extend the redundancy map (C28) with output sensitivity, for H12 | open |
 | C34 | Read S28, S29 and S30 in full, with released code. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C35 | Toy test of the group offset (`exp_offset.py`) | done |
@@ -1052,11 +1052,11 @@ Status values: `done`, `open`.
 | C50 | Inside the C28 script: per group of 128, the half-group mean magnitudes and the share of groups where splitting the scale would cut weight-space error by more than 8-bit scale rounding costs, along rows and along columns | open |
 | C51 | Read S46 in full, with released code: whether its reset and noise steps apply at 1 bit with group scales. If they do, candidates A and D use them, so the straight-through arms are the strongest available. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C52 | Read S44 and S45 in full | open |
-| C53 | Read ParetoQ and QuEST in full, with code. Both are published low-bit training recipes that section 2E does not yet cover | open |
+| C53 | Read ParetoQ and QuEST in full, with code. Both are published low-bit training recipes that section 2E does not yet cover. Done in batch 4: `docs/research/batch-4-findings.md`, section 2 | done |
 | C54 | Outside note of November 22 reviewed: its masking identity verified algebraically and by sampling (`exp_maskrank.py`), its scale split tested (`exp_scalesplit.py`), and three of its cited papers located (S44, S45, S46) | done |
 | C55 | At T0, measure the question-level correlation of correctness between PrismML's released 1.7B models on the suite, and fix the seed count for T4 from it (section 6B rule 7) | open |
 | C56 | Read S20 again for the token count, batch size and step count of each of its 1.7B runs | open |
-| C57 | Finish S47: the page read so far stops before its result tables. Record every 1-bit and 1.58-bit score beside its full precision baseline | open |
+| C57 | Finish S47: the page read so far stops before its result tables. Record every 1-bit and 1.58-bit score beside its full precision baseline. Done in batch 4: `docs/research/batch-4-findings.md`, section 2B | done |
 | C58 | Body and interface attribution on real weights: binary body with full precision embedding and output matrix, the reverse, both, neither. Shows what the strict requirement on the tied matrix costs | open |
 | C59 | Block swap with PrismML's released binary 1.7B as the specimen: a full precision Qwen block placed in the trained binary network, and a binary block placed in the full precision network, after confirming layout and basis match. A network that gets worse with a restored block has co-adapted | open |
 | C60 | In C28 and C32: sensitivity from sampled gradients of teacher log-probabilities, input side and output side; spectra at rising sample counts; and the energy a calibration subspace misses on separate text. A rank no larger than the sample count is not evidence of redundancy | open |
@@ -1100,7 +1100,7 @@ Status values: `done`, `open`.
 | C99 | The body absorbing the output role's error as it absorbs the lookup's: the last block's matrices fitted to the teacher's logits through the binary output matrix instead of to the teacher's activations | open |
 | C100 | Read the outside forensics project (S73) in full: whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, and the scripts behind its Qwen3-1.7B ladder. Its README, recipe ledger and retention report are read (section 2B). Then its newer discussion thread on the model page | open |
 | C101 | Damage table from published scores (section 1B, step 1): `docs/damage-table.md`. At 1.7B and 1 bit, MATH-500 and BFCL v3 carry 44% of the loss and MMLU-Redux another 14%; instruction following is nearly intact | done |
-| C102 | Read S74, S75 and S76 in full. S74 and S76 read in whole; S75 read to 200,000 of 277,669 characters. What each establishes is in `docs/repair-candidates.md`, section 1 | open |
+| C102 | Read S74, S75 and S76 in full. S74 and S76 read in whole; S75 read to 200,000 of 277,669 characters. What each establishes is in `docs/repair-candidates.md`, section 1. Done in batch 4, all three in whole: `docs/research/batch-4-findings.md`, section 1 | done |
 | C103 | Ranked repair candidates document (section 1B, step 3): `docs/repair-candidates.md`, first reviewer's version. The second reviewer's version is returned and compared: it confirms the damage ranking on the six benchmarks it could read, misses MATH-500, and starts every candidate from a conversion of our own. Adopted from it: the category guardrail and the per-item gained and lost lists, now in `docs/ruler-spec.md` | done |
 | C104 | Ruler specification (section 1B, step 4): `docs/ruler-spec.md`. Three decisions in its section 11 are the project owner's | written, decisions open |
 | C105 | Batch 1 of the two-reviewer research (tool-calling data, ScaleQ and CAT-Q with code, the public record on PrismML's method): `docs/research/batch-1-findings.md`, `docs/research/batch-1-second-reviewer.md`, `docs/research/batch-1-comparison.md` | done |
@@ -1111,6 +1111,8 @@ Status values: `done`, `open`.
 | C110 | Paired damage map of the released 1-bit 1.7B against the teacher, forward passes only (`docs/trials.md`, S4): where the loss sits, whether the layers still line up, whether arithmetic width changes answers | open |
 | C111 | Settle on paper, for the sign-and-scale trial's specification: the learning-rate schedule (S73 against S85), the form of a budget on sign changes (I13), and the handling of the tied matrix's two roles (I12) | open |
 | C112 | Read the body of S33 and the PRISM article on recall under quantization (https://link.springer.com/article/10.1007/s10791-026-10580-5), both cited by the second reviewer and not opened by the first | open |
+| C116 | Find a public pair of a full-precision parent and its 1-bit child trained by a known recipe that is not behind an access form, for the reference fingerprint (S5, idea I20). ParetoQ's own files are gated | open |
+| C115 | Batch 4 of the two-reviewer research (which decisions conversion breaks, published 1-bit and ternary training recipes, scale-only training and exact transformations): `docs/research/batch-4-findings.md`, `docs/research/batch-4-second-reviewer.md`, `docs/research/batch-4-comparison.md`. Ideas I19 and I20, trial S5, a margin-survival table in S4, failure fields in M1 and settings for M2 and M3 came out of it | done |
 | C114 | Batch 3 of the two-reviewer research (the released model's weights, reasoning recovery from the model's own text, faster and controlled sign training): `docs/research/batch-3-findings.md`, `docs/research/batch-3-second-reviewer.md`, `docs/research/batch-3-comparison.md`. Ideas I17 and I18 and new tests in S2 and S4 came out of it | done |
 | C113 | Research queue: `docs/research-queue.md`. Every open piece of reading and paper work, what each helps, its batch, and an account of every open row of this checklist. Research for the next five points is finished when its section 3 is done and its section 5 is settled | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
@@ -1167,7 +1169,7 @@ Status values: `done`, `open`.
 - S19. ThakiCloud, "Bonsai 1-bit Reproduction Study", README. https://github.com/ThakiCloud/bonsai-1bit-repro
 - S20. "I took Bonsai 2 27B apart: the format is public, the last 8% is trained", discussion 44. https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/44
 - S21. Chen et al., "EfficientQAT: Efficient Quantization-Aware Training for Large Language Models", ACL 2025. https://arxiv.org/abs/2407.11062
-- S22. "FPTQuant: Function-Preserving Transforms for LLM Quantization". https://www.researchgate.net/publication/392466941_FPTQuant_Function-Preserving_Transforms_for_LLM_Quantization
+- S22. van Breugel, Bondarenko, Whatmough, Nagel, "FPTQuant: Function-Preserving Transforms for LLM Quantization", ICML 2026. https://arxiv.org/abs/2506.04985 Code: https://github.com/Qualcomm-AI-research/fptquant
 - S23. "Neural Compression over Equivalence Classes: Exact Gauges and Functional Rate-Distortion". https://arxiv.org/abs/2611.07233
 - S24. Dong et al., "STBLLM: Breaking the 1-Bit Barrier with Structured Binary LLMs", ICLR 2025. https://arxiv.org/abs/2408.01803
 - S28. Chee et al., "DiscQuant: A Quantization Method for Neural Networks Inspired by Discrepancy Theory", COLT 2025. https://arxiv.org/abs/2501.06417
@@ -1206,6 +1208,12 @@ Status values: `done`, `open`.
 - S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
 - S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
 - S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S104. ParetoQ's released model files, 30 in all. https://huggingface.co/collections/facebook/mobilellm-6722be18cb86c20ebe113e95
+- S103. Shah, "Same Score, Different Model: Two Regimes of Quantization Damage Below and Above the Accuracy Plateau", NeurIPS 2026 workshop. https://neurips.cc/virtual/2026/160501
+- S102. Li et al., "Quantization Meets Reasoning: Exploring and Mitigating Degradation of Low-Bit LLMs in Mathematical Reasoning", 2026. https://arxiv.org/abs/2505.11574
+- S101. Jang, Yang, Lim, Park, "Flat Score, Amplified Failures: How the Error Budget Masks Damage in Quantized LLM Agents", 2026. https://arxiv.org/abs/2607.27275
+- S100. Alimaskina et al., "Extreme Low-Bit Inference in Reasoning Models: Failure Modes and Targeted Recovery", 2026. https://arxiv.org/abs/2606.02011 Code: https://github.com/brain-lab-research/quantized-reasoning
+- S99. Zhao, Xu, Sun, Liu, Yang, "All for 1-Bit: Towards Genuine 1-Bit Post-Training Quantization for LLMs", 2026. https://arxiv.org/abs/2609.06161
 - S98. "Error Diffusion Replaces Latent Weights: Training Binary-Weight Language Models on a Few Bits of Dithered State", 2026. https://arxiv.org/abs/2610.34566
 - S97. Helwegen et al., "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019. https://arxiv.org/abs/1906.02107
 - S96. PrismML, launch press release. https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model

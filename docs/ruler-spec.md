@@ -119,6 +119,8 @@ What the split decides:
 - Retention on the full suite rises by five points or more over the previous step.
 - The gained and lost lists and the failure split are published with the score.
 - Any change at inference (a decoding penalty, a bias, a transform) is declared with the score and is not counted as a conversion result.
+- A decoding change is scored on the teacher and the student alike, and retention is the ratio under the same decoding.
+- The suite's allowances (answer budget, retries a harness permits) are written down before the first run. A tolerant allowance can hide damage: in one agent benchmark a gap of 1.3 points at ten allowed failures was 16.7 at two.
 - A category guardrail applies. Its threshold is the project owner's decision (section 11).
 
 ## 9. Data hygiene for any training proof

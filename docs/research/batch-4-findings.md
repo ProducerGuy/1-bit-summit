@@ -76,14 +76,20 @@ Source: Wu and others, Table 6 and appendix A.18 to A.22. "Survival" is the slop
 
 Where:
 
-- None of these papers measures damage by layer. Two place it at the output by what fixes it. LFQ: fitting the last block alone, through the output matrix, carries the whole gain; adding the second and third from last adds nothing (77.13 against 76.78 on its IFEval and GSM8K mean, 75.80 with none). Wu and others: the tool-call shift behaves as a penalty on the one token that opens a call.
+- One layer-by-layer measurement exists, for the decision to call (Wu and others, appendix A.9). On a 4B model with 36 blocks, four blocks at a time are rounded to 3 bits and the rest left alone. The call rate is 0.910 with nothing rounded. Blocks 16 to 19: 0.450, with perplexity up 1%. Blocks 28 to 31: 0.640. Blocks 20 to 23: 0.665. Blocks 0 to 3: 0.800, with perplexity up 21%. The last four blocks: 0.875, inside the noise, with perplexity up 13%. Perplexity gave no guidance on which blocks matter for calls.
+- Keeping the last blocks in full precision is no better than the baseline. Protecting attention beats protecting the same bytes of MLP in 3 of 7 models. Ordering blocks by how much the margin depends on them loses to its own reverse in 6 of 16 comparisons.
+- The symptom at the output is specific to one token. At 3 bits the call-opening token falls far below the rest of the vocabulary: 13.1 logits below the other special tokens on Qwen3-4B, 8.7 on Qwen3-1.7B, 2.8 on Granite-3.3-8B. That is 1.8 to 7.6 times what the size of its row explains (appendix A.15).
+- LFQ places its repair at the last block: fitting that block alone, through the output matrix, carries its whole gain; adding the second and third from last adds nothing (77.13 against 76.78 on its IFEval and GSM8K mean, 75.80 with none). On Llama-3.2-3B, putting the output matrix into the objective with the old squared-error loss gives the GSM8K gain by itself (72.40 to 73.09; with cross-entropy 73.01). Cross-entropy adds on IFEval (65.99 to 67.28).
+- A repair that works at the last block does not show the damage was done there.
 
 Repairs:
 
 | Repair | Changes | Bit width, size | Result |
 |---|---|---|---|
 | LFQ: last block fitted by cross-entropy on the next-token distribution | Stored weights | 3 and 4 bits, 3B to 30B | MATH-500 +0.8 to +2.4, IFEval +1.3 to +1.9 on Qwen2.5-7B; AIME greedy 30.00 to 43.33 on a 7B reasoning model; Llama-3.2-3B IFEval +1.5, GSM8K +0.3 |
-| A bias on the call-opening token, calibrated | One logit | 3 bits | Returns the lost calls and loses the correct refusals |
+| A bias on the call-opening token, calibrated | One logit | 3 bits, 41 conditions | Best bias a median of 6.5 logits. It returns a median of 100% of the lost calls and loses a median of 100% of the correct refusals. In 12 of 41 it returns nothing |
+| The last blocks kept in full precision | More stored bits | 3 bits | No better than the baseline |
+| One more bit at the same size, the paper's yardstick | More stored bits | 3 to 4 bits | Flip rate down by a median of 0.330 over 458 badly damaged conditions |
 | Label-free repairs as a class (Wu and others) | Various | 3 bits | Win on no majority of models; none equals one more bit |
 | Penalty on 50 hesitation words | Decoding | 3 bits, 1.5B to 32B, thinking on | 1.5B: five-benchmark mean 29.0 to 35.2, abandoned answers 139 to 58. Under 1 point on many rows at 7B and above. Strength picked per configuration on the reported results |
 | Loop detector: commit to the answer already given, else rerun in full precision | Decoding, with a full-precision fallback | 2 bits, 8B and 32B, thinking on | Qwen3-8B MATH-500 17.20 to 74.20, mostly through the fallback |
@@ -99,7 +105,7 @@ Repairs:
 - Which decisions break. Under rounding, every kind of first-token decision loses its margin at about the same pace: most of it kept at 4 bits, a fifth to a half at 3, none at 2. Code tokens and argument filling hold longest. The decision that flips most is the one with two near-equal options and a standing bias: whether to call a tool. In running text the damage lands on the model's open choices, the points where the original was itself unsure, and determined tokens survive. The visible result is longer answers, loops, answers reached and abandoned, and calls opened and not finished.
 - By task. Long generation loses several times what recognition loses. Mathematics loses most, and more as the model shrinks.
 - How predictable. Which items are at risk can be told before conversion: the ones the full-precision model decides by a thin margin, and the failure it then falls into is usually the full-precision model's own nearest alternative. How many flip cannot be told before conversion: the two constants have to be fitted on the converted model, and they do not carry between models at 3 bits.
-- Where. At the output, on this evidence: the last block and the output matrix carry the repair that works on stored weights, and the tool-call shift is a shift on one output token. The layer-by-layer evidence is in batch 2 and is not extended here.
+- Where. Not settled, and not simply at the output. For generation quality, the one repair on stored weights that works is at the last block and the output matrix. For the decision to call, the one layer-by-layer test puts the cause in the middle of the network, finds the last blocks nearly innocent, and finds that sparing the last blocks repairs nothing. What shows at the output is a penalty on one token. It is one model at 3 bits.
 - The gap in all of it. Every measurement is on rounded models. Rounding at 2 bits leaves a survival of zero, so the instrument reads "all gone" there. Nothing in these papers, or in the searches run for this item, measures margin survival on a 1-bit or ternary model that was trained after conversion. The released 1-bit 1.7B is such a model, and its survival by decision kind is a number nobody has.
 
 ### 1G. What it means for the next five points
@@ -117,14 +123,14 @@ Sorting the failed items of the first full run. Each failed item gets these fiel
 
 What to repair first, by what the sort returns:
 
-- A one-sided shift on a decision that otherwise keeps its margin (calls never opened, a letter bias on multiple choice): the cheapest repair, at the output. In our format that is scale training on the tied matrix, which holds 16 scales for each token and which the released 1.7B never trained (batch 3). The published bias repair shows the limit to watch: it traded lost calls for lost refusals, so both sides are scored.
+- A one-sided shift on a decision that otherwise keeps its margin (calls never opened, a letter bias on multiple choice): the shift shows at the output, but a fixed correction there is measured and fails. It returns the lost calls and loses the correct refusals one for one. A repair has to depend on the input. In our format the candidates are scale training on the tied matrix, which holds 16 scales for each token and so depends on the input only weakly, and scale training of the middle blocks, where the one layer-by-layer test places the cause. Both sides of the decision are scored.
 - Thin-margin flips into the teacher's runner-up: no targeted repair exists. They fall only as overall agreement with the teacher rises, which is scale training first and sign training after.
 - Process failures: the training text has to contain the states where they happen. That is training on the 1-bit model's own answers with the teacher scoring each token (idea I14).
 - Thick-margin flips into a new kind of error: information the signs no longer hold. Sign training, with text that carries those items.
 
 Two additions to the trials:
 
-- S4 gains a margin-survival table: for each decision kind that can be read from one token (answer letter, call or reply, tool name, first argument token, yes or no, a digit), the slope and offset of the 1-bit model's margin against the teacher's, on items outside the ruler's test sets. A high slope with an offset points to the output and to scale training. A low slope points to sign training. Under rounding at 2 bits this number is zero everywhere; what a trained 1-bit model shows is unmeasured.
+- S4 gains a margin-survival table: for each decision kind that can be read from one token (answer letter, call or reply, tool name, first argument token, yes or no, a digit), the slope and offset of the 1-bit model's margin against the teacher's, on items outside the ruler's test sets. A high slope with an offset means the information is intact and shifted, which scale training can reach. A low slope means it is gone, which needs sign training. Under rounding at 2 bits this number is zero everywhere; what a trained 1-bit model shows is unmeasured.
 - M1 records the fields in the table above.
 
 One caution on the ruler: the two largest published gains at the small end are decoding rules (a word penalty, a stop on loops). They change the harness, not the weights. The ruler fixes decoding, so they do not count as retention, and the suite's allowances (answer budget, retries) are written down before the first run, since a tolerant harness can hide damage (a gap of 1.3 points at ten allowed failures was 16.7 at two).
@@ -134,7 +140,7 @@ Probabilities:
 | Candidate | Before | After | Reason |
 |---|---|---|---|
 | An on-policy stage adds at least a third of a step | 50% | 52% | Three more papers put low-bit generation failures in the process (loops, budget, abandonment). All three are with thinking on, and our suite is thinking off |
-| The tool-calling loss of the released 1.7B is mainly a one-sided shift on the decision to call | Not held | 30% | The shift is the common pattern at 4B and above. On Qwen3-1.7B at 3 bits both halves of the call go, and BFCL has parts that never test the decision |
+| The tool-calling loss of the released 1.7B is mainly a one-sided shift on the decision to call | Not held | 30% | A penalty on the call token is measured on Qwen3-1.7B at 3 bits, but there both halves of the call go, and BFCL has parts that never test the decision |
 
 ### 1H. Still unknown
 
@@ -150,7 +156,7 @@ Probabilities:
 | Source | How much | Route |
 |---|---|---|
 | Liu and others, "ParetoQ", https://arxiv.org/abs/2502.02631 | Whole paper in two extractions | PDF |
-| ParetoQ code, https://github.com/facebookresearch/ParetoQ | README, the training script, the run script, each in full | Repository read directly |
+| ParetoQ code, https://github.com/facebookresearch/ParetoQ | README, the training script, the run script, the quantizer file, each in full | Repository read directly |
 | Panferov and others, "QuEST: Stable Training of LLMs with 1-Bit Weights and Activations", https://arxiv.org/abs/2502.05003 | Whole paper, version 2, in two extractions | HTML |
 | QuEST code, https://github.com/IST-DASLab/QuEST | README, the quantizer file in full, the run script | Repository read directly |
 | ParetoQ's released files, https://huggingface.co/collections/facebook/mobilellm-6722be18cb86c20ebe113e95 | The collection page, the model card of the 1.5B 1-bit file and its file list | Direct |
@@ -177,7 +183,9 @@ Findings the paper reports:
 - Learned scales beat scales computed from statistics at every width (figures, no table).
 - A 4-bit embedding sits on the size and accuracy front; 8-bit and 16-bit embeddings do not.
 
-Results at 3B and below. Mean of eight zero-shot tasks, then WikiText-2 perplexity. From the paper's tables and the code's README, which lists released models the paper does not tabulate:
+- In the code, a weight that is exactly zero behind a sign comes out as zero, not as a sign. A format with two values needs a rule for it.
+
+Results at 3B and below. Mean of eight zero-shot tasks (five for the 8B row), then WikiText-2 perplexity. From the paper's tables and the code's README, which lists released models the paper does not tabulate:
 
 | Model | Full precision | 1 bit | 1.58 bits | 2 bits | 1 bit kept |
 |---|---|---|---|---|---|
@@ -276,6 +284,7 @@ What carries to one sign per weight, one scale per 128, tied matrix included:
 | Chen and others, "EfficientQAT", https://arxiv.org/abs/2407.11062 | Whole paper | PDF |
 | EfficientQAT code, https://github.com/OpenGVLab/EfficientQAT | The end-to-end stage's script, the quantizer, the packed linear layer, two run scripts, each in full | Repository read directly |
 | van Breugel and others, "FPTQuant: Function-Preserving Transforms for LLM Quantization", https://arxiv.org/abs/2506.04985 | Whole paper | HTML. The plan held only a ResearchGate address; the arXiv address was found by search |
+| FPTQuant code, https://github.com/Qualcomm-AI-research/fptquant | README, the transforms file, two settings files | Repository read directly |
 | Koike-Akino, "Neural Compression over Equivalence Classes: Exact Gauges and Functional Rate-Distortion", https://arxiv.org/abs/2611.07233 | Whole paper in two extractions | PDF |
 | Dong and others, "STBLLM", https://arxiv.org/abs/2408.01803 | Whole paper, version 2 | PDF |
 | STBLLM code, https://github.com/pprp/STBLLM | README, the demo run script, the mask file | Repository read directly |
@@ -333,6 +342,7 @@ How much conversion error they remove:
 
 - FPTQuant trains its transforms at 4-bit weights with 4-bit or 8-bit activations and nothing lower. Llama-3.2-3B at 4 and 4: perplexity 11.71 against 10.48 at full precision, behind a method with unfolded transforms (11.38). It is aimed at activations.
 - The compression paper measures file size, not conversion error. Exact transformations save almost nothing (14,416 bytes on a 135M model); its large savings come from small accepted changes to the function.
+- FPTQuant's released code covers Qwen3, defaults to 4-bit weights, activations and cache, and sets one weight scale for each output row. Its preset without the per-token factor keeps the MLP factor, the per-head value matrix, the pair rotation, a trained residual rotation and a Hadamard at the MLP.
 - Neither paper, and nothing found in the search for this item, measures an exact, foldable transformation at 2 bits or below.
 
 ### 3D. Facts: STBLLM
@@ -369,7 +379,7 @@ How much conversion error they remove:
 ### 3F. What it means for the next five points
 
 - The scale-only trial is cheap to read. Published scale training saturates within a few million tokens, so a short ladder of budgets tells quickly whether there is a slope.
-- Where to expect its gain: the tied matrix first. It is the one part of the released model in the state where scale training has its large published effect, and it is 2.4 million scales. The trial's tied-matrix arm should not wait on a condition; it is the main arm, with the body's scales as the second.
+- Where to expect its gain: the tied matrix first. It is the one part of the released model in the state where scale training has its large published effect, and it is 2.4 million scales. Its arm in the trial stays conditional on S4's exchange test, which is forward passes only and is read first; this batch raises the weight of that arm.
 - The loss: one precedent uses next-token loss on text, the other the teacher's distribution. Both work. The teacher's distribution is the choice already made, and nothing here argues against it.
 - Grouping stays where it was. No published evidence, an existing script trial that measures its ceiling, and no use on a binary model.
 
@@ -377,9 +387,9 @@ Probabilities:
 
 | Candidate | Before | After | Reason |
 |---|---|---|---|
-| Scale-only training from the released 1-bit 1.7B reaches a step | 55% | 57% | Two more measured cases of scale training with frozen codes, one at 1 bit. The large effect is on untrained scales, which is the tied matrix's state. All of it is recognition and perplexity, none at this size |
+| Scale-only training from the released 1-bit 1.7B reaches a step | 55% | 55% | For: two more measured cases of scale training with frozen codes, one at 1 bit, with the large effect on untrained scales, which is the tied matrix's state. Against: all of it is recognition and perplexity, none at this size, and the one layer-by-layer test of tool calls places that damage mid-network, out of the tied matrix's reach |
 | Sign and scale training from the same model reaches a step | 67% | 67% | Settings sharpened, nothing on its odds |
-| Either of the two | 74% | 75% | |
+| Either of the two | 74% | 74% | |
 | A better choice of groups adds points on its own (idea I1) | Under 5% | Under 5% | No evidence found at any width |
 | Our own conversion by a published 1-bit route beats the released model | Under 5% | Under 5% | The best post-training 1-bit result keeps 79% of recognition accuracy at 8B in another format |
 
@@ -391,8 +401,8 @@ Probabilities:
 
 ## 4. Across the three items
 
-- The three items point at the same place from three sides. Item 1: the repair that works on stored weights is at the output, and the tool-call damage is a shift on an output token. Item 3: scale training has its large effect on scales that were never trained. Batch 3: the tied output matrix of the released 1.7B was never trained. The first thing to train is the tied matrix's scales, and the first thing to measure is whether the failures are of the kind an output repair can reach.
-- That measurement is one table: margin survival by decision kind on the released model against its teacher. It turns "what to repair first" into a reading: slope high with an offset means the output and scales; slope low means signs.
+- Two of the three items point at the tied matrix as the first thing to train. Item 3: scale training has its large effect on scales that were never trained. Batch 3: the tied matrix of the released 1.7B was never trained. Item 1 does not add to that cleanly: the repair that works on stored weights sits at the last block, but the one layer-by-layer test of tool calls puts the cause mid-network and a fixed correction at the output is measured to fail.
+- The first thing to measure is one table: margin survival by decision kind on the released model against its teacher. It turns "what to repair first" into a reading: slope high with an offset means intact and shifted, which scales can reach; slope low means signs.
 - The published 1-bit training recipes do not hold the next step. The best of them on our own teacher lands near where the released model already is, with an easier format. They supply settings for sign training, not a route.
 - A reference fingerprint of ordinary 1-bit training is available from public files without training anything. It is the missing comparison for every reading of PrismML's fingerprint made so far.
 - Decoding rules are the strongest published repairs at the small end and are outside what the ruler counts. Their existence is a reason to fix the ruler's decoding and allowances in writing before the first run.
@@ -402,9 +412,9 @@ Probabilities:
 
 | Candidate | Before | After | Reason |
 |---|---|---|---|
-| Scale-only training from the released 1-bit 1.7B reaches a step | 55% | 57% | Section 3F |
+| Scale-only training from the released 1-bit 1.7B reaches a step | 55% | 55% | Section 3F |
 | Sign and scale training from the same model reaches a step | 67% | 67% | |
-| Either of the two | 74% | 75% | |
+| Either of the two | 74% | 74% | |
 | An on-policy stage adds at least a third of a step | 50% | 52% | Section 1G |
 | The tool-calling loss of the released 1.7B is mainly a one-sided shift on the decision to call | Not held | 30% | Section 1G |
 | A reference fingerprint of ordinary 1-bit training can be computed from ParetoQ's files, once access is granted | Not held | 90% | The README names the parents; the 1-bit file is dense BF16 with no code of its own. What remains is the row-magnitude check |
@@ -418,6 +428,7 @@ Probabilities:
 - EfficientQAT's code, https://github.com/OpenGVLab/EfficientQAT
 - FPTQuant on arXiv, https://arxiv.org/abs/2506.04985 (replaces the ResearchGate address)
 - STBLLM's code, https://github.com/pprp/STBLLM
+- FPTQuant's code, https://github.com/Qualcomm-AI-research/fptquant
 - "All for 1-Bit: Towards Genuine 1-Bit Post-Training Quantization for LLMs", https://arxiv.org/abs/2609.06161
 - "Extreme Low-Bit Inference in Reasoning Models: Failure Modes and Targeted Recovery", https://arxiv.org/abs/2606.02011, code https://github.com/brain-lab-research/quantized-reasoning
 - "Flat Score, Amplified Failures: How the Error Budget Masks Damage in Quantized LLM Agents", https://arxiv.org/abs/2607.27275

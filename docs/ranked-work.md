@@ -14,7 +14,7 @@ Two lists. Runs are ranked by the probability that each earns a step of five poi
 | 6 | Tool-call bias | Under 5% | The published measurement recovers lost calls and loses as many correct refusals |
 | 7 | Our own conversion: propagation strength, sign-search convergence (C97, C98) | Under 5% | Science scoreboard for now |
 
-Ranks 1 and 2 together: about 74%. The evidence for each is in the findings of batches 1 to 3 under `research/`. A stage of on-policy distillation after rank 1 is judged at 50% to add at least a third of a step (`ideas.md`, I14); it is not ranked as a step of its own.
+Ranks 1 and 2 together: about 74%. The evidence for each is in the findings of batches 1 to 4 under `research/`. A stage of on-policy distillation after rank 1 is judged at 52% to add at least a third of a step (`ideas.md`, I14); it is not ranked as a step of its own.
 
 Two runs earn no step and decide what the others are worth:
 
@@ -34,8 +34,8 @@ Two runs earn no step and decide what the others are worth:
 | 4 | A repair for knowledge loss: knowledge items in the training text, then "Linger and Lose: Knowledge Collapse in Low-Bit Language Models" (C62) | Done, batch 2. No repair of its own exists; a knowledge-only route is under 10% for a step. It gave the damage map (S4) and training settings for run 1 | Knowledge is 14% of the loss |
 | 5 | The discrete-weight optimizer papers (C37) | Done, batch 2. Neither is a candidate: under 5%. The reading found on-policy distillation and the need for a budget on sign changes | Run 1 |
 | 6 | BitDistill, OneBit and BinaryLLM read in full, with appendices and code (C5) | Done, batch 2. None is a better start than the released model. Run 1 rose from 60% to 63%; the larger-teacher run fell to 25% | Runs 1 and 2 |
-| 7 | The rest of the decisions paper (C102) | 15% | The failure split |
-| 8 | ParetoQ and QuEST read in full, with code (C53) | 15% | Run 1 |
+| 7 | The rest of the decisions paper (C102) | Done, batch 4. Flips are forecast inside a model, not across models. On Qwen3-1.7B both halves of a tool call go. One block-by-block test puts the cause of lost calls mid-network, and a fixed output correction fails. Run odds unchanged | The failure split, S4 |
+| 8 | ParetoQ and QuEST read in full, with code (C53) | Done, batch 4. Settings for run 1: a gated gradient, scales as computed times learned. Their budgets price a rebuild from full precision. Run odds unchanged | Run 1 |
 | 9 | Mirror-descent theory (C26, C27, C42, C43) | 15% to 20% | Our own conversion. Outside tests failed for ternary only, for a reason specific to three levels. No public test exists at 1 bit |
 | 10 | LFM2: published low-bit work and checkpoint facts (C9, C11, C18, C63) | 0% for this step | The LFM2 goal, 30% overall |
 
