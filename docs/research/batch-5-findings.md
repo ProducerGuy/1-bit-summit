@@ -16,7 +16,8 @@ For every item the plain outside question was asked first: who else has built, r
 | CAT-Q, arXiv 2606.26650 | Whole paper | Direct |
 | YAQA, arXiv 2505.22988 v3 | Whole paper | Direct |
 | LR-QAT, arXiv 2406.06385 v3 | First 200 thousand of 227 thousand characters, two extractions | HTML mirror of the same paper |
-| JointQ, arXiv 2611.20384 v1 | Abstract page. The body was refused by the site's rate limit five times, on two occasions | Direct |
+| JointQ, arXiv 2611.20384 v1 | Abstract page direct. Whole paper, 49 pages with appendices, in two extractions | A read-only mirror of the same paper (alphaxiv.org), after the original site's rate limit refused the body five times |
+| PRISM, Discover Computing 29, article 700, doi 10.1007/s10791-026-10580-5 | Abstract and record only: the publisher's record at Crossref, the Semantic Scholar record, and the passages a search engine shows from the article. The publisher's site refuses the article page and its PDF address | Two indexing services and a search |
 | JointQ in code: `docs/algorithms/jointq.md`, `benchmark/jointq_benchmark/README.md`, `model_validation/jointq/README.md` of github.com/FujitsuResearch/OneCompression | Each in full | Repository read directly |
 | github.com/IntelChina-AI/BitTern, README | In full | Repository read directly |
 | GSQ: README of github.com/IST-DASLab/GSQ (42.7 thousand characters) and the abstract page of arXiv 2604.18556 v3 | README in full. Paper body not read | Repository read directly; direct |
@@ -44,7 +45,16 @@ For every item the plain outside question was asked first: who else has built, r
 - YAQA is one-shot rounding with an estimate of how each layer's error reaches the final output, built from input-side and output-side statistics of each layer. Lowest width 2 bits, smallest model 1B. At 2 bits on Qwen3-8B: GSM8K 56.31 to 66.07 (full precision 84.31), MMLU 63.94 to 66.75 (72.99). Nothing at 1 bit.
 - LR-QAT freezes the pretrained weights and trains a low-rank term placed inside the rounding, plus the scale. After training the low-rank term folds into the integer codes, so nothing is added at inference. Rank 32 is about 1.2% of the parameters. Memory 20.5 GB against 62 to 98 GB for full training on a 7B model.
 - LR-QAT at 2 bits with groups of 128 (perplexity and zero-shot average): LLaMA-2-7B 7.62 and 61.70 against full precision 5.47 and 70.47. Scale-only training in the same table: 7.87 and 60.74. On LLaMA-3-8B: 11.09 and 60.46 against scale-only 12.39 and 57.81. So at 2 bits, changing codes through a low-rank term adds 1 to 2.7 points over training scales alone. Lowest width 2 bits, smallest model 7B.
-- JointQ is layer-by-layer. It searches integer codes one at a time, and scores each candidate code with the group scale re-solved in closed form. Its code accepts 1 to 4 bits. No 1-bit result is published; its documentation says a 1-bit result cannot be packed or served by its loader. Its lowest published setting is 2 bits with groups of 32: Qwen3-8B perplexity 9.73 to 45.98 and six-task average 0.7403 to 0.5755.
+- JointQ is layer-by-layer. It searches integer codes one at a time, each move changing one code by one level, and scores each candidate with the group scale re-solved in closed form and the other groups counted through the layer's input statistics. Its code accepts 1 to 4 bits. No 1-bit result is published; its documentation says a 1-bit result cannot be packed or served by its loader. Its lowest published setting is 2 bits with groups of 32: Qwen3-8B perplexity 9.73 to 45.98 and six-task average 0.7403 to 0.5755.
+- Against error-compensated rounding at that setting, six-task average: Qwen3-8B 0.4063 to 0.5755; Qwen3-14B 0.5094 to 0.6200; Llama-3-8B 0.3682 to 0.4866. The authors say none of these recovers practical quality.
+- Its gain over error-compensated rounding grows as the grid gets coarser: a mean of 0.0044 at 4 bits with groups of 128, 0.1559 at 3 bits with one scale per row. Their reason: with scales frozen, each group has fewer usable levels as the width drops or the group grows, so choosing codes without moving the scale costs more.
+- Its regularization strengths were tuned on data that overlaps the reported benchmarks, which the authors flag. It takes 2.6 to 15.7 times as long as error-compensated rounding. Nothing at ternary or 1 bit, in the body or the appendices.
+
+**PRISM: where recall is lost, at abstract level only.**
+
+- A diagnostic study, not a method. Models: Qwen2.5 at 3B and 7B, Llama-3.2-3B, Gemma-2-2B, all post-training quantized by four schemes. Bit widths were not visible in what could be read.
+- Its stated findings: open-ended recall of memorized facts degrades at low widths while copying an answer from supplied context stays intact; quantizing the MLP matrices alone erodes recall far more than quantizing the attention matrices alone, and this holds under a calibrated quantizer and in three model families; multi-hop reasoning stays vulnerable.
+- No numbers could be read.
 - GSQ is layer-by-layer. Each weight gets learnable preferences over its few allowed values, trained through a sampled soft choice that hardens over ten epochs, with per-group scales learned at the same time. Loss: squared error between the full-precision and quantized layer outputs. It starts from an error-compensated rounding.
 - GSQ's code has a 1-bit quantizer ("The binary case uses a single logit"), a Qwen3 wrapper and groups of 128. Its paper's abstract reports 2 and 3 bits only.
 - GSQ can improve somebody else's released low-bit file without changing its format: Qwen3-8B, a public 2-bit file, average 50.03 to 56.28.
@@ -119,7 +129,8 @@ For every item the plain outside question was asked first: who else has built, r
 - What repair must be judged on: the Permea pattern (gain where there was task text, zero elsewhere) is the failure the ruler exists to catch. A repair counts as a step only if benchmarks that supplied no training text also move. The ruler's data rules already forbid test items; training splits of the scored benchmarks are allowed by section 9 of the ruler specification, so this is the case to watch in M2's records, per benchmark, with the source of every training prompt logged.
 - One loss setting for sign training (M3), from EdgeRazor: mixing the two directions of KL by the teacher's entropy gained 1.2 points over the teacher-to-student direction alone, at 1.88 bits on a 0.6B model. Batch 4 found that the KL a damaged model shows tracks the teacher's entropy; this is a recipe that acts on the same quantity. One source, one model size, not at 1 bit.
 - The cost of an open recipe is now known and large: eight 80 GB cards and up to 22.9 billion tokens for half of the teacher's score on hard tasks at ternary. This is the measured reason that our own conversion stays under 5%, and that starting from a released model is the route.
-- One rule for any sign search (M3), from JointQ: a candidate sign change is scored with its group's scale re-solved, never with the scale held fixed.
+- One rule for any sign search (M3), from JointQ: a candidate sign change is scored with its group's scale re-solved, never with the scale held fixed. Its own trend says why this matters most for us: the cost of holding scales fixed grows as the grid coarsens and as groups grow, and 1 bit with groups of 128 is the coarsest case of both.
+- The MLP matrices are now named as the main site of damage by two independent sources: the forensics rounding test on our parent (section 2C) and PRISM's component test on three other families. Both are post-training rounding, not a trained 1-bit model. Any sign-change budget and any damage table should be split by matrix class from the start.
 - One memory-cheap arm for sign training, from LR-QAT: a low-rank term inside the sign function, folded into the signs afterward. It cannot flip arbitrary sets of signs. Untested at 1 bit.
 - The gated correction of the ten-percent entry is outside the storage format and is not a route to the goal. It is evidence about one loss class: on the 1-bit 1.7B a wrong output token was moved by a margin-sized push at layer 20, and a gate on the layer-20 state kept everything else. Batch 4 found that an ungated bias on the call token trades calls for refusals one for one. The gate is the difference.
 
@@ -128,6 +139,7 @@ For every item the plain outside question was asked first: who else has built, r
 - Any of these methods at 1 bit with one scale per 128 weights.
 - Permea's steps, loss and learning rate, and whether its gain survives a benchmark it had no text for.
 - How the CAT-Q and ScaleQ papers treat the tied matrix.
+- PRISM's numbers, bit widths and any layer-range result.
 - Whether EdgeRazor's entropy-weighted loss helps at 1 bit, and how much of its score comes from the scored tasks' own training splits.
 
 ## 2. The outside forensics project in full
@@ -404,7 +416,7 @@ To be applied when the two reviews are compared.
 - M2: the source of every training prompt logged per benchmark, and the per-benchmark record that separates a general gain from a task-specific one.
 - M3: a loss arm that mixes the two KL directions by teacher entropy; the scale re-solve rule for sign search; the low-rank arm as a memory-cheap option; three seeds per schedule; the plain straight-through pass as baseline; the six acceptance checks of section 2I.
 - Ideas: Permea's result under the repair idea; the gated correction as evidence only; the mirror step's implementation notes under idea I5.
-- Plan checklist: C3, C8 and C100 done; C56 done (token counts in section 2B); C4 and C6 done as far as the first run needs, with the open parts in section 3H; C62 done except the unread paper bodies of section 8; C112 open for the article of section 8.
+- Plan checklist: C3, C8 and C100 done; C56 done (token counts in section 2B); C4 and C6 done as far as the first run needs, with the open parts in section 3H; C62 done except the unread paper bodies of section 8; C112 done at abstract level, with the article's full text open (section 8).
 
 ## 7. Sources found in this batch that the plan does not yet hold
 
@@ -426,8 +438,7 @@ To be applied when the two reviews are compared.
 
 ## 8. Not read
 
-- The PRISM article on recall under quantization, https://link.springer.com/article/10.1007/s10791-026-10580-5. The publisher's site refuses the article page and its PDF address, and a search by its identifier found no other copy. It can be read if the owner pastes its text or a copy of the file.
-- The body of the JointQ paper, https://arxiv.org/html/2611.20384v1. Refused by the site's rate limit five times, on two occasions. Its documentation and result tables in code were read.
+- The full text of the PRISM article, https://link.springer.com/article/10.1007/s10791-026-10580-5. It is open access under CC BY 4.0, but the publisher's site refuses the article page and its PDF address, and its records list no preprint or other copy. Its abstract was read through two indexing services. The full text can be read if the owner pastes it or a copy of the file.
 - The last 27 thousand characters of LR-QAT, and the code of YAQA and LR-QAT.
 - The body of the GSQ paper.
 - The ReasoningQAT paper's page, which answers with a browser check.
