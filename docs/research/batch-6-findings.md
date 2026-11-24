@@ -234,7 +234,7 @@ Where the theory says it cannot: at low redundancy (no guarantee, adverse cases)
 
 | Source | How much | Route |
 |---|---|---|
-| Hu, Ramachandran, structure of quantization damage, arXiv 2609.01587 | Whole paper, version 1. arXiv lists one version, dated 2 September 2026 | Mirror, and the arXiv listing |
+| Hu, Ramachandran, structure of quantization damage, arXiv 2609.01587 | Whole paper, version 1 of 2 September 2026. Version 2 of 15 November 2026 read against it: the same budget table, with one added column for the share held by the single largest layer | Mirror, at the address of each version |
 | Duan, perplexity can miss feature damage, arXiv 2606.03002, version 2 | Whole paper | Mirror |
 | CEWT, quantization-aware pre-training with constrained weight distribution, arXiv 2609.32659 | All but the last 500 characters | Mirror |
 | Morris and others, how much do language models memorize, arXiv 2505.24832, version 3 | Whole paper | Mirror |
@@ -329,7 +329,7 @@ Judgment.
 | Binary perceptron | Two levels, one neuron, random patterns | Patterns, one bit each | At most 0.847, conjectured 0.833 |
 | Spherical perceptron | Real, one neuron | Same | 2 |
 
-- Share of the 16-bit model's stored facts kept by the three-level model: 0.36, 0.24, 0.09 and 0.06 at 2.5M, 10M, 25M and 50M weights under a cosine schedule; 0.24 to 0.26 at every size under the better schedule; 0.49 and 0.78 at 25M and 50M when the data asks for less per weight.
+- Share of the 16-bit model's stored facts kept by the three-level model, by the paper's main estimator: 0.36, 0.24, 0.09 and 0.06 at 2.5M, 10M, 25M and 50M weights under a cosine schedule (with a floor applied per attribute the last two are 0.13 and 0.11; a second estimator of the Morris kind gives 0.20 and 0.19 at 10M and 25M and does not register the late collapse; one of three 16-bit runs at 50M also crashed); 0.24 to 0.26 at every size under the better schedule; 0.49 and 0.78 at 25M and 50M when the data asks for less per weight.
 - Fine-tuning a trained 16-bit model into three levels destroyed about 90% of what it knew within 25 passes and ended where training from scratch ends. A model first adapted to 4 bits did better.
 - Doubling numeric precision from 16 to 32 bits adds 9% (Morris). Most stored bits are not used for storage.
 - Models with no MLP store as much at 1,000 exposures and 1.5 times less at 100. The gated MLP that Qwen uses stores about 1.3 times less than a plain one at 100 exposures (Allen-Zhu, Li).
@@ -384,7 +384,7 @@ Judgments.
 
 ## 7. Asks of the registers
 
-- Plan: C26, C27, C43, C38, C41, C52, C47 done. C46 done for the search, with the design in section 4D. New rows: the two-level capacity measurement as a designed, unapproved experiment (C124); one reading row (C125) for LittleBit-2, the TWLA method behind the Qwen3-4B report, the second half of the knowledge-capacity paper, and BinaryRelax and ProxQuant in full. Sources S119 to S134 added. The line for the structure paper corrected: one version, 2 September 2026. The odds of the 99% goal move from 5% to 4%.
+- Plan: C26, C27, C43, C38, C41, C52, C47 done. C46 done for the search, with the design in section 4D. New rows: the two-level capacity measurement as a designed, unapproved experiment (C124); one reading row (C125) for LittleBit-2, the TWLA method behind the Qwen3-4B report, the second half of the knowledge-capacity paper, and BinaryRelax and ProxQuant in full. Sources S119 to S134 added. The odds of the 99% goal move from 5% to 4%.
 - Ideas: I5 lowered, with the reason. A note on the cage hypothesis: its nearest prior work and the two results that bear on it.
 - S4 specification: the exchange curve is cumulative and its steps are not summed; a line on what not to trust.
 - Trials: the sign-change budget of the factorization code as one form for the budget in M3; the final-state term for M3 and for any conversion of our own.
