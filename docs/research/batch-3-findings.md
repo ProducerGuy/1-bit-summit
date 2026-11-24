@@ -91,7 +91,7 @@ This is inference, not a measurement.
 
 - The body of the first-generation 1-bit 1.7B was trained: 90% before, 97% after.
 - The tied embedding and output matrix of the 1.7B was left as the plain conversion: 85%. One source, a sample of rows, supported by the first block's input gain being the only gain that moved.
-- Scale-only training reaches a step: 50% before, 58% after. The body's scales are already trained, which takes headroom away. The tied matrix's scales, 16 per token, have never been trained, and they sit at the last decision, which adds headroom of a kind nobody has used.
+- Scale-only training reaches a step: 50% before, 55% after. The body's scales are already trained, which takes headroom away. The tied matrix's scales, 16 per token, have never been trained, and they sit at the last decision, which adds headroom of a kind nobody has used.
 - The paired damage map (S4) gains a sharp question: with the teacher's full-precision matrix put in the output role of the released model, and nothing else changed, how many lost items return.
 - The reproduction study's error-compensated conversion is the reference implementation for "rounded with compensation" in trial M4. Its scale is the mean of the error-updated block and its signs are those of the error-updated weights, column by column, so its sign changes should rise along each row. S2 already measures that trend on the released model.
 
@@ -120,7 +120,7 @@ This is inference, not a measurement.
 - Qwen3-1.7B at 2 bits, teacher in brackets: GSM8K 79.05 (90.55), MATH-500 69.33 (90.13), HumanEval+ 47.76 (79.07), MBPP+ 42.59 (68.96), MMLU-Redux 55.49 (74.36), GPQA Diamond 27.10 (38.72), IFEval 55.70 (71.10). Average of nine 45.24 (67.58), 66.9%.
 - By stage, average of nine: plain rounding 3.91, after calibration 23.35, after on-policy distillation 45.24. Best baseline trained on fixed text 40.82.
 - At 3 bits: 60.77 of 67.58, 89.9%; calibration alone 54.58.
-- The comparison that isolates the idea, Qwen3-1.7B at 2 bits, same calibration:
+- On-policy against fixed answers, Qwen3-1.7B at 2 bits, same calibration and the same number of answer tokens. The prompts are not the same: the fixed arms use the baselines' 32,768 question and answer pairs, the on-policy arm its own pool of 25,600 prompts. So the gap is the idea and the prompt pool together:
 
 | Training after calibration | MATH-500 | HumanEval+ | MMLU-Redux |
 |---|---|---|---|
@@ -147,12 +147,13 @@ This is inference, not a measurement.
 - It only chooses, for each weight, the grid point above or below it. The grid and its scales are given. Each weight gets a variable between 0 and 1; the variables are trained with distillation to the original model plus a term that pushes them to 0 or 1; the few left in between are rounded greedily.
 - Its theory: with m data samples, all but a number of weights proportional to m can be rounded with small expected error, if the model's gradients lie close to a low-dimensional space.
 - Evidence: Phi-3-mini 3.8B and Llama-3.1-8B at 3 to 4.5 bits, 8,192 samples of 2,048 tokens, 1,024 iterations. GSM8K on Phi-3-mini, nearest rounding, error-compensated rounding, DiscQuant: at 3.0 bits 1.0, 2.3, 26.8; at 3.25 bits 31.0, 54.3, 64.2; at 4.0 bits 62.2, 71.5, 77.3; the original scores 84.4. On Llama-3.1-8B at 3.0 bits 0.5, 3.6, 14.3 of 77.0. Nothing under 3 bits.
-- Its loss is the divergence to the original model's next-token distribution. In its own ablation that plain loss beat losses on intermediate layers and mixtures of the two. OneBit found the opposite for hidden states (batch 2); the two results are at different bit widths and starts.
+- Its loss is the divergence to the original model's next-token distribution. In its own ablation on Phi-3-mini at 3.25 bits that plain loss scores 64.9 on GSM8K, against 54.1 for layer outputs alone, 60.1 for linear outputs alone, 61.4 to 63.9 for mixtures and 52.7 for ground-truth tokens. More mathematics in its calibration text raises GSM8K and lowers PIQA. OneBit found the opposite for hidden states (batch 2); the two results are at different bit widths and starts.
 - Its theory is proven for a linear stand-in for the loss, and the shipped algorithm is a heuristic. It does not report how many weights end away from nearest rounding. Scales are not optimized in its reported runs.
 
 ### 2D. Answer
 
-- What brings mathematics and code back is training on the student's own answers with the teacher scoring every token. Two independent papers now show it on Qwen3-1.7B: this one at 2 and 3 bits, the batch 2 paper at 1.88 and 2.79 bits. Over the same loss on fixed teacher answers it adds 8.4 points of MATH-500, 6.7 of HumanEval+ and 3.1 of MMLU-Redux.
+- What brings mathematics and code back is training on the student's own answers with the teacher scoring every token. Two independent papers now show it on Qwen3-1.7B: this one at 2 and 3 bits, the batch 2 paper at 1.88 and 2.79 bits. Here it is 8.4 points of MATH-500, 6.7 of HumanEval+ and 3.1 of MMLU-Redux above fixed answers, with a different prompt pool; the batch 2 paper's control uses the same prompts and loses 16 of 16.
+- The prompt mixture decides which abilities return. On mathematics prompts alone HumanEval+ goes from 3.66 to about 11; with the mixed pool it reaches 48.78.
 - The teacher's per-token score does the work. Rewards for correct answers add little on top and, alone, leave the model worse than it started. This answers a question batch 2 left open, and it removes the need for answer checkers and code tests in training.
 - Knowledge does not pay for it: MMLU-Redux rises with it.
 - The same-size teacher is used throughout. The prompts are public reasoning sets; the answers are the student's.
@@ -161,7 +162,7 @@ This is inference, not a measurement.
 
 ### 2E. What it means for the next five points
 
-- An on-policy stage adds at least a third of a step after sign and scale training: 45% before, 55% after. A second paper on our teacher, a matched comparison, and no need for rewards.
+- An on-policy stage adds at least a third of a step after sign and scale training: 45% before, 50% after. A second paper on our teacher and no need for rewards; its comparison with fixed answers is not matched on prompts.
 - Sign and scale training from the released model reaches a step: 63% before, 65% after.
 - The mix of training text is now documented twice for this teacher: mathematics, code, science and instruction prompts, with the student's own answers.
 - The loss for the scale-only and sign-and-scale trials has a measured ranking on this teacher: the mixed divergence, then the teacher-to-student divergence, then student-to-teacher, within 1 to 4 points of each other on the student's own answers.
@@ -196,9 +197,11 @@ This is inference, not a measurement.
 | LLaMA-3-1B, ternary | 14.0 to 12.9 | 54.7 to 55.6 |
 | LLaMA-3-1B, 2 bits | 12.5 to 11.9 | 56.7 to 56.6 |
 | LLaMA-3-1B, 3 bits | 10.9 to 10.9 | 57.2 to 57.8 |
-| Qwen3-0.6B, 1 bit, 8-bit activations | 64.0 to 61.9 | |
-| Qwen3-1.7B, 2 bits, 8-bit activations | 22.2 to 21.8 | |
+| Qwen3-0.6B, 1 bit, 8-bit activations | 64.0 to 61.9 | 41.2 to 41.4 |
+| Qwen3-1.7B, 1 bit, 8-bit activations | 46.5 to 45.9 | 42.3 to 42.4 |
+| Qwen3-1.7B, 2 bits, 8-bit activations | 22.2 to 21.8 | 47.8 to 48.2 |
 
+- Full-precision Qwen3-1.7B on the same eight tasks: perplexity 16.2, accuracy 58.2. So 1-bit training of the Qwen3-1.7B body for 20 billion tokens, embedding left in full precision, keeps 73% on eight easy tasks, and WinQ adds 0.1 point to it. The main-text table prints 42.2 for both.
 - Its speed-up is 1.5 to 2.8 times for 1-bit to 2-bit weights.
 - Ablations at 1 bit on LLaMA-3-1B, perplexity: no pull 16.5; pull of 0.2, 0.4, 0.6, 0.8 gives 15.5, 15.3, 15.5, 16.0; pull without noise 16.0; noise at half, one, two and four times the chosen size gives 15.7, 15.3, 16.3, 18.5.
 - The best settings change with model, bit width and batch size. Gains on Qwen are small.
@@ -217,7 +220,7 @@ This is inference, not a measurement.
 
 ### 3C. Answer
 
-- It holds at 1 bit and at 1B, with a modest gain: 1.6 points of perplexity and 0.7 of accuracy at equal cost. It is a setting, not a route.
+- It holds at 1 bit and at 1B, with a modest gain on LLaMA-1B (1.6 points of perplexity and 0.7 of accuracy at equal cost) and almost none on our teacher (0.1 point). It is a setting, not a route.
 - Its steps assume full-precision weights behind the codes. Read for a model that has none, they say two useful things:
   - A full pull puts every weight behind the codes exactly on its quantized value. That is the state a released binary model is in. Partial pulls toward that state help, and a pull of 0.8 still beats none. Starting sign training from bare signs is therefore a strong form of something that helps, not a handicap.
   - Noise at the right size helps and at four times that size destroys the gain. When every weight behind the signs has the same magnitude, the noise size relative to that magnitude sets how many signs move in a step. That is the budget on sign changes in another form, and it has to be set, not left to chance.
@@ -249,11 +252,11 @@ This is inference, not a measurement.
 
 | Candidate | Before | After | Reason |
 |---|---|---|---|
-| Scale-only training from the released 1-bit 1.7B reaches a step | 50% | 58% | The tied embedding and output matrix was never trained; the body's scales already were |
+| Scale-only training from the released 1-bit 1.7B reaches a step | 50% | 55% | The tied embedding and output matrix was never trained; the body's scales already were, and the body may have been trained around that matrix as it is |
 | Sign and scale training from the same model reaches a step | 63% | 67% | Second paper on the teacher for on-policy training; starting from bare signs supported again; an untrained output matrix to train |
-| Either of the two | 70% | 75% | |
+| Either of the two | 70% | 74% | |
 | The tied matrix of the released 1.7B is the plain conversion | Not held | 85% | One analysis on a sample of rows |
-| An on-policy stage adds at least a third of a step | 45% | 55% | Matched comparison on the teacher; rewards not needed |
+| An on-policy stage adds at least a third of a step | 45% | 50% | Second paper on the teacher; rewards not needed; its comparison is not matched on prompts |
 | The body of the first-generation 1-bit models was trained | 90% | 97% | Second analysis: half the smallest weights changed sign, scales uncorrelated with the base in places; PrismML's press release says the 8B was trained |
 | The published 2.257 is a storage convention | Not held as a number | Under 10% | The script reads written-out weights |
 

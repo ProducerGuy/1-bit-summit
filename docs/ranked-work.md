@@ -6,15 +6,15 @@ Two lists. Runs are ranked by the probability that each earns a step of five poi
 
 | Rank | Run | Probability of a five-point step | Why |
 |---|---|---|---|
-| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 63% | Highest odds and highest cost. It runs after rank 2. Training from signs with equal magnitudes behind them is published practice (OneBit) |
-| 2 | Scale-only training on the same-size teacher's own answers to mathematics, code and tool-calling prompts, signs frozen, on a ladder of token budgets | 50% | The cheapest candidate that can move the two largest losses. It runs first |
+| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 67% | Highest odds and highest cost. It runs after rank 2. Training from signs with nothing behind them is published practice (OneBit) and has a measured control for sign changes |
+| 2 | Scale-only training on the same-size teacher's own answers to mathematics, code and tool-calling prompts, signs frozen, on a ladder of token budgets | 55% | The cheapest candidate that can move the two largest losses. It runs first. The released model's tied embedding and output matrix was never trained |
 | 3 | Rank 2 with a larger teacher's logits as the target | 25% | Two sources find the same-size teacher equal or better at 1.7B |
 | 4 | Last block fitted to the teacher's logits (C99) | 10% | Published gains are 1 to 3 points at 3 and 4 bits on 7B models |
 | 5 | Rotation inside conversion and training | Under 10% against the 70.2% line | It applies only to a conversion of our own, whose ladder starts far lower |
 | 6 | Tool-call bias | Under 5% | The published measurement recovers lost calls and loses as many correct refusals |
 | 7 | Our own conversion: propagation strength, sign-search convergence (C97, C98) | Under 5% | Science scoreboard for now |
 
-Ranks 1 and 2 together: about 70%. The evidence for each is in `research/batch-1-findings.md` and `research/batch-2-findings.md`. A stage of on-policy distillation after rank 1 is judged at 45% to add at least a third of a step (`ideas.md`, I14); it is not ranked as a step of its own.
+Ranks 1 and 2 together: about 74%. The evidence for each is in the findings of batches 1 to 3 under `research/`. A stage of on-policy distillation after rank 1 is judged at 50% to add at least a third of a step (`ideas.md`, I14); it is not ranked as a step of its own.
 
 Two runs earn no step and decide what the others are worth:
 

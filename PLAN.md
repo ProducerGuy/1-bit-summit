@@ -1021,7 +1021,7 @@ Status values: `done`, `open`.
 | C4 | Establish the evaluation harness for Apple Silicon: can EvalScope score an OpenAI-compatible local server, are PrismML's hotfix scripts public, what is needed for sandboxed code benchmarks | open |
 | C5 | Read BitDistill, OneBit and BinaryLLM in full, including appendices and any released code, and extract exact losses, schedules and data. Done in batch 2 (`docs/research/batch-2-findings.md`, section 3). Not available: training code for BitDistill and BinaryLLM | done |
 | C6 | Read PrismML's MLX and llama.cpp forks for the 1-bit and Hadamard kernel code paths. Done for the Hadamard path as merged into upstream llama.cpp (graph, loader, converter) and for the demo repository's format and backend documents (S66, S67). The MLX fork and the 1-bit kernels remain | open |
-| C7 | Read the independent Bonsai reproduction study (ThakiCloud/bonsai-1bit-repro) in full: REPORT.md, the paper and the fingerprint scripts. Its README is read | open |
+| C7 | Read the independent Bonsai reproduction study (ThakiCloud/bonsai-1bit-repro) in full: REPORT.md, the paper and the fingerprint scripts. Its README is read. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C8 | Confirm which upstream MLX and mlx-lm versions load 1-bit g128 checkpoints | open |
 | C9 | Count parameters by tensor type in the real LFM2 checkpoint | open |
 | C10 | Measure peak memory and throughput for latent-weight training of Qwen3-1.7B in MLX on the M5 Max | open |
@@ -1034,7 +1034,7 @@ Status values: `done`, `open`.
 | C30 | Toy tests of the theory (`exp_nullspace.py`, `exp_gain.py`, `exp_twosided.py`) | done |
 | C31 | Read S21, S22, S23 and S24 in full, with released code | open |
 | C32 | Extend the redundancy map (C28) with output sensitivity, for H12 | open |
-| C34 | Read S28, S29 and S30 in full, with released code | open |
+| C34 | Read S28, S29 and S30 in full, with released code. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C35 | Toy test of the group offset (`exp_offset.py`) | done |
 | C40 | Outside proposal on radix operator encoding read, reproduced and stress-tested (`check_gpt_zip.py`) | done |
 | C41 | Read S36 in full, with released code | open |
@@ -1050,7 +1050,7 @@ Status values: `done`, `open`.
 | C48 | Multi-layer toy of H20 against straight-through training at equal steps (`exp_multilayer.py`) | done |
 | C49 | Four-way interaction on real weights: for pairs of components (the three projections inside an MLP first, then neighbouring blocks), the loss with neither, either and both naively binarized, and `I = L11 - L10 - L01 + L00`. Decides whether block order matters for candidate F and whether errors across components cancel or compound | open |
 | C50 | Inside the C28 script: per group of 128, the half-group mean magnitudes and the share of groups where splitting the scale would cut weight-space error by more than 8-bit scale rounding costs, along rows and along columns | open |
-| C51 | Read S46 in full, with released code: whether its reset and noise steps apply at 1 bit with group scales. If they do, candidates A and D use them, so the straight-through arms are the strongest available | open |
+| C51 | Read S46 in full, with released code: whether its reset and noise steps apply at 1 bit with group scales. If they do, candidates A and D use them, so the straight-through arms are the strongest available. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C52 | Read S44 and S45 in full | open |
 | C53 | Read ParetoQ and QuEST in full, with code. Both are published low-bit training recipes that section 2E does not yet cover | open |
 | C54 | Outside note of November 22 reviewed: its masking identity verified algebraically and by sampling (`exp_maskrank.py`), its scale split tested (`exp_scalesplit.py`), and three of its cited papers located (S44, S45, S46) | done |
@@ -1106,11 +1106,12 @@ Status values: `done`, `open`.
 | C105 | Batch 1 of the two-reviewer research (tool-calling data, ScaleQ and CAT-Q with code, the public record on PrismML's method): `docs/research/batch-1-findings.md`, `docs/research/batch-1-second-reviewer.md`, `docs/research/batch-1-comparison.md` | done |
 | C106 | Ideas register: `docs/ideas.md`. Every unproven idea with its evidence, odds and cheapest proof | open, kept current |
 | C107 | Trials register: `docs/trials.md`. Every intended script or run with its justification. Written specifications: M1 (`docs/ruler-spec.md`) and S1 to S4 (`docs/specs/`). M2, M3 and M4 are specified after the research queue's section 3 is done and approved | open |
-| C108 | Open and check three sources the second reviewer surfaced from search excerpts: a second fingerprint analysis of the 1-bit 1.7B, a second discussion thread on the 27B model page, and the config files of the released 1.7B | open |
+| C108 | Open and check three sources the second reviewer surfaced from search excerpts: a second fingerprint analysis of the 1-bit 1.7B, a second discussion thread on the 27B model page, and the config files of the released 1.7B. Done in batch 3 (`docs/research/batch-3-findings.md`, `docs/research/batch-3-comparison.md`) | done |
 | C109 | Batch 2 of the two-reviewer research (knowledge loss, optimizers for discrete weights, BitDistill with OneBit and BinaryLLM): `docs/research/batch-2-findings.md`, `docs/research/batch-2-second-reviewer.md`, `docs/research/batch-2-comparison.md`. Ideas I12 to I16 and trial S4 came out of it | done |
 | C110 | Paired damage map of the released 1-bit 1.7B against the teacher, forward passes only (`docs/trials.md`, S4): where the loss sits, whether the layers still line up, whether arithmetic width changes answers | open |
 | C111 | Settle on paper, for the sign-and-scale trial's specification: the learning-rate schedule (S73 against S85), the form of a budget on sign changes (I13), and the handling of the tied matrix's two roles (I12) | open |
 | C112 | Read the body of S33 and the PRISM article on recall under quantization (https://link.springer.com/article/10.1007/s10791-026-10580-5), both cited by the second reviewer and not opened by the first | open |
+| C114 | Batch 3 of the two-reviewer research (the released model's weights, reasoning recovery from the model's own text, faster and controlled sign training): `docs/research/batch-3-findings.md`, `docs/research/batch-3-second-reviewer.md`, `docs/research/batch-3-comparison.md`. Ideas I17 and I18 and new tests in S2 and S4 came out of it | done |
 | C113 | Research queue: `docs/research-queue.md`. Every open piece of reading and paper work, what each helps, its batch, and an account of every open row of this checklist. Research for the next five points is finished when its section 3 is done and its section 5 is settled | open |
 | C68 | Outside note on functional equivalence reviewed: column factors and commit-and-compensate tested (`exp_gpt3.py`) | done |
 | C37 | Read S33 and S34 in full, with released code. Done in batch 2 (`docs/research/batch-2-findings.md`, section 2). S33 is a refiner of error-compensated rounding at 3 and 4 bits with no 1-bit result. S34's one comparison with straight-through training is 100 steps on a 0.13B ternary checkpoint; its models up to 2.7B are trained from scratch with no straight-through baseline. Neither is a candidate optimizer. S34's code is not released | done |
@@ -1205,6 +1206,11 @@ Status values: `done`, `open`.
 - S61. Anshumann, Zaidi, Kedia and others, "Sparse Logit Sampling: Accelerating Knowledge Distillation in LLMs", ACL 2025. https://arxiv.org/abs/2503.16870
 - S62. Cameron, Gelbach, Miller, "Robust Inference with Multi-way Clustering", NBER technical working paper 327. https://www.nber.org/papers/t0327
 - S63. Owen, "The Pigeonhole Bootstrap", Annals of Applied Statistics 2007. https://artowen.su.domains/reports/pbs2.pdf
+- S98. "Error Diffusion Replaces Latent Weights: Training Binary-Weight Language Models on a Few Bits of Dithered State", 2026. https://arxiv.org/abs/2610.34566
+- S97. Helwegen et al., "Latent Weights Do Not Exist: Rethinking Binarized Neural Network Optimization", NeurIPS 2019. https://arxiv.org/abs/1906.02107
+- S96. PrismML, launch press release. https://prismml.com/news/prismml-launches-worlds-first-1-bit-ai-model
+- S95. Discussion 62 on the second-generation 27B model page, "I took Bonsai 2 27B apart, part 2". https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/discussions/62
+- S94. Chowdhury, Kalaris Labs, "PrismML Bonsai: the team and how to reverse-engineer 1-bit LLMs", 28 October 2026. https://kalarislabs.com/blog/prismml-bonsai-team-1-bit-reverse-engineering
 - S93. FujitsuResearch, OneCompression repository: JointQ source, benchmark reports and column-swap module. https://github.com/FujitsuResearch/OneCompression
 - S92. Hunyuan Team, "AngelSlim: A more accessible, comprehensive, and efficient toolkit for large model compression", 2026. https://arxiv.org/abs/2602.21233
 - S91. Wang, Yu, Zhao, Wang, Han, "LC-QAT: Data-Efficient 2-Bit QAT for LLMs via Linear-Constrained Vector Quantization", ICML 2026. https://arxiv.org/abs/2606.10531
