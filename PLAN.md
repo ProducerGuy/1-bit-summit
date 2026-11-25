@@ -14,7 +14,7 @@ This section is the single place where odds, open problems, the work queue and w
 
 ### Odds per goal
 
-Judgment figures, uncalibrated until real Qwen results exist. Time and compute are not limits on this project: local machines and local models are available to it without end, by the owner's ruling of 25 November 2026. No figure here is capped by a training budget, and a goal that is missed is worked until it is met. What limits each goal is what is not yet known.
+Judgment figures, uncalibrated until real Qwen results exist. The project is open, public research and sells nothing. Licensing is settled for it, by the owner's ruling of 25 November 2026: the Qwen and LFM licenses both permit research, conversion and publishing converted weights, and licensing is not tracked as an open item. Time and compute are not limits on this project: local machines and local models are available to it without end, by the owner's ruling of 25 November 2026. No figure here is capped by a training budget, and a goal that is missed is worked until it is met. What limits each goal is what is not yet known.
 
 | Goal | Odds | What limits it | What would move it |
 |---|---|---|---|
@@ -591,7 +591,7 @@ Each unknown is owned by a checklist item in section 9. None is to be filled by 
 | Whether EvalScope, or another harness, can score a model served from MLX or llama.cpp on a Mac with rule-based scoring only | C4 |
 | Whether Hadamard rotation helps binary weights at small scale. PrismML's rotated releases are ternary only | C17 |
 | Whether LFM2's multiplicative gates tolerate low-bit projections | C19 |
-| Which LFM2 checkpoint is the target, and what its license permits for releasing converted weights | C18 |
+| Which LFM checkpoint is the target | C18 |
 | Whether PrismML's evaluation hotfix scripts, mentioned in S1 appendix B.5.3, are public | C4 |
 
 ## 4. Theory and hypotheses
@@ -1144,7 +1144,7 @@ Status values: `done`, `open`.
 | C15 | T1 won | open |
 | C16 | T2 measured, T3 race run | open |
 | C17 | H3 rotation test run, binary and ternary | open |
-| C18 | LFM2 checkpoint chosen and pinned, license read Batch 7: license read (LFM Open License v1.0: research, conversion and publishing converted weights are permitted with the license attached; commercial use below 10 million US dollars of annual revenue). Candidates with weight revisions recorded (`docs/research/batch-7-findings.md`, section 2I). The choice is the owner's (section 10). Weight revisions for all three candidates are now recorded, LFM2-350M included. On the project's suite LFM2-1.2B is a weak teacher on four tasks (two at chance), which bears on the choice: `docs/research/batch-7-findings.md`, section 2E. | open |
+| C18 | LFM2 checkpoint chosen and pinned, license read Batch 7: license read (LFM Open License v1.0: research, conversion and publishing converted weights are permitted with the license attached; commercial use below 10 million US dollars of annual revenue). Candidates with weight revisions recorded (`docs/research/batch-7-findings.md`, section 2I). The choice is the owner's (section 10). Weight revisions for all three candidates are now recorded, LFM2-350M included. On the project's suite LFM2-1.2B is a weak teacher on four tasks (two at chance), which bears on the choice: `docs/research/batch-7-findings.md`, section 2E. The license half of this row is closed; what remains is the owner's choice of target. | open |
 | C19 | H5 exceptions ablation run on LFM2 | open |
 | C20 | T4 won | open |
 | C21 | T5 won | open |

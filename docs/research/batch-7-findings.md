@@ -380,7 +380,7 @@ What a conversion can use.
 
 - The figures of the papers other than the LFM2 technical report, and the blog posts' charts. The report's nine figures were read from its file.
 - The technical report's tables for vision, audio and retrieval.
-- The license and the two chat templates as verbatim text. The reading tool returns an account of a file, clause by clause or step by step, and not its text.
+- The two chat templates as verbatim text. The reading tool returns a step-by-step account of a file and not its text.
 - The headers of the model files. They cannot be reached from this workspace; checklist row C9 reads them on the owner's machine.
 - The tokenizer files.
 - The transformers LFM2 model file outside its convolution block (lines 269 to 365 of 606 were read).
