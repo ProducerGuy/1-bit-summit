@@ -209,6 +209,8 @@ A Mamba block is a projection in, a depthwise convolution, a gated recurrence an
 
 What these say for LFM.
 
+- The plan holds a fifth case, from PrismML itself: its three-level 27B model is built on a hybrid whose linear-attention blocks contain a small convolution, and it keeps that convolution, the recurrence parameters and every normalization weight in full precision, 0.0976% of the language model, after an earlier release that converted them. It keeps 97% of a general suite.
+
 - Blocks of this shape do convert, by the same kind of recipe the project plans for Qwen: start from the pretrained model, distil from it, train signs through an estimator.
 - Groups of 128 with one scale each have been used on such a block. The paper found group sizes 64, 128 and 256 equal, and found that scales left free to learn collapsed, with nine tenths of weights going to zero, where scales computed from the weights did not. That is a ternary result; at two levels there is no zero to collapse to.
 - Every one of them leaves the depthwise convolution and the embedding in full precision. Converting the tied embedding, which the project's format requires, has no precedent on this kind of model.

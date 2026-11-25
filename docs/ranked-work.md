@@ -6,7 +6,7 @@ Two lists. Runs are ranked by the probability that each earns a step of five poi
 
 | Rank | Run | Probability of a five-point step | Why |
 |---|---|---|---|
-| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 72% | Highest odds and highest cost. It runs after rank 2. Training from signs with nothing behind them is published practice (OneBit) and has a measured control for sign changes |
+| 1 | Training of signs and scales from PrismML's released 1-bit 1.7B, straight through, with a managed learning-rate decay | 74% | Highest odds and highest cost. It runs after rank 2. Training from signs with nothing behind them is published practice (OneBit) and has a measured control for sign changes PrismML's own retraining of an unchanged format raised a hard skill from 63% to 90% of the 16-bit score at 27B (`research/bonsai-2-5-whitepaper-notes.md`) |
 | 2 | Scale-only training on the same-size teacher's own answers to mathematics, code and tool-calling prompts, signs frozen, on a ladder of token budgets | 55% | The cheapest candidate that can move the two largest losses. It runs first. The released model's tied embedding and output matrix was never trained |
 | 3 | Rank 2 with a larger teacher's logits as the target | 25% | Two sources find the same-size teacher equal or better at 1.7B |
 | 4 | Last block fitted to the teacher's logits (C99) | 10% | Published gains are 1 to 3 points at 3 and 4 bits on 7B models |
