@@ -53,7 +53,7 @@ These do not change which trial runs first. They stay open until their goal is t
 | 6 | J. Mirror-descent theory | C26, C27, C43 | S14, S17, S18 and the matrix mirror-descent paper; S15, S16 and the noise-shaping follow-ups; S38 and its results at 1 bit | Our own conversion formula. Idea I5 (the Caltech potential at 1 bit). The implementation row C42 follows it | Done by both reviewers. `research/batch-6-findings.md`, `research/batch-6-second-reviewer.md`, `research/batch-6-comparison.md` |
 | 6 | K. Compensation and factorization | C38, C41 | Noda's cross-layer compensation (S35); double binary factorization (S36) with code | Our own conversion formula. M4 | Done by both reviewers. `research/batch-6-findings.md`, `research/batch-6-second-reviewer.md`, `research/batch-6-comparison.md` |
 | 6 | L. Structure of the damage, and prior art for one hypothesis | C52, C47, C46 | S44 and S45; clipping schedules, box-constrained and proximal quantization training, arXiv 2609.32659; any measurement of bits stored per parameter in binary or ternary transformers | The science scoreboard. Hypothesis H20. How S4's results are read | Done by both reviewers. `research/batch-6-findings.md`, `research/batch-6-second-reviewer.md`, `research/batch-6-comparison.md` |
-| 7 | M. LFM2 | C11, C18 | Any published low-bit LFM2 work; the checkpoint chosen and pinned, its license | The LFM2 goal. The scripts C9 and C63 follow it | In work by both reviewers, as three items: the target and its licence; low-bit LFM2 and models built like it; carrying a recipe from Qwen to LFM2. Brief: `research/batch-7-prompt.md` |
+| 7 | M. LFM2 | C11, C18 | Any published low-bit LFM2 work; the checkpoint chosen and pinned, its license | The LFM2 goal. The scripts C9 and C63 follow it | Done by the first reviewer (`research/batch-7-findings.md`); the second reviewer's return is pending. Three items: the target and its licence; low-bit LFM2 and models built like it; carrying a recipe from Qwen to LFM2. Brief: `research/batch-7-prompt.md` |
 
 ## 5. Paper work that is not reading
 
@@ -77,11 +77,11 @@ Code announced and not released. Each is checked again when its part comes up.
 
 ## 7. Every open checklist row, accounted for
 
-`PLAN.md` has 54 rows marked open, and two more with an open remainder.
+`PLAN.md` has 53 rows marked open, and two more with an open remainder.
 
 | Kind | Rows | Where they are tracked |
 |---|---|---|
-| Reading and paper work, 7 rows | C11, C18, C111, C118, C119, C122, C125 | Sections 3, 4 and 5 of this document |
+| Reading and paper work, 6 rows | C18, C111, C118, C119, C122, C125 | Sections 3, 4 and 5 of this document |
 | Scripts and runs, 33 rows | C9, C10, C28, C29, C32, C33, C42, C49, C50, C55, C58, C59, C60, C63, C64, C65, C67, C69, C75, C76, C79, C81, C89, C90, C92, C93, C95, C96, C97, C98, C99, C110, C124 | `trials.md` for those with a trial (C76, C90 and C92 are S2; C67 and C50 are S3 in part; C110 is S4); the plan for the rest |
 | Registers, kept current | C106, C107, C113 | `ideas.md`; `trials.md` and `specs/`; this document |
 | Written, with decisions open | C104 | `ruler-spec.md`, section 11: five decisions for the project owner |
