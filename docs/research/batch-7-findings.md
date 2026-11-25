@@ -11,6 +11,7 @@ First reviewer. The brief is `batch-7-prompt.md`. Every figure has its source in
 - Nobody was found to have trained or converted an LFM model to 1 bit or to three levels. What exists below 4 bits is community rounding at about 1.6 to 2 bits with no scores.
 - Liquid AI itself distils into 4 bits and publishes how much comes back: 96.5% to 97.4% of the 16-bit average. From its own figures, plain 4-bit rounding costs these models 7% to 13% of their benchmark average. This is the only measured retention for the family at any width.
 - In its lowest-bit build for LFM3, Liquid AI quantizes the feed-forward matrices only and leaves the convolutions, attention, embedding and output matrix in 16 bits.
+- The only scores found under 4 bits on any LFM model come from a community test file: LFM3-1.7B rounded to about 2.6 bits solves 1 of 164 HumanEval+ problems with no calibration and 51 to 55 with it, against 118 in 16 bits.
 - The nearest published 1-bit and three-level work on blocks like LFM's is on Mamba models, which have the same shape of block: a projection in, a depthwise convolution, a gate, a projection out. Three papers convert only the two projections, keep the convolution and the embedding in full precision, and land at 85% to 87% of the full-precision zero-shot average. One of them uses groups of 128 with one scale each, starts from a pretrained model and uses about 100 million tokens.
 - The LFM convolution block has no nonlinearity. It is a cubic polynomial of its input. That gives it far more exact freedom than a feed-forward block: four free scale factors per channel, signs included, and its 16-bit kernel can absorb a free factor per column of the output projection.
 - LFM3 puts a normalization with a 16-bit gain after every sublayer as well as before it. A scale error on a converted sublayer's output is erased there. Qwen3 has nothing like it.
@@ -109,12 +110,15 @@ Computed from the configuration files and module definitions by `lfm_counts.py`.
 
 | | LFM2 and LFM2.5 | LFM3-1.7B |
 |---|---|---|
-| Template | ChatML-like with a start-of-text token and a default system message | The same family of template, 12 kB long |
+| Template | ChatML-like with a start-of-text token. A system block is written only when a system message is supplied or tools are present | The same family, 12 kB long, with the same rule for the system block |
 | Reasoning | None in the standard models; a separate Thinking model in LFM2.5 | On by default. Turning it off prefills an empty trace, and the card warns this can be inconsistent on tasks that need reasoning |
 | Tool calls | Function definitions as JSON between list markers; the call as a Python-style list between call markers | Calls as XML blocks; tool schemas on every request; tools that load on demand |
 | Recommended sampling | Temperature 0.3, min-p 0.15, repetition penalty 1.05 (LFM2); 0.1, top-k 50, 1.05 (LFM2.5) | 0.1, top-k 50, repetition penalty 1.1; for mathematics and science 1.0, top-p 0.95, top-k 20 |
 | Maker's own caution | Not for knowledge-heavy tasks or programming | Not for agentic coding or long multi-step reasoning; knowledge tasks should use retrieval |
 
+- Neither template inserts a default system message, although the LFM2 model card shows one. The ruler has to fix the system text itself.
+- LFM2's template refuses tool-call arguments passed as a string and writes each call as `name(key=value)` with strings in single quotes. LFM3's writes `<tool_call>` blocks with one `<parameter>` element per argument and puts tool definitions between `<tools>` markers in the system block.
+- With reasoning on, LFM3's prompt ends with an open `<think>`; with it off, with an empty `<think></think>`.
 - The PrismML reference on Qwen is thinking off. An LFM3 baseline has to be measured both ways before either is chosen, since its maker warns that the no-thinking mode is uneven.
 
 ### 2G. The license
@@ -137,7 +141,8 @@ LFM Open License v1.0, the same 10.6 kB file in the LFM2-1.2B and LFM3-1.7B repo
 ### 2H. Runtimes
 
 - Upstream llama.cpp has an `lfm3` architecture: model file and conversion script read in full. It loads the tied matrix once and reuses it for the output. The quantized files Liquid AI publishes need build b11960 or later.
-- In that file linear layers are applied through a routine that takes a second, companion scale tensor for the matrix. What writes those tensors and whether the convolution block's projections go through the same routine was not traced.
+- The runtime's shared LFM file, read in full, builds the convolution block exactly as the model code does: one projection, three views B, C and x, the product B times x, the stored state prepended, the depthwise convolution, the product with C, the projection out. It agrees with the transformers model file and with the MLX implementation, which was also read in full.
+- Some matrices in these graphs accept an optional companion tensor. It is a single number per matrix, BitNet's per-matrix scale, and is not required. The 1-bit block type carries its own scale in every 18-byte block and does not use it. The convolution block's two projections take no companion.
 - The plan already records that upstream llama.cpp does not apply its runtime rotation to LFM2 and that the 1-bit tensor type is not tied to an architecture. That type is a half-precision scale and 16 bytes of signs per 128 weights, 18 bytes, 1.125 bits per weight. The quantizer skips the short-convolution kernel by name at every width, as it does Mamba's small convolution weights, so a file in the reference format keeps these kernels unquantized.
 - Upstream mlx-lm has modules for LFM2, its vision models and its mixture-of-experts models. A search of it found no LFM3 module, although Liquid AI publishes LFM3 builds for MLX. Where that support lives was not found.
 - LFM3 in the transformers library needs the repository's own code.
@@ -148,7 +153,7 @@ LFM Open License v1.0, the same 10.6 kB file in the LFM2-1.2B and LFM3-1.7B repo
 |---|---|---|---|
 | Target | LiquidAI/LFM3-1.7B, with LFM3-1.7B-Base beside it | Commit 40ebe0aa6662c9d40389c2f5d565b6a2c6aebacd | The same size, width and head size as Qwen3-1.7B, so a difference in retention cannot be put down to size. It is the model Liquid AI now recommends. Its block design is the friendlier one for 1 bit (4D). A base checkpoint exists |
 | Second transfer point | LiquidAI/LFM2-1.2B | Commit 6dae451d2ecff1b14b43601685927492c4727811 | The only LFM with a published score on the project's ten benchmarks. Documented by a technical report. In the transformers library and in every runtime. A second generation makes the formula claim stronger than one |
-| Engineering check | LiquidAI/LFM2-350M | Not read; to be pinned with C9 | Small, same block types, its table verified to the last weight |
+| Engineering check | LiquidAI/LFM2-350M | Commit 3dbef3298cda75424434b99f524452ffd5af0d49 (repository head f37d3f5c8c5484bc01dad379a595cf4c68c4e70e, a template fix) | Small, same block types, its table verified to the last weight |
 
 - Against LFM3 as the only target: no technical report, model code outside the transformers library, reasoning on by default, and no score on six of our ten benchmarks.
 - Against LFM2-1.2B as the only target: deprecated by its maker, a third smaller than the Qwen reference, and the least friendly of the three designs for 1 bit.
@@ -175,7 +180,9 @@ LFM Open License v1.0, the same 10.6 kB file in the LFM2-1.2B and LFM3-1.7B repo
 
 - One uploader publishes importance-weighted GGUF sets for many LFM models and derivatives, each including IQ1_S, IQ1_M, IQ2 and Q2_K files: for the LFM2.5 encoder models, LFM2.5-1.2B-JP, LFM2.5-2.6B and 8B-A1B derivatives, LFM2-24B-A2B, LFM2.5-24B-A2B derivatives and one LFM3-1.7B derivative (IQ1_S at 0.6 GB). The uploader's own label for the 1-bit-class files is "for the desperate". No scores are given.
 - These formats are codebook rounding at about 1.6 to 2 bits with parts kept higher. None is one sign per weight with a scale per group, and none is trained.
-- The listing of quantized versions of LFM3-1.7B holds 173 repositories. The first 30 were read: none is named for a width under 4 bits. The other pages were not read.
+- The listing of quantized versions of LFM3-1.7B holds 173 repositories and was read to the end. Named for a width under 4 bits: one importance-weighted set with the 1-bit-class files; a mixed-precision MLX series from 2 to 3.5 bits (its 2-bit member averages 3.0 bits per weight: 39% of weights at 2 bits, 61% at 3, and 0.022% in 16 bits); and one Q2_K file published as a deliberately failing test case. None is a 1-bit, three-level or BitNet-style model.
+- That test file gives the only scores found under 4 bits on an LFM model. LFM3-1.7B at Q2_K (2.6 bits per weight in the matrices) with no importance weighting solves 1 of 164 HumanEval+ problems and fails 40% of tool calls; the same weights rounded with importance weighting solve 51 to 55. The 16-bit model solves 118. So calibrated rounding at 2.6 bits keeps under half of this model's code ability.
+- The first page of the 44 quantized versions of LFM2-1.2B was read: nothing under 4 bits by name. One community repository of the original model holds Q2_K and Q3 files, by the second reviewer's read.
 
 ### 3C. Trained or converted LFM at 1 bit or three levels
 
@@ -199,12 +206,14 @@ What these say for LFM.
 - Groups of 128 with one scale each have been used on such a block. The paper found group sizes 64, 128 and 256 equal, and found that scales left free to learn collapsed, with nine tenths of weights going to zero, where scales computed from the weights did not. That is a ternary result; at two levels there is no zero to collapse to.
 - Every one of them leaves the depthwise convolution and the embedding in full precision. Converting the tied embedding, which the project's format requires, has no precedent on this kind of model.
 - In Bi-Mamba, converting the projection out as well as the projection in costs nothing at 780M and 2.5 points at 2.7B.
+- Bi-Mamba's released code computes each scale as the mean magnitude of the latent weights along one axis, held out of the gradient, and passes the gradient straight through the sign. The scale is computed, not learned, as in the ternary paper.
 - The measure in all three is a zero-shot average of easy tasks. None reports mathematics, code or tool calling.
 
 ### 3E. Depthwise kernels at 1 bit, from vision
 
-- Two vision papers, seen in search results only and not read, say that depthwise convolutions are the part binary networks could not convert: early binary MobileNets replaced them with ordinary convolutions, and one reports that a binary depthwise convolution's output per channel falls in too small a range to train.
-- This does not bear on our format. An LFM kernel has 3 or 7 weights per channel. It cannot be grouped by 128, holds 0.005% to 0.011% of the model, and stays in 16 bits. Every language model in 3D keeps it in full precision too.
+- One vision paper was read through questions put to its full text. It says binary depthwise filters fail for two reasons: each has so few weights that rounding errors do not average out, and each sees one input channel, so its output varies little and the normalization after it blows that up. With two changes (a shortcut into the next normalization, and two binary filters summed) it trains networks whose depthwise weights are binary: 89.93% on CIFAR-10 against 71.04% for its base network, and 65.3% on ImageNet. First and last layers stay real.
+- An earlier paper, seen in search results only, replaced binary depthwise filters with grouped ones because training did not converge.
+- For our format this does not arise: an LFM kernel has 3 or 7 weights per channel, cannot be grouped by 128, holds 0.005% to 0.011% of the model, and the reference runtime leaves it unquantized. Every language model in 3D keeps it in full precision. It bears on idea I29, where the kernels would be made binary: the failure it describes is the one to expect, and LFM3's normalization after the block is the kind of remedy it uses.
 
 ### 3F. The comparator
 
@@ -243,7 +252,9 @@ What these say for LFM.
 ### 4C. Training history
 
 - The one quantitative law found is for rounding after training: over 1,500 rounded checkpoints of one family, the loss from rounding grows with training tokens to the power 0.53 and falls with size to the power 0.23 and with bit width to the power 5.5. Its data stop at 206 billion tokens and at 2 bits, and it does not cover training with quantization in the loop.
-- Applied far outside its range, as a direction only: against Qwen3-1.7B, the law puts LFM3-1.7B at 0.77 times the damage, LFM2-1.2B at 0.57 times and LFM2.5-1.2B at 0.94 times. By training history none of the LFM targets is harder than the Qwen reference.
+- Applied far outside its range, as a direction only: against Qwen3-1.7B, the law puts LFM3-1.7B at 0.77 times the damage, LFM2-1.2B at 0.57 times and LFM2.5-1.2B at 0.94 times. A second study of 465 small models finds the same dependence on tokens per weight.
+- A third study disputes both. Following models trained on up to 15 trillion tokens, and in controlled runs, it finds that rounding damage rises when the learning rate decays, falls with a larger peak rate, with weight averaging and with weight decay, and stays flat across token budgets when the rate is held and dropped only at the end. It says the earlier laws mistook the schedule for the token count. LFM2 and Qwen3 both report a faster decay in a late stage.
+- None of the three goes under 2 bits or covers training with quantization in the loop. By training history no source makes the LFM targets harder than the Qwen reference, and the question is about schedule as much as tokens.
 - Nothing was found on whether a model that was itself distilled converts better or worse. LFM2 is such a model; LFM3 is not stated to be.
 - Against that, the measured fact in 3A: these models lose 7% to 13% at plain 4 bits, a large loss for that width. No like-for-like Qwen3-1.7B figure on the same suite was found, so this is a flag and not a comparison.
 
@@ -347,21 +358,27 @@ What a conversion can use.
 - Bi-Mamba: https://arxiv.org/abs/2411.11843 Code https://github.com/Tangshengku/Bi-Mamba
 - DF-SSM: https://arxiv.org/abs/2606.10932 Code https://github.com/cs-cmyk/df-ssm
 - Nemotron 3.5 Bolt: https://arxiv.org/abs/2610.33039
-- Low-bit quantization and training tokens: https://arxiv.org/abs/2411.17691
-- Depthwise convolutions in binary vision networks, seen in search results only: https://arxiv.org/abs/2511.17633 and https://arxiv.org/abs/2005.06305
+- Low-bit quantization and training tokens: https://arxiv.org/abs/2411.17691 and https://arxiv.org/abs/2411.04330
+- Training dynamics and rounding damage: https://arxiv.org/abs/2510.06213
+- LFM2.5-350M and LFM2.5-2.6B releases: https://www.liquid.ai/blog/lfm2-5-350m-no-size-left-behind and https://www.liquid.ai/blog/lfm2-5-2-6b
+- LFM2-350M repository: https://huggingface.co/LiquidAI/LFM2-350M
+- A failing Q2_K test file with scores: https://huggingface.co/vatsal-roy-29/LFM3-1.7B-Q2_K-no-imatrix-BROKEN
+- A mixed-precision MLX series: https://huggingface.co/bambocher/LFM3-1.7B-oQ2
+- transformers, `src/transformers/models/lfm2/modeling_lfm2.py`: https://github.com/huggingface/transformers
+- llama.cpp, `src/models/lfm-base.cpp`, `src/models/bitnet.cpp`
+- Depthwise convolutions in binary vision networks: https://arxiv.org/abs/2511.17633 and, seen in search results only, https://arxiv.org/abs/2005.06305
 
 ## 8. Not read
 
-- Any figure. The technical report and the papers were read through a text mirror; the blog posts' charts are images.
+- Any figure. The technical report and the papers were read through a text mirror, and the blog posts' charts are images. The report's file is needed to read its figures.
 - The technical report's result tables beyond the LFM2 rows and the Qwen3-1.7B entries used here.
-- The transformers library's LFM2 model code. The LFM2 tables rest on the configuration file, the report's equations and the exact match of the totals.
-- The license as verbatim text. A tool returned an account by clause.
-- The chat templates as text.
-- The LFM2-350M repository's revision; the model cards of the LFM2.5 models on the model hub; the LFM3 exact parameter count.
-- Pages 2 to 6 of the listing of quantized LFM3 builds, and the 44 quantized versions of LFM2-1.2B.
-- The llama.cpp base class that builds the convolution block and the feed-forward block; the LFM2 model file; where the companion scale tensors are written.
+- The license and the two chat templates as verbatim text. The reading tool returns an account of a file, clause by clause or step by step, and not its text.
+- The headers of the model files. They cannot be reached from this workspace; checklist row C9 reads them on the owner's machine.
+- The tokenizer files.
+- The per-benchmark rows for LFM2-1.2B in PrismML's whitepaper. The file is a PDF the repository reader cannot open; the plan holds the two averages.
+- The transformers LFM2 model file outside its convolution block (lines 269 to 365 of 606 were read).
+- The second page of the quantized versions of LFM2-1.2B; the model cards of the LFM2.5 models on the model hub; LFM3's exact parameter count as published.
 - Where MLX support for LFM3 lives.
-- The per-benchmark rows for LFM2-1.2B in PrismML's whitepaper. The plan holds the two averages.
-- The code of Bi-Mamba and DF-SSM. The three Mamba papers and the two others in section 3D and 4C were read through targeted questions put to the full text, not line by line.
-- The two vision papers in 3E.
+- DF-SSM's code, and Bi-Mamba's beyond its quantized linear layer. The papers in 3D, 3E and 4C were read through questions put to their full text, not line by line.
+- The earlier of the two vision papers in 3E.
 - A leaderboard Liquid AI links from its distillation post, and its fine-tuning cookbook.
