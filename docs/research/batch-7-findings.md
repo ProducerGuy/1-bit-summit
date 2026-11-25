@@ -87,13 +87,16 @@ Computed from the configuration files and module definitions by `lfm_counts.py`.
 | Base checkpoint released | No | Yes, 1.2B and 2.6B | Yes | Not checked here |
 | Tokens per weight | 0.9 times ten thousand (1.2B) | 2.4 times ten thousand (1.2B) | 1.3 times ten thousand | 2.1 times ten thousand |
 
+- Liquid AI's own result table carries a row for trained tokens: 11 trillion for each LFM2 model, 36 trillion for Qwen3-1.7B. One sentence elsewhere in the report says the 350M checkpoint used for its retrieval model saw 25 trillion tokens; the report does not reconcile the two.
+- The report's architecture figure agrees with the three code bases: a normalization, then the convolution or attention block, then a normalization and the feed-forward block, with the last linear layer marked as tied to the embedding.
 - LFM1-7B, the teacher of LFM2, is not released. No larger model of the LFM3 architecture exists. The larger LFM2.5 models are mixture-of-experts models with a different vocabulary history. For distillation into a 1-bit LFM the available teacher is the model itself, which is also what the project's Qwen recipe uses.
 
 ### 2E. Published scores, and how they sit beside our ten benchmarks
 
 | Source | Model | What it reports |
 |---|---|---|
-| PrismML's 1-bit whitepaper, on its own harness (already in the plan) | LFM2-1.2B, 16-bit | Ten-benchmark average 41.08, six-benchmark average 46.73. This is the only LFM score on the project's own suite |
+| PrismML's 1-bit whitepaper, table 9, on its own harness, greedy, thinking off | LFM2-1.2B, 16-bit | MMLU-Redux 52.9, GPQA Diamond 23.5, MuSR 25.4, IFEval 77.5, IFBench 27.7, GSM8K 62.2, MATH-500 42.2, HumanEval+ 36.0, MBPP+ 37.0, BFCL v3 26.4. Average 41.08. This is the only LFM model scored on all ten of the project's benchmarks |
+| The same table | Qwen3-1.7B, 16-bit | 66.8, 32.5, 50.1, 70.3, 18.3, 83.1, 74.0, 57.3, 58.2, 71.8. Average 58.24 |
 | LFM2-1.2B model card, Liquid AI's harness | LFM2-1.2B | MMLU 55.23, GPQA 31.47, IFEval 74.89, IFBench 20.7, GSM8K 58.3, MGSM 55.04, MMMLU 46.73 |
 | LFM2 technical report, tables 6 and 7, the same harness | LFM2-1.2B | MATH-500 42.40, MMLU-Pro 19.71, Multi-IF 45.28, GSMPlus 36.09, MATH level 5 18.61. LFM2-2.6B: MATH-500 63.60, GSM8K 82.41 |
 | The same tables | Qwen3-1.7B | MATH-500 70.00 |
@@ -102,6 +105,10 @@ Computed from the configuration files and module definitions by `lfm_counts.py`.
 | The same table | Qwen3-1.7B, no thinking | GPQA 34.85, IFEval 73.68, IFBench 21.33, BFCL v3 46.30 |
 | LFM3-1.7B model card, thinking on | LFM3-1.7B | IFEval 96.66, IFBench 73.03, GPQA Diamond 63.37, BFCL V4 71.39, LiveCodeBench v6 73.46, 29 benchmarks in all |
 
+- On the project's suite LFM2-1.2B in 16 bits (41.08) scores what the 1-bit Qwen scores (40.88). It beats Qwen3-1.7B on IFEval and IFBench and trails it by 45 points on BFCL v3, 32 on MATH-500 and 25 on MuSR.
+- Two of its ten scores sit at or under chance: GPQA Diamond at 23.5 with four choices, and MuSR at 25.4. A converted model cannot lose points on those, so retention there says nothing, and the average flatters any conversion of this teacher. Retention on LFM2-1.2B has to be read with those two tasks set apart, or above chance.
+- A step of five points on LFM2-1.2B is 20.5 summed score points, against 29.1 on Qwen3-1.7B. Seventy percent retention is an average of 28.8.
+- Liquid AI's own figure of average score against speed puts Qwen3-1.7B near 48.5 and LFM2-1.2B near 42, read from the plot. On both harnesses Qwen3-1.7B is the stronger teacher.
 - A warning for the ruler: Liquid AI's harness gives Qwen3-1.7B 51.4 on GSM8K. PrismML's gives the same model 83.1. Scores from two harnesses cannot be mixed, for the teacher or the student.
 - Of our ten benchmarks, LFM3-1.7B has published scores on three (IFEval, IFBench, GPQA Diamond), with thinking on and sampling at temperature 0.6, and on BFCL in version 4, not version 3. Nothing is published for MATH-500, GSM8K, MMLU-Redux, MBPP+, HumanEval+ or MuSR.
 - Liquid AI's settings for LFM2 are in an appendix of its report: five-shot prompts for MMLU and GSM8K, four-shot for MATH-500, answers read from logits on multiple choice, ten orderings per GPQA question, greedy decoding with 4,096 output tokens.
@@ -337,7 +344,8 @@ What a conversion can use.
 
 ## 7. Sources
 
-- LFM2 technical report: https://arxiv.org/abs/2511.23404
+- LFM2 technical report, read from its file with all figures: https://arxiv.org/abs/2511.23404
+- PrismML, 1-bit Bonsai whitepaper, tables 7 to 9, read from its file: https://github.com/PrismML-Eng/Bonsai-demo/blob/main/1-bit-bonsai-8b-whitepaper.pdf
 - LFM2 release: https://www.liquid.ai/blog/liquid-foundation-models-v2-our-second-series-of-generative-ai-models
 - LFM2.5 release: https://www.liquid.ai/blog/introducing-lfm2-5-the-next-generation-of-on-device-ai
 - LFM2.5-24B-A2B: https://www.liquid.ai/blog/lfm2-5-24b-a2b
@@ -370,12 +378,11 @@ What a conversion can use.
 
 ## 8. Not read
 
-- Any figure. The technical report and the papers were read through a text mirror, and the blog posts' charts are images. The report's file is needed to read its figures.
-- The technical report's result tables beyond the LFM2 rows and the Qwen3-1.7B entries used here.
+- The figures of the papers other than the LFM2 technical report, and the blog posts' charts. The report's nine figures were read from its file.
+- The technical report's tables for vision, audio and retrieval.
 - The license and the two chat templates as verbatim text. The reading tool returns an account of a file, clause by clause or step by step, and not its text.
 - The headers of the model files. They cannot be reached from this workspace; checklist row C9 reads them on the owner's machine.
 - The tokenizer files.
-- The per-benchmark rows for LFM2-1.2B in PrismML's whitepaper. The file is a PDF the repository reader cannot open; the plan holds the two averages.
 - The transformers LFM2 model file outside its convolution block (lines 269 to 365 of 606 were read).
 - The second page of the quantized versions of LFM2-1.2B; the model cards of the LFM2.5 models on the model hub; LFM3's exact parameter count as published.
 - Where MLX support for LFM3 lives.
