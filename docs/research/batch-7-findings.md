@@ -94,6 +94,8 @@ Computed from the configuration files and module definitions by `lfm_counts.py`.
 |---|---|---|
 | PrismML's 1-bit whitepaper, on its own harness (already in the plan) | LFM2-1.2B, 16-bit | Ten-benchmark average 41.08, six-benchmark average 46.73. This is the only LFM score on the project's own suite |
 | LFM2-1.2B model card, Liquid AI's harness | LFM2-1.2B | MMLU 55.23, GPQA 31.47, IFEval 74.89, IFBench 20.7, GSM8K 58.3, MGSM 55.04, MMMLU 46.73 |
+| LFM2 technical report, tables 6 and 7, the same harness | LFM2-1.2B | MATH-500 42.40, MMLU-Pro 19.71, Multi-IF 45.28, GSMPlus 36.09, MATH level 5 18.61. LFM2-2.6B: MATH-500 63.60, GSM8K 82.41 |
+| The same tables | Qwen3-1.7B | MATH-500 70.00 |
 | The same table | Qwen3-1.7B | MMLU 59.11, GPQA 27.72, IFEval 73.98, IFBench 21.27, GSM8K 51.4 |
 | LFM2.5 release | LFM2.5-1.2B-Instruct | GPQA 38.89, MMLU-Pro 44.35, IFEval 86.23, IFBench 47.33, Multi-IF 60.98, AIME25 14.00, BFCL v3 49.12 |
 | The same table | Qwen3-1.7B, no thinking | GPQA 34.85, IFEval 73.68, IFBench 21.33, BFCL v3 46.30 |
@@ -136,7 +138,7 @@ LFM Open License v1.0, the same 10.6 kB file in the LFM2-1.2B and LFM3-1.7B repo
 
 - Upstream llama.cpp has an `lfm3` architecture: model file and conversion script read in full. It loads the tied matrix once and reuses it for the output. The quantized files Liquid AI publishes need build b11960 or later.
 - In that file linear layers are applied through a routine that takes a second, companion scale tensor for the matrix. What writes those tensors and whether the convolution block's projections go through the same routine was not traced.
-- The plan already records that upstream llama.cpp does not apply its runtime rotation to LFM2 and that the 1-bit tensor type is not tied to an architecture.
+- The plan already records that upstream llama.cpp does not apply its runtime rotation to LFM2 and that the 1-bit tensor type is not tied to an architecture. That type is a half-precision scale and 16 bytes of signs per 128 weights, 18 bytes, 1.125 bits per weight. The quantizer skips the short-convolution kernel by name at every width, as it does Mamba's small convolution weights, so a file in the reference format keeps these kernels unquantized.
 - Upstream mlx-lm has modules for LFM2, its vision models and its mixture-of-experts models. A search of it found no LFM3 module, although Liquid AI publishes LFM3 builds for MLX. Where that support lives was not found.
 - LFM3 in the transformers library needs the repository's own code.
 
@@ -165,7 +167,7 @@ LFM Open License v1.0, the same 10.6 kB file in the LFM2-1.2B and LFM3-1.7B repo
 | 4-bit audio decoder | LFM2.5-Audio | Trained with quantization in the loop | The one statement of such training before the distilled builds |
 
 - Arithmetic on the distilled-build figures (an inference from the two published columns): if a share c of the loss is recovered and the result keeps a share r, plain Q4_0 rounding keeps 1 minus (1 minus r) over (1 minus c). That is 90.1% for the 230M model, 86.8% for 350M, 92.5% for 1.2B and 93.4% for 2.6B. Rounding to 4 bits costs these models 7% to 13% of their benchmark average.
-- Liquid AI gives no method for its distillation: no loss, data, token count or code.
+- Liquid AI gives no method for its distillation: no loss, data, token count or code. It does publish the result before packing: the `qad` directory of the LFM2.5-1.2B-Instruct quantized repository holds the 32-bit weights after distillation, with a statement that converting them at a named llama.cpp revision reproduces the released 4-bit file byte for byte.
 - Its release blog for LFM3 says the head gates were added in part to suppress activation outliers that hurt quantization.
 - No statement by Liquid AI on widths below 4 bits, or on which layers are sensitive, was found. Its NVFP4 build is the nearest thing: it takes only the feed-forward matrices down.
 
@@ -351,7 +353,7 @@ What a conversion can use.
 ## 8. Not read
 
 - Any figure. The technical report and the papers were read through a text mirror; the blog posts' charts are images.
-- The technical report's result tables 6 and 7 row by row; the scores used here are from the model card.
+- The technical report's result tables beyond the LFM2 rows and the Qwen3-1.7B entries used here.
 - The transformers library's LFM2 model code. The LFM2 tables rest on the configuration file, the report's equations and the exact match of the totals.
 - The license as verbatim text. A tool returned an account by clause.
 - The chat templates as text.
