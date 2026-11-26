@@ -7,7 +7,7 @@ Three parts: Precision Numerics' Boole (C118), the rest of the outside study of 
 - **Boole (U4, P3).** Precision Numerics states no method anywhere: not in the post, the two model pages, the 32B preview page, or the code. One fact in the code is a method statement: the scales are trained parameters. Nothing else can be learned from its text. What is left is in its weights, which is trial S5.
 - **The outside study (U4, P3, U2).** It has no 1.7B training result. The repository has three commits, all of 6 October 2026, and its 1.7B script only measures speed. Its files not read before add: the full set of 0.8B results, the training code, and the per-matrix-kind and per-weight-size numbers for PrismML's 1-bit file. Those numbers show the 1-bit model re-chose the signs of its small weights and kept the signs of its large ones.
 - **Under 2 bits (P3, U2).** Two published claims near 1 bit were missing from the plan and one of them does not hold up: SAGE-PTQ's 1.03 bits leaves out a group index of about 4 bits per weight. One paper that both reviewers missed in batch 2 is prior art for idea I13: PV-Tuning. No public method read here gives a 1-bit model at 1.7B with reasoning scores above PrismML's without training.
-- **Not read:** listed in section 8. Three pages need the owner's approval to fetch.
+- **Not read:** listed in section 8. One file could not be fetched and needs to be attached: the chart with Boole's per-task scores.
 
 ## 2. Part A: Boole (C118)
 
@@ -17,12 +17,14 @@ Three parts: Precision Numerics' Boole (C118), the rest of the outside study of 
 - The launch post of 11 October 2026 and the model page of Boole-1.7B, through a fetch tool that returns an account of a page. Text only. The per-task scores sit in chart images and were not read.
 - The model page of Boole-32B-A2.5B-Preview, the same way.
 - The commit list of its llama.cpp fork at the pinned commit.
+- Fetched with the owner's approval after the first pass: the organization page, the discussion tabs of both 1.7B repositories with the one thread in full, and the file listing of the model repository.
 
 ### 2B. Every statement of method
 
 - The post and the pages state none: no training, loss, teacher, data, token count or hardware.
 - The loader's file comment calls the stored scales "learned per-group scale, any sign" and defines the weight as sign times `max(|scale|, 1e-5)` (`src/boole_demo/w1.py`). The test fixture builds scales with negative and below-floor values to cover what the real file holds (`tests/synthetic.py`). Scales that can be negative and near zero come from unconstrained gradient training of the scales themselves. A scale computed as a group mean magnitude can be neither.
 - The model page lists Qwen3-1.7B-Base as base and Qwen3-1.7B as the tuned parent.
+- The organization page carries no description, two private members, two models and one collection. The only discussion thread holds two staff replies: more models are in work, and a request for the 6 to 8 billion class was noted. Neither says anything about method.
 
 ### 2C. The format, from code and arithmetic
 
@@ -225,7 +227,7 @@ Found through the outside study's notes. Absent from the plan and from batch 2, 
 
 ## 6. What needs the owner
 
-1. Approval to fetch three pages that a search did not return: the Hugging Face organization page of Precision Numerics, the discussion tabs of its two 1.7B repositories, and the chart image file on the Boole model page that holds the per-task scores.
+1. The chart file with Boole's per-task scores, `assets/boole-under-500mb.svg` in the Boole-1.7B model repository (410 kB), attached to the conversation. The site returned an error on every direct fetch of the file, and no page or search result carries the per-task numbers as text.
 
 ## 7. Sources
 
@@ -246,7 +248,7 @@ Found through the outside study's notes. Absent from the plan and from batch 2, 
 
 ## 8. Not read in full
 
-- Boole: the chart images holding per-task scores; discussion threads on its repositories and on public forums; the organization page. The fork's source was not read beyond its commit list.
+- Boole: the chart file holding per-task scores (fetch refused by the site); threads on public forums. The fork's source was not read beyond its commit list.
 - The outside study: of its four literature notes, one was read in full, one in its sections on token counts, losses, schedules and synthesis, and two by their summaries only. They are an assistant's notes with some numbers marked by their author as taken from a summarizing tool, so nothing here rests on them without a check at source. Three of its review files, its agent guide, two design files for runs already read, and scripts other than the three named in 3A were not read.
 - BWLA, SAGE-PTQ, PTQ1.61 and the GSQ refinement page were read through a fetch tool that returns an account of a page, not its text. Figures were not seen. PV-Tuning was read the same way to the end of its third appendix; the later appendices, which hold its learning rates and token counts, were not returned.
 - LBLLM, Tequila, Spectral-LLM, BiLLM and PB-LLM: known from the survey only.
