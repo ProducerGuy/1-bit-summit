@@ -138,7 +138,8 @@ The first reviewer's second figure falls from 50% to 48%: a second public run at
 ## 10. Still open
 
 - RaBiT in full with its code; NanoQuant's start procedure. New checklist row.
-- The forum thread with the Boole author's replies. The fetch tool blocks that site outright; a mirror of the post carries no replies. The second reviewer's report that the author calls Boole in-place binarization and not his factorization method stays unconfirmed here.
+- The forum thread with the Boole author's replies. The fetch tool blocks that site outright. The post itself was read from the owner's screenshots: it states sizes, the 85.9% figure and links, and nothing about method; it has 66 comments and three images, of which the first is the per-task chart already read. Every link in it was followed: the launch post, both model pages, the runtime repository and the browser chat page were read and state no method; the link to the company's post on X is closed to the fetch tool. The second reviewer's report that the author calls Boole in-place binarization and not his factorization method stays unconfirmed here until the replies are seen.
+- The second and third images of that post. If one of them places the 16-bit model task by task in Boole's run, it settles whether the BFCL difference between the two harnesses applies to the teacher as well.
 - The two announced Boole models (2B, and a 1-bit 27B) once their posts and weights are public.
 - The cause of the BFCL and HumanEval+ differences between the two harnesses. Only the first benchmark run on our ruler settles it.
 - The second reviewer's acquisition list (its section 5): the files it could not reach. The owner's PDFs of the PrismML reports are the largest item on it.
