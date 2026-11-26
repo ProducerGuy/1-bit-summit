@@ -215,7 +215,7 @@ What these say for LFM.
 - Groups of 128 with one scale each have been used on such a block. The paper found group sizes 64, 128 and 256 equal, and found that scales left free to learn collapsed, with nine tenths of weights going to zero, where scales computed from the weights did not. That is a ternary result; at two levels there is no zero to collapse to.
 - Every one of them leaves the depthwise convolution and the embedding in full precision. Converting the tied embedding, which the project's format requires, has no precedent on this kind of model.
 - In Bi-Mamba, converting the projection out as well as the projection in costs nothing at 780M and 2.5 points at 2.7B.
-- Bi-Mamba's released code computes each scale as the mean magnitude of the latent weights along one axis, held out of the gradient, and passes the gradient straight through the sign. The scale is computed, not learned, as in the ternary paper.
+- Bi-Mamba's released training script replaces each projection with a layer that learns a scale and an offset per column, both started from the weights' mean and mean absolute deviation, and passes the gradient straight through the sign. The model is built from its configuration with no pretrained weights loaded. Classes that compute the scale from the weights and hold it out of the gradient are in the same repository and are not the ones the script uses.
 - The measure in all three is a zero-shot average of easy tasks. None reports mathematics, code or tool calling.
 
 ### 3E. Depthwise kernels at 1 bit, from vision
