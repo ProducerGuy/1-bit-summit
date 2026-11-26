@@ -1,6 +1,6 @@
 # Batch 9 findings, first reviewer
 
-Three parts: training under a constraint with two paper checks on each candidate method (C125), factorization, rotation and binary-training papers (C125, C132), and what two-value weights can store (C125, C124). Brief: `docs/research/batch-9-prompt.md`. Written before the second reviewer's return was seen.
+Three parts: training under a constraint with two paper checks on each candidate method (C125), factorization, rotation and binary-training papers (C125, C132), and what two-value weights can store (C125, C124). Brief: `docs/research/batch-9-prompt.md`. The reading was done before the second reviewer's return was seen, except the sources marked in sections 3A and 4A as opened while checking it.
 
 Odds set before reading: a 1-bit Qwen3-1.7B in the strict format reaches 90% retention by some training, 40%; reaches 99%, 5%.
 
@@ -18,7 +18,7 @@ Factorization, rotation and binary-training papers:
 
 - Nothing published stores what the project stores, and at 1 bit a single sign matrix is not behind the factorized methods in their own tables.
 - A rotation is free only where it can cancel. A single sign matrix has no inside, so only the network's own symmetries are free.
-- Boole's storage matches neither RaBiT's code nor NanoQuant's. Its scales are free trained numbers, not group means. RaBiT's code refuses a single path, leaves the embedding and output matrix in full precision, and its own ablation credits its gain to coupling two paths, which one path does not have.
+- Boole's storage matches neither RaBiT's code nor NanoQuant's. Its card points to scales trained as free numbers, not group means. The published RaBiT paper trains Boole's own parent, Qwen3-1.7B, at 2 bits and keeps 94% of an easy-task average. RaBiT's code refuses a single path, leaves the embedding and output matrix in full precision, and its own ablation credits its gain to coupling two paths, which one path does not have.
 - NanoQuant's largest gain is letting the not-yet-converted matrices retrain to absorb the error of the converted ones: perplexity 206 to 15 on Qwen3-8B.
 
 What two-value weights can store:
@@ -158,7 +158,7 @@ Notation: a group of 128 stored weights is `w_i = s * b_i`, with signs `b_i` and
 
 | Source | Read |
 |---|---|
-| RaBiT, arXiv 2602.05367 | Paper to the start of its kernel listing (97% of the page). Code `SamsungLabs/RaBiT`, repository read directly: `README.md`, `main.py`, `eval.py`, all of `configs/`, all of `quantization/` except the bit packer's body and the Phi attention module, and `utils/kd_utils.py`, `calib.py`, `common.py`, `datautils.py` |
+| RaBiT, arXiv 2602.05367 | The first version to the start of its kernel listing, and the published third version for its Qwen3 table and settings (opened while checking the second review). Code `SamsungLabs/RaBiT`, repository read directly: `README.md`, `main.py`, `eval.py`, all of `configs/`, all of `quantization/` except the bit packer's body and the Phi attention module, and `utils/kd_utils.py`, `calib.py`, `common.py`, `datautils.py` |
 | NanoQuant, arXiv 2602.06694 | Paper to 84% of the page; the last part (size formulas for other methods, the size table) was not returned. Code `SamsungLabs/NanoQuant`, repository read directly: `README.md`, `main.py`, `core/compress_block.py`, `core/compress_model.py`, `modules/linear.py`. Not read: the factorization routine, the importance statistics, the rank rule, the kernels |
 | LittleBit-2, arXiv 2603.00042 | Whole paper |
 | LittleBit, arXiv 2506.13771 | Abstract and its rows in the two papers above. Code not opened |
@@ -167,7 +167,8 @@ Notation: a group of 128 stored weights is `w_i = s * b_i`, with signs `b_i` and
 | Structured Kashin transforms, arXiv 2609.11687 | Whole paper |
 | SDQ-LLM, arXiv 2510.03275 | Whole paper. Code not opened |
 | Double binary factorization | The fine-tuning script only (section 2) |
-| PBBQ; arXiv 2609.01962; the first Kashin paper, arXiv 2404.09737 | Not read. The first two were not found by search |
+| PBBQ, Electronics 15(4), 819 | The first half of the page: method and headline numbers. Its result tables were not returned (opened while checking the second review) |
+| arXiv 2609.01962; the first Kashin paper, arXiv 2404.09737 | Not read |
 
 No figure of any paper was seen.
 
@@ -177,20 +178,21 @@ The format: one sign per weight, one 16-bit scale per 128 weights, the tied matr
 
 | Method | What is stored | True bits per weight | Fits the format | Smallest model, and what it keeps at about 1 bit | Training | Rotation |
 |---|---|---|---|---|---|---|
-| RaBiT | Two or three sign matrices, each with a row vector and a column vector of trained scales | 2 or 3 plus the vectors | No. One path would fit after swapping its two vectors for group scales, but the code refuses one path in three places | Gemma3-1B at 2 bits: 92% of easy-task average. No 1-bit result | 200M tokens, six passes, a teacher's outputs plus every layer's hidden states | None |
+| RaBiT | Two or three sign matrices, each with a row vector and a column vector of trained scales | 2 or 3 plus the vectors | No. One path would fit after swapping its two vectors for group scales, but the code refuses one path in three places | Qwen3-1.7B at 2 bits: 60.38 of 64.21 on easy tasks, 94%, perplexity 10.19 against 7.12; Gemma3-1B 92%. No 1-bit result | 200M tokens, six passes, a teacher's outputs plus every layer's hidden states | None |
 | NanoQuant | Two low-rank sign factors and two or three scale vectors | 1.00, 0.80, 0.55 by its count | No | Qwen3-0.6B. Qwen3-1.7B at 1.00: perplexity 19.21 against 9.39. Qwen3-8B: 48.9 of 71.2 on six easy tasks, 69% | None beyond 0.26M tokens of calibration | None |
 | LittleBit-2 | Two paths of low-rank sign factors with three scale vectors each | 1.0 down to 0.1 | No | Llama2-7B at 1.0: perplexity 8.27 against OneBit's 8.36 | Straight-through training, settings "identical" to LittleBit and not given | Yes, between the two factors, folded into them at no cost |
 | AF1 | Two low-rank sign factors, three scale vectors, a rank per layer set by a sensitivity search | 1.00 on average over layers | No | Gemma-3-4B-it: 74%. Qwen3-8B 79%, 14B 82%, 32B 89% of a seven-task average; Llama-3-8B 63%, 70B 78%. Qwen3-14B-Instruct keeps 56% of MMLU-Pro, 56% of HumanEval, 68% of GSM8K | None beyond 262 thousand tokens for scales | None; a per-channel rescaling only |
 | TWLA | Three-level codes, a scale and an offset per row | 1.58 plus the row numbers | No: three levels, an offset the format has no place for, and a transform at run time | Qwen3-8B weight-only: 90%; 14B 94.5%; 32B 96%. Nothing under 7B | None | A learned Kronecker rotation. Weights are rotated offline and the inverse is applied to activations at run time: about 524 thousand multiply-adds per 4,096-wide vector by its own count |
 | Kashin transforms | Two 2-bit codes per weight in two bases | 4 | No | Only 4-bit results; no 1-bit result | None | A fast transform that is not folded: applied at load or on activations |
 | SDQ-LLM | Three-level codes on an oversampled row | 3.16 at the tested setting; its tables call this 1.58 | No | Llama3.2-1B collapses (perplexity 298 against 9.75) | None | A Hadamard transform before rounding; cost at run time not stated |
+| PBBQ | Whatever its host method stores | The host's | It changes the order of error compensation and undoes its column reordering before storage, so it is a search order and not a format | Llama2-7B headline perplexities: BiLLM 32.48 to 25.51, ARB-LLM 16.44 to 12.82 | None | None |
 | BinaryLLM (section 2) | One sign matrix with scale vectors; embedding and output matrix in full precision | 1.01 on block matrices | Closest of all: the scale vectors would become group scales | 135M: 87% of easy-task average. 1B 88%, 3B 88%, 7B 85% | Next-token training on RedPajama; token count given only for a 70M test (50B) | None |
 
 Readings:
 
 - **Nothing published stores what the project stores,** and no low-rank method can be repacked into one sign per weight.
 - **At 1 bit a single sign matrix is not behind the factorized methods.** Llama2-7B perplexity, trained methods, as the papers' tables give them: 7.88 for BinaryMoS (one sign matrix with mixed scale vectors), 8.27 LittleBit-2, 8.36 OneBit (one sign matrix; the NanoQuant paper lists it at 9.73), 9.08 LittleBit, 9.25 double binary factorization, 8.85 to 10.34 NanoQuant without training. Factorization buys rates under 1 bit. It does not buy quality at 1 bit.
-- **A free rotation needs somewhere to sit.** LittleBit-2's rotation sits between two factors and cancels. A single sign matrix has no inside. The only transforms that cancel for it are those the network already allows: reordering channels, rescaling a channel where a normalization follows, and rotations inside an attention head's query and key pair. This is the content of idea H11 and no paper read here adds to it.
+- **A free rotation needs somewhere to sit.** LittleBit-2's rotation sits between two factors and cancels. A single sign matrix has no inside. The only transforms that cancel for it are those the network already allows: reordering channels, rescaling a channel where a normalization follows, and maps inside an attention head's query and key pair that commute with the position rotation. This is the content of idea H11 and no paper read here adds to it.
 - **Rotations are worth a lot where they can be used.** SDQ-LLM: 2,435 perplexity without the Hadamard step, 20 with it. LittleBit-2: 16.30 to 12.63 from a random rotation alone, 11.53 with a fitted one. BWLA in batch 8 showed the same. The gain is from making weights two-humped before the sign is taken. TWLA's own ablation at three levels, weights only, on Qwen3-14B: perplexity 23.64 with its quantizer alone, 102.12 with its rotation alone, 17.26 with both, and 57.6, 25.0 and 69.2 on MMLU. Its rotation is not free: the inverse runs on activations.
 - **Where the bits go matters as much as how they are fitted.** AF1 at an average of 1 bit on Qwen3-8B: perplexity 28.92 with the same rank everywhere, 16.26 with rank given to layers by sensitivity. The project's format gives every weight the same rate, so this lever is closed to it. It is evidence for idea I20 only in its other form, effort per layer.
 - **Training-free 1 bit stops near 70% to 90% on easy tasks and near 56% to 68% on hard ones, and rises with size.** AF1's 79%, 82%, 89% at 8B, 14B, 32B is the clearest size series read. Qwen3-1.7B is below every point in it.
@@ -211,7 +213,8 @@ Boole's files (batch 8): one sign per weight; a scale tensor per matrix of shape
 | Data in the code | C4 with WikiText-2; also LMSYS-Chat-1M with the loss taken on assistant turns only, and a mix of both, none of which the paper reports | 128 WikiText-2 sequences | Unknown |
 
 - Boole's storage is neither method's. NanoQuant is ruled out by the files alone: a low-rank product of signs is not one free sign per weight.
-- One fact in Boole's files does carry information. Its card says a stored scale can have either sign and is used through an absolute value with a floor. A mean magnitude is never negative and needs neither. So Boole's scales are free trained numbers, as in both of these code bases, and not the mean-magnitude rule that both public Qwen trainers read in batch 8 use.
+- One fact in Boole's files does carry information. Its card says a stored scale can have either sign and is used through an absolute value with a floor. A mean magnitude is never negative and needs neither. That points to scales trained as free numbers, as in both of these code bases, and away from the mean-magnitude rule that both public Qwen trainers read in batch 8 use. It is evidence and not proof: a negative scale is also only another way to write the same group.
+- The published version of the RaBiT paper has a Qwen3 table: 1.7B, 4B and 8B at 2 bits keep 94%, 95% and 94% of an easy-task average; at 1.7B that is ahead of the two baselines it lists. So the group around Boole's author trained Boole's parent with this trainer at 2 bits. The paper gives no settings for Qwen3.
 - RaBiT's forward function accepts one path. The refusals are in the wrapper, the argument parser and the initializer. With one path it is: sign of a trained matrix, times trained scales, the gradient passed straight through, a teacher's outputs and hidden states as the loss. That is method A with the scale made a parameter.
 - RaBiT's code has a chat-data path with the loss on assistant turns only that its paper never uses, and its loader keeps the file name of the older LittleBit configuration. The code is a working tree of that group, wider than the paper.
 - What none of this settles: Boole's start, data, token count, loss, and how it trains a tied matrix that both code bases leave alone.
@@ -239,17 +242,18 @@ Boole's files (batch 8): one sign per weight; a scale tensor per matrix of shape
 |---|---|
 | Allen-Zhu and Li, arXiv 2404.05405 | Main text read in batch 6 and again here; the appendix read here. The values in its rounding figures came back unreadable |
 | ParetoQ, arXiv 2502.02631 | Read whole with its code in batch 4. Its tables were read again here for the 1-bit rows |
-| Spectra, arXiv 2407.12327 | The first 70% of the page. Most appendix tables and all figure values were not returned |
+| Spectra, arXiv 2407.12327 | Whole paper in two parts; the binary rows of its appendix tables in the second (opened while checking the second review). No figure values |
 | "On the Expressive Power of Weight Quantization in Large Language Models", arXiv 2606.22249 | Whole paper. Found by search during this batch |
 | "Strong freezing in binary perceptron models", arXiv 2610.06275 | Whole paper. Found by search during this batch |
 | BitNet b1.58 2B4T, arXiv 2504.12285 | In the plan since the first reading list. Only a search extract of its tables was looked at here |
-| arXiv 2611.01564 | Not found by search. Not read |
+| "Meta-memorization and memorization scaling laws in transformers", arXiv 2611.01564 | The first 72% of the page (opened while checking the second review) |
 
 The capacity table of batch 6 (section 4D of that document) already holds the measured figures. This part adds to it and does not repeat it.
 
 ### 4B. New facts
 
-- **Two levels against three, trained from scratch (Spectra).** Binary models were trained at 99M, 560M and 1.1B weights on the same data as the three-level ones, with one scale per matrix. At a billion weights three levels are better per weight and per stored bit. The gap narrows with size and the authors place the meeting point above 10B. At 99M the two are close (35.8 against 36.6 on one task, 39.1 for 16 bits).
+- **Two levels against three, trained from scratch (Spectra).** Binary models were trained at 99M, 560M and 1.1B weights on the same data as the three-level ones, with one scale per matrix and the embedding in 16 bits. Six-task averages for 16 bits, three levels and two: 44.3, 43.5, 39.8 at 99M; 50.5, 48.4, 44.5 at 560M; 54.9, 51.6, 47.1 at 1.1B. Two levels keep 90%, 88% and 86% of the 16-bit twin, falling with size, and a steady 91% to 92% of three levels. On MMLU the binary models score 23.1, 22.9 and 23.0, at chance at every size, while 16 bits rises from 25.3 to 30.0. The authors read their validation losses as a gap that closes above 10B; the task tables do not show it closing.
+- **Random strings shown unevenly (arXiv 2611.01564).** With 100-bit random strings presented by a Zipf law, 16-bit transformers hold 0.5 bits per weight at one layer and 1 at twelve. The MLP holds the associations. After the data is swapped for fresh strings, the model learns the new ones faster than it learned the first. No low-bit weights were tested.
 - **Two levels from a pretrained model, trained to saturation (ParetoQ).** Llama-3 8B, embedding and output matrix in full precision, five easy tasks: 64.1 at 1 bit, 69.0 at three levels, 71.2 at 2 bits, 74.6 in 16 bits. That is 86%, 92.5% and 95%. Saturation took about 30B tokens at 2 bits and below and 10B at 3 and 4 bits. Weights moved about 40% from their start at 2 bits and below and 10% to 20% above. Its own appendix finds embeddings at the weights' precision or at 4 bits on the best size-accuracy line.
 - **A theorem that pure 1-bit networks are not universal (arXiv 2606.22249).** With weights of 2 bits or more, three levels included, attention with an MLP can approximate any continuous function. With weights in two values there is a target function no such network gets within a fixed distance of. The paper concludes that three levels is the limit. Its class has no full-precision scale per group and no full-precision normalization gain, both of which the project's format has, so as read it does not bound the format. Its experiments show trends only.
 - **Solutions of the two-value perceptron are isolated (arXiv 2610.06275).** For one neuron with sign weights and random patterns, at every load, all but a vanishing share of solutions have no other solution within a fixed fraction of sign flips. Methods that do find solutions find rare ones that sit in a connected cluster. The result is for one layer and random data.
@@ -295,7 +299,7 @@ Against:
 
 - On the one harness that scored all three models, the best three-level model of this size is at 87.7%. Reaching 90% at two levels means passing it with 71% of its bits.
 - Trained to saturation, 1 bit kept 86% of easy-task accuracy at 8B with the embedding in full precision. Easy tasks have high chance floors, which flatters that figure.
-- From scratch, two levels are behind three at a billion weights.
+- From scratch at 1.1B, two levels keep 86% of the 16-bit twin's easy-task average and sit at chance on MMLU.
 
 Verdict on paper: 90% is consistent with everything read and shown by nothing. 99% is not ruled out by a bound, and needs two-level weights to store well above a quarter of their raw bits or a parent far under its ceiling, neither of which is measured.
 
@@ -323,7 +327,7 @@ Judgment, not measurement.
 | The same at 99% | 5% | 4% | The quarter-of-raw-bits pattern is new and points down; no bound rules it out |
 | Sign-and-scale training from PrismML's released model gains five points on the project's ruler | 76% | 78% | A sign-budget trainer exists in code; the freezing result favours starting from a trained sign pattern over a rounded one |
 | A conversion from public recipes reaches 70.2% | 48% | 50% | Two published starts from the parent itself; NanoQuant's retraining of unconverted matrices is a stronger compensating start than any in the plan |
-| Boole was trained by a one-matrix form of its author's group's published trainers | 50% | 50% | Its free-sign scales match their free scale parameters; its group scales, binary tied matrix and single path match neither code base |
+| Boole was trained by a one-matrix form of its author's group's published trainers | 50% | 50% | Its scales look like free parameters, as theirs are, and the published RaBiT paper trains the same parent at 2 bits; its group scales, binary tied matrix and single path match neither code base |
 | Boole's method can be learned from public text | 3% | 3% | Nothing new |
 
 ## 6. What this serves in the plan
@@ -333,7 +337,7 @@ Judgment, not measurement.
 | P3, no recipe of ours leads | Two checks passed on paper by B with a fixed-norm closing and a trained radius, and by smooth C, both from the parent; which methods end in the format by construction (B with fixed norm, D, E) and which need a last stage (smooth C, the blend); NanoQuant's sequential compensation |
 | CH3, proof for 99% | The counting limits of section 4D. The evidence rule itself is unchanged |
 | U2, how far two values can go | The share-of-raw-bits table; the counting limits; where the missing points are; the criticism of C124 |
-| U4, how PrismML and Boole trained | Boole's scales are free parameters; RaBiT's one-path form; code and paper differences |
+| U4, how PrismML and Boole trained | Boole's scales look like free parameters; RaBiT's one-path form; code and paper differences |
 | H8, H11 | Sequential compensation as a form of migrate-then-convert; no rotation is free for a single sign matrix beyond the network's own symmetries |
 | I13, I24 | A published scalar-sign budget trainer; the fixed-norm closing needs a trained radius |
 | C125, C132 | Closed for what was read; the unread parts are in section 9 |
@@ -344,21 +348,21 @@ Nothing.
 
 ## 8. Sources
 
-Read in this batch, in the order used: arXiv 1801.06313; 1810.00861; 2211.03741; 2405.14852; 2508.06974; `usamec/double_binary`; arXiv 2602.05367 with `SamsungLabs/RaBiT`; 2602.06694 with `SamsungLabs/NanoQuant`; 2603.00042; 2609.06161; 2606.13054; 2609.11687; 2510.03275; 2404.05405; 2502.02631; 2407.12327; 2606.22249; 2610.06275. New to the project among these: 1801.06313 and 1810.00861 in full, the two code bases, 2603.00042, 2407.12327, 2606.22249, 2610.06275.
+Read in this batch, in the order used: arXiv 1801.06313; 1810.00861; 2211.03741; 2405.14852; 2508.06974; `usamec/double_binary`; arXiv 2602.05367 with `SamsungLabs/RaBiT`; 2602.06694 with `SamsungLabs/NanoQuant`; 2603.00042; 2609.06161; 2606.13054; 2609.11687; 2510.03275; 2404.05405; 2502.02631; 2407.12327; 2606.22249; 2610.06275. Opened while checking the second review: the PBBQ paper (Electronics 15(4), 819) and arXiv 2611.01564. New to the project among all of these: 1801.06313 and 1810.00861 in full, the two code bases, 2603.00042, 2407.12327, 2606.22249, 2610.06275, 2611.01564, PBBQ.
 
 ## 9. Not read, or read in part
 
 - No figure of any paper. Every paper was read through a tool that returns an account of the page, so quoted numbers are as that tool reported them.
-- RaBiT: the kernel listing at the end of the paper; `utils/misc.py`; the bit packer's body; the Phi attention module.
+- RaBiT: the published third version beyond its Qwen3 table and settings; the kernel listing at the end of the paper; `utils/misc.py`; the bit packer's body; the Phi attention module.
 - NanoQuant: the last 16% of the paper; the factorization routine, importance statistics, rank rule, loader, kernels.
 - LittleBit: the paper and code, beyond its abstract.
-- TWLA: the last 30% of the paper, including its calibration ablation. Its companion, arXiv 2609.01962, was not found.
-- PBBQ: not found in two searches.
+- TWLA: the last 30% of the paper, including its calibration ablation. Its companion, arXiv 2609.01962, was not read.
+- PBBQ: the second half of the page, with its result tables.
 - The first Kashin paper, arXiv 2404.09737: not read.
 - Double binary factorization: both compression notebooks.
 - SDQ-LLM's code.
 - Allen-Zhu and Li: the values in the appendix figures on rounding, which came back unreadable.
-- Spectra: the binary appendix's tables and every figure value.
+- Spectra: every figure value.
 - BitNet b1.58 2B4T: not re-read.
-- arXiv 2611.01564: not found.
+- arXiv 2611.01564: the last 28%, with its theory section.
 - Found by search and not read: ECO (arXiv 2601.22101), CAGE (arXiv 2510.18784), arXiv 2606.09012.
