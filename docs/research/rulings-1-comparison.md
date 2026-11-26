@@ -118,3 +118,33 @@ Second reviewer:
 - The capacity measurement's specification is written with both reviewers' requirements (C124).
 - The unchanged-formula definition is written before any LFM score (C142).
 - For the LFM reading: how LFM3-1.7B is scored with reasoning off, and whether PrismML's file stores its gains in 16 bits.
+
+## 9. Each settled ruling with its reason
+
+One place to read what was decided and why. The second reviewer's full argument for each, with the strongest case against and what would change it, is in `rulings-1-second-reviewer.md` under the section named.
+
+| Ruling | Reason | Full argument |
+|---|---|---|
+| A step is reported in one of three classes: an observed gain, a confirmed step, or a result that trades one benchmark for another. Margins per benchmark are fixed before any score. | An average can rise while one ability is destroyed, and the goal is to keep ability. Not finding a loss is not the same as showing there is none, and a rule built on noise protects the noisiest benchmarks least. | Section 2 |
+| Losses are also checked against the frozen reference, not only the previous step. | Small allowed losses at each step would otherwise add up to a large one. | Section 2 |
+| Training may start from a released file, from the parent, or from a disclosed initializer. Recovery and conversion are separate claims. | Improving someone else's converted file shows that better sign patterns exist nearby. It does not show how to get there from the parent, and the project's goal is a way to convert. Both are worth learning from. | Section 3 |
+| Every result carries its lineage: starting file, format, ancestor, score before and after on the same ruler. | A strong start must not be counted as a gain of the method. | Sections 3 and 7 |
+| A transform newly required at inference is a separate track. A change folded away exactly offline stays in the original track. | After conversion, a rotated matrix can represent functions the unrotated format cannot. It changes what the model can be, not only how it is stored. A fold that leaves the same graph and the same format changes nothing. | Section 4 |
+| A second set of scales for the tied matrix is outside the format. | One sign tensor with two scales reproduces one tied matrix only if the two scales are equal. Two free numbers per group are not one, however small the cost: 0.0226 bits per weight. | Section 5 |
+| A model outside the format may be a comparator and an initializer. It is never an in-format result until it is projected into the format and audited. | A slightly freer model is the cleanest way to measure what a restriction costs. Its own score belongs to its own format. | Section 6 |
+| Boole is reported at four points: its maker's score, its score on the project's ruler, its score right after re-tying, and its score after training in the strict format. | The second minus the third is the cost of the projection; the fourth minus the third is the recovery. Without all four, a gain could be manufactured by a poor projection. | Section 6 |
+| Progress is measured against four references kept apart. | A published figure on another harness is not a measured baseline. A method's gain is the difference from where it started on the same ruler: from 76.4 to 78.0 is 1.6 points, not 7.8 from the published 70.2. | Section 7 |
+| LFM2-1.2B is the first confirmatory target; LFM2-350M is an engineering check; LFM3-1.7B is a separately locked second target; LFM2.5-1.2B-Instruct is a control. | LFM3 reasons by default and its maker warns that turning reasoning off is unreliable, while the ruler is scored with reasoning off. A poor first result on it could not be told from a protocol fault. LFM2 has a technical report and no reasoning mode. LFM3 stays because it is the same size as Qwen3-1.7B and current. | Section 8 |
+| The recipe is frozen on Qwen before any confirmatory LFM score is seen. | Tuning on the target and then calling it transfer would prove nothing. | Sections 8 and 13B |
+| Every learned weight under the binary rule is the strict target. Matrices in the format with 16-bit gains is a separately named track at 1.126 bits per weight. | The owner's stated format is one sign per weight. 123,904 gains are a tiny share of the bits and scale every activation, so what they cost under the rule has to be measured, not assumed. Keeping both tracks measures it. | Section 9 |
+| Residual gains may be folded into the parent's matrices before conversion. | Exact in full precision, and a gain of one is in the strict format. It leaves 9,216 gains to constrain. Its cost in the matrices is unmeasured (C144). | This document, section 3C |
+| Drafting a specification, accepting it and running it are three separate permissions. Drafting starts now for seven drafts. | Writing equations and controls is research and needs no run. Treating a draft as approval is what would cause harm, so the gates are separate. | Section 10 |
+| Scales alone, gains alone, and both are separate runs. | Training scales and gains together cannot say which one helped. | Section 10 |
+| The capacity measurement's specification is written now. No run is approved. | Its theory is enough to write a test that can fail. A failed run would show a trainer's limit, not the format's, and the specification must say so in advance. | Section 11 |
+| The whole ruler is frozen before any model is scored. | One benchmark's settings move retention by 5.58 points, more than a step. A ruler chosen after seeing scores measures nothing. | Section 12 |
+| Full BFCL v3, with its multi-turn part, is the primary tool score. The 13-subset single-turn score is reported beside it. | The owner named BFCL v3, and multi-turn is what version 3 added. The single-turn score keeps the link to the one outside harness that scored Boole. | Section 12 |
+| A format and graph contract is written before any model is judged in or out of the format. | "16-bit" covers two different number formats; short tensors do not divide into groups of 128; LFM's kernels have three taps. These must be fixed before a transfer, not after a bad score. | Section 13A |
+| A checkpoint's score, a mechanism, and a reproduced recipe are three strengths of claim. | One good file does not show why it is good or that the recipe repeats. | Section 13C |
+
+Open, with both positions: the form of the per-benchmark test (section 4, row C143).
+
