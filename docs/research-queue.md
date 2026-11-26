@@ -44,6 +44,24 @@ Ten parts, three batches. Batches 3, 4 and 5 are done, except part O of batch 5 
 | 5 | H. The outside forensics project in full | C100, C56 | Whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, the scripts behind its Qwen3-1.7B ladder, its newer discussion thread; token count, batch size and step count of each 1.7B run | M3: the learning-rate schedule, where it conflicts with "Linger and Lose" (C111). M4. S2 | Done. `research/batch-5-findings.md`, `research/batch-5-comparison.md` |
 | 5 | I. Facts the runs stand on | C3, C4, C6, C8 | The Qwen3-1.7B model card; PrismML's MLX fork and 1-bit kernels; which upstream MLX and mlx-lm versions load the 1-bit files; the evaluation harness on Apple Silicon | M1: the ruler's harness and settings. S2 and S4: reading and loading the released files | Done. `research/batch-5-findings.md`, `research/batch-5-comparison.md` |
 
+## 3A. Batches 8 to 10, in the order agreed on 25 November 2026
+
+Each batch has three parts and is worked by both reviewers independently. Each part names the open problem, challenge or unknown it serves (`PLAN.md`, section 1A).
+
+| Batch | Part | Checklist rows | What is read or worked | Serves | Status |
+|---|---|---|---|---|---|
+| 8 | A. A second 1-bit model of the same parent | C118 | Everything Precision Numerics has published on its Boole models: model pages and files, posts, code, forks | U4, P3; the first benchmark run and the choice of starting model | In work by both reviewers. Brief: `research/batch-8-prompt.md` |
+| 8 | B. The outside study of PrismML's 1.7B files | C119 | The whole repository with code: research log, replication plan, the low-bit training reports on a small Qwen, any 1.7B run | U4, P3; the fingerprint run and the sign-and-scale run | In work by both reviewers |
+| 8 | C. What may be missing under 2 bits | C122 | The public survey of methods under 2 bits; an independent audit of the Bonsai 2.5 report; the two post-training methods behind its comparison files; the packed low-bit types in upstream runtimes | P3, U2 | In work by both reviewers |
+| 9 | A. Constraint and relaxation methods, and two paper checks | C125 | BinaryRelax, ProxQuant and ASkewSGD in full; for each method of ours, whether its first step moves the model and whether its end point fits the format | P3 | Open |
+| 9 | B. Factorization and rotation papers not finished | C125 | LittleBit-2, the TWLA method, the structured Kashin paper, PBBQ, the rest of AF1, the factorization notebooks, with code | P3, U2 | Open |
+| 9 | C. What two-level weights can store | C125, C124 | The capacity papers and their appendices; the theory behind the 99% goal; the design of the capacity measurement | U2, CH3 | Open |
+| 10 | A. LFM3 in depth | new | Everything public on LFM3, which has no technical report; Liquid AI's 4-bit-adapted weights as a control | U6 | Open |
+| 10 | B. The transfer rule in writing | new | What "nothing changes but shapes" means; the format's exceptions; the equivalence test; ideas I24 to I29 worked through | U6, CH5 | Open |
+| 10 | C. Sources read in part in batches 6 and 7 | new | Every source either reviewer read in part, figures included | P3, U6 | Open. Needs the files for the figures |
+
+Not in a batch: C111 waits on the result of S4; the model file headers are a run (C9).
+
 ## 4. Open, for later goals
 
 These do not change which trial runs first. They stay open until their goal is taken up.
