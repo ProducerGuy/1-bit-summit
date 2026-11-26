@@ -45,7 +45,8 @@ The first reviewer's findings are `batch-8-findings.md`. The second reviewer's d
 **4A. The independent 1.7B ternary run is not what its model page says.** The page describes FineWeb-Edu text and a forward KL loss. The second reviewer read the launch script and the run summary.
 
 - Checked here: `training/run_r9.sh` carries the comment "KL + 0.1*CE" and the flags `--data_mix_v2 --quant_embed --ce_weight 0.1 --unfreeze_norms --lr 6e-5 --steps 20000`. `training/summary.json` holds the same settings (batch 4, accumulation 2, sequence 1,024, 42 zeros per group, block 1,024, seed 0) and the trajectory below.
-- Not checked here: the data weights, which the second reviewer took from the trainer's code (FineWeb-Edu 25%, a textbook set 15%, Wikipedia 10%, OpenWebMath 25%, MetaMathQA 25%), and the six-task table.
+- Checked here afterwards, from the trainer `training/train_bonsai_repro.py`: the data weights are FineWeb-Edu 0.25, a textbook set 0.15, English Wikipedia 0.10, OpenWebMath 0.25 and MetaMathQA 0.25, drawn per sequence. The KL has no temperature. The next-token term is added at weight 0.1. Zeros are the 42 smallest magnitudes of each group by a strict comparison, so ties add zeros; the scale is the mean magnitude of the kept weights and is not rounded to 16 bits in training; the gradient passes straight through. The optimizer is AdamW with no decay, betas 0.9 and 0.95, clip 1.0, cosine to zero. With the embedding flag, one rotated ternary table serves lookup and output. The sign and zero-pattern figures are averages over matrices with equal weight, not over weights. No model revision is pinned.
+- Not checked here: the six-task table.
 
 | Step | Perplexity | KL to teacher | Same top token | Signs changed | Zero pattern changed |
 |---|---|---|---|---|---|
@@ -63,6 +64,7 @@ The first reviewer's findings are `batch-8-findings.md`. The second reviewer's d
 
 - NanoQuant (ICML 2026, arXiv 2602.06694): Hyochan Chong first author. One-shot, low-rank binary factors with scales, below 1 bit. The second reviewer reports the author saying on a public forum that Boole binarizes in place and is not this method. That statement was not reached here.
 - RaBiT (ICML 2026, arXiv 2602.05367): Chong a co-author, code released. A training method. Read here through a fetch tool: each binary matrix is the sign of a shared full-precision weight; row and column scales are learned by gradient; the start is a sign-and-value fit weighted by input activations and output gradients; the loss is KL to the teacher plus a hidden-state term; 200 million tokens of WikiText-2 and C4 for 6 epochs; the Muon optimizer at about 1e-5. Its results are at 2 and 3 bits (two or three binary matrices added together). It reports no single-matrix 1-bit result and no Qwen3 model.
+- The author's own page, fetched afterwards, gives his affiliation as Precision Numerics, lists both papers, and lists two further items dated November 2026: a Boole-2B described as a strong 1-bit model and a Boole-27B-preview described as a 1-bit Qwen3.8-27B. Both link to posts on the Precision Numerics site that returned an error when fetched, and neither model is in the organization's model list, which holds the two 1.7B repositories and the 32B preview.
 - Reading: Boole's learned scales, its start from a pretrained parent and its author's own published trainer point to training of this family with one binary matrix and group scales. That is an inference, not a statement by Precision Numerics.
 
 **4C. What retying Boole's scales would cost, in closed form.** With shared signs and scales `a` and `c` for the two roles, the best single scale is their mean and the squared error added is `64 (a - c)^2` per group of 128, or a weighted mean with weights for the two roles. Verified here by algebra. It turns "is Boole inside our format" into a number that can be read from Boole's file alone.
@@ -136,7 +138,7 @@ The first reviewer's second figure falls from 50% to 48%: a second public run at
 ## 10. Still open
 
 - RaBiT in full with its code; NanoQuant's start procedure. New checklist row.
-- The trainer of S108 in full, for the data weights and the quantizer's handling of ties.
-- The forum thread with the Boole author's replies, and his publication page. Both fetches need the owner's approval.
+- The forum thread with the Boole author's replies. The fetch tool blocks that site outright; a mirror of the post carries no replies. The second reviewer's report that the author calls Boole in-place binarization and not his factorization method stays unconfirmed here.
+- The two announced Boole models (2B, and a 1-bit 27B) once their posts and weights are public.
 - The cause of the BFCL and HumanEval+ differences between the two harnesses. Only the first benchmark run on our ruler settles it.
 - The second reviewer's acquisition list (its section 5): the files it could not reach. The owner's PDFs of the PrismML reports are the largest item on it.
