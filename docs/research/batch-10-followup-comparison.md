@@ -36,7 +36,7 @@ Recomputed from the paper's tables: its retention figures, its per-benchmark tab
 - The correct inverse map, as both reviewers derive it: each entry is its dual value divided by the ridge constant, clipped at a cap; the cap is set so that the amounts clipped add to one; if the dual values add to one or less in absolute value, every weight is zero.
 - The printed rule differs in two places. It returns the unclipped entries undivided, which the second reviewer shows with the dual vector (3, 0.1) and ridge constant 0.2: the answer is (10, 0.5), not (10, 0.1). And it asks for the largest count of clipped entries that satisfies its inequality. That inequality, once true for a count, is true for every larger count, so "largest" clips nearly everything. The count needed is the smallest. `scripts/cage_inverse_check.py` tries the four combinations on 2,000 vectors: only "smallest, divided" returns a valid gradient, every time.
 - The second reviewer's dual start for a binary group, each entry equal to its sign times (ridge constant times scale, plus one over the group size), returns the group exactly: largest error 1.5 parts in ten thousand million million on a group of 128 (`scripts/plateau_check.py`).
-- Whether the slips are in the application or in Justia's rendering is not known. Neither reviewer has the typeset publication.
+- Google Patents' rendering of the same publication carries both slips in the same words: "largest" in step 2, and the unclipped entries returned undivided. They are not Justia's. Neither reviewer has the typeset pages.
 
 ### 3C. The flat step in the joint potential
 
@@ -82,4 +82,4 @@ Done well, first reviewer: the second slip, with a test that separates the four 
 - Row C142 takes the candidate development measure and its limits.
 - The plan's rows on the patent take the flat step, the dual start, the zero case and both slips.
 - Idea I43 is entered: the flat-step map as a way to hold weights exactly on one magnitude during training. Idea I5 takes the dual start.
-- Not opened: the Google Patents page for the application, which would show whether a second rendering carries the same two slips. The fetch asked for an approval that was not given.
+- The Google Patents page was read in full after the comparison: description through the group-pruning section, the systems section, the 20 claims and the legal events. It adds one inconsistency in the kurtosis section (two names for one weighting constant) and confirms the plan's record of the claims: independent claims 1, 11 and 20 all recite pruning. Its 16 drawing sheets are images, which a fetch does not return.
