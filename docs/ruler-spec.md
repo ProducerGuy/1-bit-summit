@@ -53,6 +53,7 @@ Settings for every model:
 - Our ruler extracts answers by rule only. An answer the rule cannot extract counts as wrong and is also counted in its own column, per benchmark and per model.
 - Consequence: our absolute scores on MMLU-Redux, GPQA Diamond, GSM8K, MATH-500 and MuSR can sit below PrismML's. Retention is a ratio on one ruler, so the effect largely cancels. Section 5 tests whether it does.
 - Instruction following, tool calling and code are scored by rule in PrismML's own setup. No departure there.
+- Known before the first run: an outside rerun of the released 1-bit model with the BFCL settings of section 3 scored 67.4 on BFCL where PrismML's table has 34.9, 74.3 on IFEval (mean of prompt-level and instruction-level accuracy) where the table has 63.0, and 36.0 on HumanEval+ where the table has 45.1; its average was 44.97 against 40.88 and its retention 76.4% against 70.2% (`research/batch-8-findings.md`, section 2E). The causes are not established. If our ruler repeats this, the reference-retention row of section 5 fails on these three benchmarks and not on the model.
 
 ## 5. Acceptance of the ruler
 

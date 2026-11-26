@@ -7,7 +7,8 @@ Three parts: Precision Numerics' Boole (C118), the rest of the outside study of 
 - **Boole (U4, P3).** Precision Numerics states no method anywhere: not in the post, the two model pages, the 32B preview page, or the code. One fact in the code is a method statement: the scales are trained parameters. Nothing else can be learned from its text. What is left is in its weights, which is trial S5.
 - **The outside study (U4, P3, U2).** It has no 1.7B training result. The repository has three commits, all of 6 October 2026, and its 1.7B script only measures speed. Its files not read before add: the full set of 0.8B results, the training code, and the per-matrix-kind and per-weight-size numbers for PrismML's 1-bit file. Those numbers show the 1-bit model re-chose the signs of its small weights and kept the signs of its large ones.
 - **Under 2 bits (P3, U2).** Two published claims near 1 bit were missing from the plan and one of them does not hold up: SAGE-PTQ's 1.03 bits leaves out a group index of about 4 bits per weight. One paper that both reviewers missed in batch 2 is prior art for idea I13: PV-Tuning. No public method read here gives a 1-bit model at 1.7B with reasoning scores above PrismML's without training.
-- **Not read:** listed in section 8. One file could not be fetched and needs to be attached: the chart with Boole's per-task scores.
+- **The ruler.** Boole's per-task chart, supplied by the owner, shows where its rerun of PrismML's 1-bit model departs from PrismML's own table: BFCL 67.4 against 34.9. That one benchmark is 3.25 of the 4.09 points between the two averages, and more than one five-point step on its own.
+- **Not read:** listed in section 8.
 
 ## 2. Part A: Boole (C118)
 
@@ -17,6 +18,7 @@ Three parts: Precision Numerics' Boole (C118), the rest of the outside study of 
 - The launch post of 11 October 2026 and the model page of Boole-1.7B, through a fetch tool that returns an account of a page. Text only. The per-task scores sit in chart images and were not read.
 - The model page of Boole-32B-A2.5B-Preview, the same way.
 - The commit list of its llama.cpp fork at the pinned commit.
+- The chart of per-task scores from the Boole model repository, as an image supplied by the owner. Every bar label was read; the ten task scores of each model average to its published figure to within rounding.
 - Fetched with the owner's approval after the first pass: the organization page, the discussion tabs of both 1.7B repositories with the one thread in full, and the file listing of the model repository.
 
 ### 2B. Every statement of method
@@ -59,13 +61,64 @@ Boole's own run, EvalScope 1.4.2 and bfcl-eval, thinking off, greedy, seed 42, G
 - Boole beats PrismML's 1-bit model on seven of ten tasks, most in mathematics and code, and is lower on MuSR, IFEval and BFCL. This was already held from batch 4.
 - New this batch: the settings in full (token limits per task, 16,384 context, a 10-second deadline per answer on GSM8K and MATH-500 with timed-out answers scored zero). The deadline is a harness choice that our ruler must either copy or drop before M1 compares numbers.
 
-### 2E. The 32B preview
+### 2E. Per-task scores, from the chart
+
+Boole's run, non-thinking mode.
+
+| Benchmark | Boole-1.7B | PrismML 1-bit 1.7B | PrismML ternary 1.7B | LFM2.5-230M, 4-bit | LFM2.5-350M, 4-bit |
+|---|---|---|---|---|---|
+| MMLU-Redux | 50.7 | 43.4 | 53.4 | 39.5 | 38.7 |
+| GPQA-Diamond | 26.3 | 25.4 | 26.5 | 26.5 | 26.3 |
+| MuSR | 43.8 | 43.9 | 49.2 | 36.2 | 41.1 |
+| IFEval | 69.8 | 74.3 | 76.0 | 68.5 | 75.2 |
+| IFBench | 18.3 | 16.9 | 17.3 | 36.2 | 33.8 |
+| GSM8K | 74.7 | 64.8 | 75.4 | 27.7 | 28.1 |
+| MATH-500 | 49.8 | 35.0 | 47.8 | 12.8 | 13.4 |
+| HumanEval+ | 53.7 | 36.0 | 53.7 | 13.4 | 15.2 |
+| MBPP+ | 53.7 | 42.6 | 48.1 | 20.4 | 28.8 |
+| BFCLv3 | 64.9 | 67.4 | 68.2 | 33.9 | 60.1 |
+| Average | 50.6 | 45.0 | 51.6 | 31.5 | 36.1 |
+| Stored, GB | 0.25 | 0.24 | 0.46 | 0.15 | 0.22 |
+
+The chart also shows a 4-bit Granite-4.0-H-350M (average 30.2). The 16-bit Qwen3-1.7B is not in this chart, so its per-task scores in Boole's run are not known here.
+
+**Boole against PrismML's 1-bit model, same run.**
+
+- Ahead: HumanEval+ by 17.7, MATH-500 by 14.8, MBPP+ by 11.1, GSM8K by 9.9, MMLU-Redux by 7.3, IFBench by 1.4, GPQA by 0.9.
+- Behind: IFEval by 4.5, BFCL by 2.5, MuSR by 0.1.
+- At 1 bit Boole equals or passes PrismML's ternary model on HumanEval+ (53.7 and 53.7), MBPP+ (53.7 against 48.1) and MATH-500 (49.8 against 47.8). At this size, mathematics and code are not capped by the 1-bit format at PrismML's 1-bit level.
+- The pattern fits the outside study's finding that each kind of teacher-answered text restores its own skill (section 3C): Boole gained where mathematics and code text would act and lost a little where instruction following and tool calls are scored. That is a reading, and Boole states nothing about its data.
+
+**PrismML's 1-bit model: Boole's run against PrismML's own table (S1 table 9).** Same released model, two harnesses.
+
+| Benchmark | PrismML's table | Boole's run | Difference |
+|---|---|---|---|
+| BFCLv3 | 34.9 | 67.4 | +32.5 |
+| IFEval | 63.0 | 74.3 | +11.3 |
+| GPQA-Diamond | 20.7 | 25.4 | +4.7 |
+| IFBench | 13.8 | 16.9 | +3.1 |
+| MATH-500 | 34.4 | 35.0 | +0.6 |
+| MBPP+ | 42.3 | 42.6 | +0.3 |
+| MMLU-Redux | 43.2 | 43.4 | +0.2 |
+| MuSR | 45.1 | 43.9 | -1.2 |
+| GSM8K | 66.3 | 64.8 | -1.5 |
+| HumanEval+ | 45.1 | 36.0 | -9.1 |
+| Average | 40.88 | 44.97 | +4.09 |
+
+- Six of ten benchmarks agree within 1.5 points. The gap between the two averages is BFCL (3.25 of the 4.09 points), IFEval and HumanEval+.
+- Boole's page gives its BFCL setting: 13 single-turn subsets, native function calling off, names kept as written. Our ruler specifies the same. Boole scores IFEval as the mean of prompt-level and instruction-level accuracy, which reads higher than prompt-level alone. The cause of the BFCL and HumanEval+ differences is not established here.
+- Consequences for the ruler, to be confirmed by M1 and not before:
+  - On our ruler the released 1-bit model is likely to land near Boole's 76%, not at 70.2%. The acceptance row that asks for 70.2% within 3.5 points would then fail on BFCL, and the reason is now known in advance.
+  - The statement that tool calling is 21% of the released model's loss comes from PrismML's table (34.9 against 71.8). In Boole's run that loss is small unless the teacher also scores far higher there.
+  - A five-point step on Qwen is 29.1 summed points. The BFCL difference between the two harnesses is 32.5. How BFCL is run moves the count by more than a step.
+
+### 2F. The 32B preview
 
 - A compression of an outside 32B mixture-of-experts model to 8.96 GB: 21% of the routed experts removed, the rest at 1, 2 or 4 bits each (1.8 on average), other weights at 4 bits, the router at 16.
 - No method stated. An 11.4 GB mixed 1-to-2-bit file from Unsloth beats it on all six reported tasks.
 - It is not a 1-bit result and not our format. It shows Precision Numerics moving to mixed precision at larger sizes.
 
-### 2F. Reading for the project
+### 2G. Reading for the project
 
 - Boole stays what batch 4 called it: a second released 1-bit child of the same parent with an unknown recipe. Its text cannot move U4 further.
 - The trained scales are the one new lead. PrismML's scales follow one rule in both of its 1.7B files: all 2,426,704 embedding groups equal the parent's group mean (batch 5, and section 3E). Boole's do not follow a rule at all. Two teams reached 70% and 86% by their own counts with different treatments of the scale, so the scale rule is a real degree of freedom and not a detail.
@@ -227,7 +280,7 @@ Found through the outside study's notes. Absent from the plan and from batch 2, 
 
 ## 6. What needs the owner
 
-1. The chart file with Boole's per-task scores, `assets/boole-under-500mb.svg` in the Boole-1.7B model repository (410 kB), attached to the conversation. The site returned an error on every direct fetch of the file, and no page or search result carries the per-task numbers as text.
+Nothing for this batch. The chart was supplied on 25 November 2026.
 
 ## 7. Sources
 
@@ -248,7 +301,7 @@ Found through the outside study's notes. Absent from the plan and from batch 2, 
 
 ## 8. Not read in full
 
-- Boole: the chart file holding per-task scores (fetch refused by the site); threads on public forums. The fork's source was not read beyond its commit list.
+- Boole: the second chart of the launch post, which places the 16-bit model and the other precisions task by task; threads on public forums. The fork's source was not read beyond its commit list.
 - The outside study: of its four literature notes, one was read in full, one in its sections on token counts, losses, schedules and synthesis, and two by their summaries only. They are an assistant's notes with some numbers marked by their author as taken from a summarizing tool, so nothing here rests on them without a check at source. Three of its review files, its agent guide, two design files for runs already read, and scripts other than the three named in 3A were not read.
 - BWLA, SAGE-PTQ, PTQ1.61 and the GSQ refinement page were read through a fetch tool that returns an account of a page, not its text. Figures were not seen. PV-Tuning was read the same way to the end of its third appendix; the later appendices, which hold its learning rates and token counts, were not returned.
 - LBLLM, Tequila, Spectral-LLM, BiLLM and PB-LLM: known from the survey only.

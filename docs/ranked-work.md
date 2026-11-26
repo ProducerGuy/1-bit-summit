@@ -30,7 +30,7 @@ Two runs earn no step and decide what the others are worth:
 
 | Rank | Research | Probability it changes the ranking or raises a run's odds | Feeds |
 |---|---|---|---|
-| 1 | A source of tool-calling training prompts that shares nothing with BFCL v3, which has no training split | Done, batch 1. No public set is certified clean; a screen is defined (`trials.md`, S1) | Run 2. Tool calling is 21% of the loss |
+| 1 | A source of tool-calling training prompts that shares nothing with BFCL v3, which has no training split | Done, batch 1. No public set is certified clean; a screen is defined (`trials.md`, S1) | Run 2. Tool calling is 21% of the loss by PrismML's table. An outside rerun of the same model scores 67.4 on BFCL where that table has 34.9, so the share has to be re-read from our own first run (`research/batch-8-findings.md`, section 2E) |
 | 2 | ScaleQ-1.58 and CAT-Q read in full, with code (C62) | Done, batch 1. It led to ThinkBit, which measures scale-only training on our teacher. Runs 1 and 2 rose | Runs 1 and 2: the text recipe, the token budget, the loss |
 | 3 | The outside forensics project read in full (C100), with the reproduction study (C7) | Done, batch 1. Recipe settings taken; trained end to end stands at 90% | Run 1, and the fingerprint |
 | 4 | A repair for knowledge loss: knowledge items in the training text, then "Linger and Lose: Knowledge Collapse in Low-Bit Language Models" (C62) | Done, batch 2. No repair of its own exists; a knowledge-only route is under 10% for a step. It gave the damage map (S4) and training settings for run 1 | Knowledge is 14% of the loss |
