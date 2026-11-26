@@ -162,7 +162,7 @@ Bits per weight and file size for each layout, from `scripts/b10_bits.py`:
 |---|---|---|---|
 | Reference tools: matrices binary, gains and kernels in 32 bits | 1.12722, 242.43 MB | 1.12842, 165.08 MB | 1.13193, 244.61 MB |
 | Named track: gains and kernels in 16 bits | 1.12607, 242.19 MB | 1.12665, 164.82 MB | 1.12834, 243.83 MB |
-| The same with gains before sublayers folded away | 1.12500, 241.96 MB | 1.12575, 164.69 MB | 1.12743, 243.64 MB |
+| The same with gains before sublayers folded away | 1.125005, 241.96 MB | 1.12575, 164.69 MB | 1.12743, 243.64 MB |
 | Strict: everything in groups of 128 | 1.12500, 241.96 MB | 1.12500, 164.58 MB | 1.12500, 243.11 MB |
 
 Gains that cannot be folded: 9,216 in Qwen3-1.7B, 2,816 in LFM2-1.2B, 103,168 in LFM3-1.7B. The whole difference between the named track and the strict target is 0.23 MB on Qwen3, 0.24 MB on LFM2-1.2B and 0.72 MB on LFM3-1.7B.
