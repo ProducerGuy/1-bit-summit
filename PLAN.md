@@ -944,6 +944,16 @@ A trophy is won only when its evidence file exists in the repository and was pro
 | **T8, north star** | A strict binary model, at 1.125 bits per weight, retains 99% of its full precision original on the primary metric. For reference, PrismML's published binary models retain 70% at 1.7B and 89.5% at 27B, and their best ternary retains 98.2% | `results/T8/` |
 | **T7, independent replication** | A fresh agent, given only the repository and no conversation history, reruns T4 and lands inside the reported confidence interval | `results/T7/` |
 
+### 5A. Releases
+
+How finished work is published, by the owner's ruling of 25 November 2026.
+
+- A release is frozen. It is a fixed set of weights in the fixed format, pinned by hash, with its manifest and its scores on the ruler. Nothing in a release is changed after it is published.
+- Improvement ships as the next release: the same format, retrained or converted again, scored on the same ruler, and compared with the release before it by the paired test of section 6.
+- Each five-point step is a candidate release. The first release does not have to be the best the format can hold. It has to be reproducible and honestly scored. 99% is where the line of releases is headed.
+- The format outlives any one release. A change of format starts a new line under its own name.
+- Precedent: PrismML held its format and size fixed from Bonsai 2 to Bonsai 2.5 and raised agentic coding from 63% to 90% of the 16-bit score by retraining alone (S154).
+
 ## 6. Statistical protocol
 
 This follows the recommendations in S13: standard errors from the Central Limit Theorem, clustered standard errors where questions come in related groups, and inference on question-level paired differences when two models are compared.
