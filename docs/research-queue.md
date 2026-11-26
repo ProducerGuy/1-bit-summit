@@ -53,9 +53,9 @@ Each batch has three parts and is worked by both reviewers independently. Each p
 | 8 | A. A second 1-bit model of the same parent | C118 | Everything Precision Numerics has published on its Boole models: model pages and files, posts, code, forks | U4, P3; the first benchmark run and the choice of starting model | Done by both reviewers and compared (`research/batch-8-comparison.md`). Brief: `research/batch-8-prompt.md` |
 | 8 | B. The outside study of PrismML's 1.7B files | C119 | The whole repository with code: research log, replication plan, the low-bit training reports on a small Qwen, any 1.7B run | U4, P3; the fingerprint run and the sign-and-scale run | Done by both reviewers and compared. Left over: the trainer of the independent 1.7B run (C133) |
 | 8 | C. What may be missing under 2 bits | C122 | The public survey of methods under 2 bits; an independent audit of the Bonsai 2.5 report; the two post-training methods behind its comparison files; the packed low-bit types in upstream runtimes | P3, U2 | Done by both reviewers and compared. Left for a later read: RaBiT with code (C132), LBLLM at source, the later appendices of PV-Tuning |
-| 9 | A. Constraint and relaxation methods, and two paper checks | C125 | BinaryRelax, ProxQuant and ASkewSGD in full; for each method of ours, whether its first step moves the model and whether its end point fits the format; PV-Tuning and the quantized-endpoint paper added | P3 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. Unread remainders are row C136 |
-| 9 | B. Factorization and rotation papers not finished | C125 | LittleBit-2, the TWLA method, the structured Kashin paper, PBBQ, the rest of AF1, the factorization notebooks, with code; RaBiT and NanoQuant with code, carried over from batch 8 (C132) | P3, U2, U4 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. Unread remainders are row C136 |
-| 9 | C. What two-level weights can store | C125, C124 | The capacity papers and their appendices; the theory behind the 99% goal; the design of the capacity measurement | U2, CH3 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. Unread remainders are row C136 |
+| 9 | A. Constraint and relaxation methods, and two paper checks | C125 | BinaryRelax, ProxQuant and ASkewSGD in full; for each method of ours, whether its first step moves the model and whether its end point fits the format; PV-Tuning and the quantized-endpoint paper added | P3 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. The remainders listed in row C136 were then read in full |
+| 9 | B. Factorization and rotation papers not finished | C125 | LittleBit-2, the TWLA method, the structured Kashin paper, PBBQ, the rest of AF1, the factorization notebooks, with code; RaBiT and NanoQuant with code, carried over from batch 8 (C132) | P3, U2, U4 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. The remainders listed in row C136 were then read in full |
+| 9 | C. What two-level weights can store | C125, C124 | The capacity papers and their appendices; the theory behind the 99% goal; the design of the capacity measurement | U2, CH3 | Done by both reviewers and compared: `research/batch-9-findings.md`, `batch-9-comparison.md`. The remainders listed in row C136 were then read in full |
 | 10 | A. LFM3 in depth | new | Everything public on LFM3, which has no technical report; Liquid AI's 4-bit-adapted weights as a control | U6 | Open |
 | 10 | B. The transfer rule in writing | new | What "nothing changes but shapes" means; the format's exceptions; the equivalence test; ideas I24 to I29 worked through | U6, CH5 | Open |
 | 10 | C. Sources read in part in batches 6 and 7 | new | Every source either reviewer read in part, figures included | P3, U6 | Open. Needs the files for the figures |
@@ -95,11 +95,11 @@ Code announced and not released. Each is checked again when its part comes up.
 
 ## 7. Every open checklist row, accounted for
 
-`PLAN.md` has 57 rows marked open, and two more with an open remainder.
+`PLAN.md` has 56 rows marked open, and two more with an open remainder.
 
 | Kind | Rows | Where they are tracked |
 |---|---|---|
-| Reading and paper work, 10 rows | C18, C111, C134, C136, C139, C140, C141, C142, C143, C144 | Sections 3, 4 and 5 of this document |
+| Reading and paper work, 9 rows | C18, C111, C134, C139, C140, C141, C142, C143, C144 | Sections 3, 4 and 5 of this document |
 | Scripts and runs, 33 rows | C9, C10, C28, C29, C32, C33, C42, C49, C50, C55, C58, C59, C60, C63, C64, C65, C67, C69, C75, C76, C79, C81, C89, C90, C92, C93, C95, C96, C97, C98, C99, C110, C124 | `trials.md` for those with a trial (C76, C90 and C92 are S2; C67 and C50 are S3 in part; C110 is S4); the plan for the rest |
 | Registers, kept current | C106, C107, C113 | `ideas.md`; `trials.md` and `specs/`; this document |
 | Written, with decisions open | C104 | `ruler-spec.md`, section 11: decisions settled between the two reviewers on 26 November 2026 |
