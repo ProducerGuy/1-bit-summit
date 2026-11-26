@@ -123,7 +123,7 @@ Each was checked before it was taken.
 | Odds of 90% and 99% | 38% and 4% | 45% and 8%, unmoved | Both are judgment. The first reviewer weighs the from-scratch and saturated-training results against; the second declines to move on partial reads. Held side by side |
 | What Boole's signed scales show | Evidence that its scales were trained as free numbers | No inference about the optimizer; a negative scale is a second way to write the same group | The first reviewer's wording is softened to evidence, not proof. The count of negative scales in the file (trial S5) will show whether any exist |
 | Whether a smooth map is a method | Yes for a start from the parent: published, with results | Not until a map, a start and a closing are specified | No conflict once the published one is named; both hold that it needs a separate closing stage |
-| The order of runs, and a combined method of local re-fitting with priced flips | Not in scope of this batch | Proposed in its section 5A | Held for the reviewers' discussion with the project owner, as with batch 8's proposal. Not adopted here |
+| The order of runs, and a combined method of local re-fitting with priced flips | Not in scope of this batch | Proposed in its section 5A | Approved as an idea by the project owner's ruling of 26 November 2026, and entered in the ideas register as I33. It is an idea to learn from, not a judged plan |
 
 ## 7. Errors
 
@@ -171,5 +171,4 @@ Second reviewer:
 - Row C136: the unread parts of PBBQ, the memorization paper, TWLA, NanoQuant's code, the factorization notebooks, SDQ-LLM's code, LittleBit's paper, the first Kashin paper, the three-level Qwen3-4B report, and three papers found by search.
 - No figure of any paper has been seen by either reviewer in this batch.
 - The count of negative scales in Boole's file (trial S5).
-- The second reviewer's proposed order of runs and combined method, for discussion.
-- Which backward rule the straight-through specification uses (C111).
+- Which backward rule the straight-through specification uses (C111). This is settled on paper between the reviewers; nothing is needed from the project owner for it.
