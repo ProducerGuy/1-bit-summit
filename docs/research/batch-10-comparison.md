@@ -218,7 +218,7 @@ The first reviewer does not move after the comparison. The community measurement
 
 - Figures of every paper. Neither reviewer saw one.
 - Model file headers of the LFM, Qwen, Bonsai and Boole files, and the tensor listing of the community 1-bit file. They are read on the project owner's machine under checklist row C9.
-- The full text of the workshop paper on the distilled 4-bit builds, Pipette's results table, and the patent transcription the second reviewer used. Each needed a fetch approval that was not given.
+- The rows of Pipette's results table, which a fetch cannot read. The workshop paper on the distilled 4-bit builds and the patent transcription the second reviewer used were read afterwards from copies the project owner supplied (`batch-10-findings.md`, sections 2H and 4B).
 - ARB-LLM's supplementary file; the appendix of the Nemotron paper.
 - The form of the per-benchmark test and of the transfer test, row C143.
 - The layout of short vectors, row C139.
