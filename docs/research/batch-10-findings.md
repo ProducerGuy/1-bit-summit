@@ -87,7 +87,16 @@ The weight file is 3.46 GB in 16 bits, which is this total times two bytes.
 
 - The card's table has 29 rows. Three are in the project's suite: IFEval 96.66, IFBench 73.03, GPQA Diamond 63.37. BFCL is there as version 4 (71.39); the project uses version 3. There is no row for MATH-500, MMLU-Redux, GSM8K, MBPP+, HumanEval+ or MuSR.
 - The card says its evaluations use temperature 0.6 and top-p 0.95 in 16 bits on vLLM. The scoring document of Pipette says Liquid AI's internal harness samples at temperature 0.6 with a fresh seed per call and that its model-card MATH-500 figure is a mean of five runs. So Liquid AI's card numbers are sampled means, not greedy single runs, and the mode per row is not stated. The default is thinking on.
-- Pipette scores quantized files on IFBench, GPQA Diamond and MATH-500, tags each result with its thinking mode, and publishes its comparisons with thinking off, against a 16-bit reference. Its scorer is open: the IFBench loose checker at a pinned revision, 300 prompts; GPQA Diamond's 198 questions with shuffled options; MATH-500 in two prompt versions, each served five times. Its list of formats includes the 1-bit block type, used there for a 27B model. Whether its results table holds LFM3-1.7B with thinking off was not established, because the table could not be opened.
+- Pipette scores quantized files on IFBench, GPQA Diamond and MATH-500, tags each result with its thinking mode, and publishes its comparisons with thinking off, against a 16-bit reference. Its scorer is open: the IFBench loose checker at a pinned revision, 300 prompts; GPQA Diamond's 198 questions with shuffled options; MATH-500 in two prompt versions, each served five times. Its list of formats includes the 1-bit block type, used there for a 27B model. Its results table is drawn by script and a fetch returns only the headers, so whether it holds LFM3-1.7B with thinking off is still not established. The leaderboard's visible rows are all 4-bit files and show the mean of four evaluations only: LFM3-1.7B 79.5%, LFM2.5-1.2B-Thinking 44.2%, LFM2.5-1.2B-Instruct 38.2%, with no mode shown. Bonsai-27B in the 1-bit block type is in its list of models. Its data export is given against an email address and a license, and holds speed and memory only, no quality scores.
+- Pipette's method, from its documentation and its three public repositories, read whole where named in section 8:
+  - Each item is drawn five times at temperature 0.6 with no fixed seed, and the score is the mean over all draws. Each evaluation also has a greedy sibling in the catalog.
+  - A score belongs to the model, file, runtime and flags together. Multiple choice is answered by one grammar-constrained token on one runtime, free text on another, and by a guided choice or first-token probabilities on a third. Its documentation says not to compare scores across runtimes.
+  - Greedy decoding is not repeatable under batching. On a 9B model at temperature 0, 17 of 30 completions matched the one-at-a-time run exactly; the other 13 diverged after a shared prefix. Its documentation says a reference run that has to attribute a small difference should be run one sample at a time.
+  - The thinking setting on record is what the job sent to the chat template, not what the model did. Closed reasoning blocks are stripped before scoring. A completion cut off inside a reasoning block usually fails, and a second, strict count marks those wrong outright. Completions that hit the token cap are scored as they stand; on reasoning models that is described as routinely the majority.
+  - GPQA Diamond is scored from generated text: options shuffled by a hash of the question, an answer line extracted, and an answer that cannot be parsed counted wrong. A model that returns no valid letter scores zero there, not 25.
+  - The MATH-500 figure on Liquid AI's model cards comes from the later of two versions: the problem followed by one instruction, a 32,768-token bound on prompt plus output, and a grader that tries an exact match, then symbolic equivalence, then the last 150 lines of the response. The two versions are stated not to be comparable with each other.
+  - IFBench is scored loose and by prompt: a prompt passes when every constraint passes under any of eight transformations. Empty and collapsed outputs are rejected first.
+- For the project's ruler: parent and student go through one runtime and one answer path; counted runs are made one sample at a time; a chance value is stated for the scorer in use, since a generative scorer gives zero to output it cannot parse; truncations and mode breaks are counted per item.
 - For the project: the parent's ten scores with thinking off have to be measured, none can be taken from the card, and the card's three overlapping rows are not comparable with a greedy thinking-off run.
 
 ### 2F. What each runtime does with each kind of tensor
@@ -126,7 +135,7 @@ The weight file is 3.46 GB in 16 bits, which is this total times two bytes.
 |---|---|
 | The parent's ten scores with thinking off, greedy | Measure them; they are the denominator of every LFM3 claim |
 | How far thinking-off scores of the parent move between runs | Repeat the parent's run with three seeds on the sampled benchmarks |
-| LFM3 scores of quantized files with thinking off on three benchmarks | Open Pipette's results table |
+| LFM3 scores of quantized files with thinking off on three benchmarks | Pipette's results table, read in a browser. A fetch returns its headers only |
 | The method details of Liquid AI's distillation: data, tokens, loss | The full text of the workshop paper |
 | Whether the head gates are sensitive at 1 bit | A weights-and-activations measurement: convert only the 11 gate matrices and compare outputs |
 | The spread of tap shapes across channels in the kernels | A count from the weights, inside row C63 |
@@ -458,8 +467,8 @@ Stated before reading, then after. They are judgments.
 
 ## 7. Could not be opened in this session
 
-- The full text of the workshop paper on Liquid AI's distilled 4-bit builds, at `openreview.net/forum?id=Lc5ByfbARS`. The fetch asked for an approval that was not given. Only its abstract was read.
-- Pipette's results table at `pipette.liquid.ai/results`, for the same reason. It holds scores of quantized LFM files on three of the project's ten benchmarks.
+- The full text of the workshop paper on Liquid AI's distilled 4-bit builds, at `openreview.net/forum?id=Lc5ByfbARS`. The site answers a fetch with a browser check. Only its abstract was read.
+- The rows of Pipette's results table at `pipette.liquid.ai/results` and of its raw data page. Both are drawn by script, and a fetch returns the column headers only. The table has columns for IFBench, IFStruct, GPQA Diamond, MATH-500 and their mean, each beside its full-precision counterpart.
 
 ## 8. Sources
 
@@ -476,6 +485,9 @@ Item 1:
 - "Quantization-Aware Distillation for 4-Bit On-Device Language Models", NeurIPS 2026 workshop: https://openreview.net/forum?id=Lc5ByfbARS
 - Liquid AI's training code: https://github.com/Liquid4All/liquid-finetune
 - Pipette scorer: https://github.com/Liquid4All/pipette-scores
+- Pipette documentation, pages read: introduction, reading results, quantization, evaluation methodology, coverage and selection, result selection, limitations, data exports, and the pages for GPQA Diamond, MATH-500 and IFBench: https://pipette.liquid.ai/docs/introduction
+- `Liquid4All/pipette-clients`, repository read directly: `docs/methodology/evals.md` whole: https://github.com/Liquid4All/pipette-clients
+- `Liquid4All/pipette-mgmt`, repository read directly: `docs/scoring-service.md`, the accuracy section of `docs/benchmarks.md`, and the methodology pages for GPQA Diamond, IFBench and both MATH-500 versions, whole: https://github.com/Liquid4All/pipette-mgmt
 - llama.cpp at commit 0e4e925: https://github.com/ggml-org/llama.cpp
 
 Item 2:
