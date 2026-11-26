@@ -110,7 +110,7 @@ The weight file is 3.46 GB in 16 bits, which is this total times two bytes.
 - Liquid AI publishes nothing below 4 bits for LFM3 or LFM2.
 - Its 4-bit file for LFM3 is a distilled one. No score is published for it.
 - For LFM2.5 it reports a seven-task average, five repeats: the plain 4-bit files keep 86.8% to 92.6% of the 16-bit score across 230M, 350M and 1.2B; the distilled ones 96.5% to 97.7%. Distillation closes 70.6%, 73.4%, 65.5% and 48.4% of the gap at 230M, 350M, 1.2B and 2.6B.
-- Among 177 community quantizations of LFM3-1.7B, those below 4 bits are importance-weighted rounding series and mixed-precision MLX series, both met in batch 7. No trained 1-bit or three-level LFM3 was found on the model hub.
+- Among 177 community quantizations of LFM3-1.7B, those below 4 bits are importance-weighted rounding series, mixed-precision MLX series, and one repository with a fidelity table, `ngquocvinh/LFM3-1.7B-GGUF`, which the listing scan did not open and the second reviewer found. Its files were made by rounding with an importance matrix and no training. Against the 16-bit file's perplexity of 14.85 on WikiText-2: 16.12 at Q4_K_M, 17.75 at Q3_K_M, 30.30 at Q2_K, 170.86 at IQ1_M and 35,970 at Q1_0, where the top token agrees with the parent's 0.39% of the time. The Q1_0 file is 431.0 MB. By the quantizer's rules in 2F a stock run gives a 1-bit body, a 6-bit tied matrix and 32-bit small tensors, 422.8 MB before the vocabulary, so that is what this file holds to the accuracy of its size; its tensor listing was not opened. No trained 1-bit or three-level LFM3 was found on the model hub.
 
 ### 2H. The 4-bit-adapted weights
 
@@ -154,7 +154,7 @@ The weight file is 3.46 GB in 16 bits, which is this total times two bytes.
 | Gain before a sublayer | Yes | Yes | Yes | Can be multiplied into the columns of the matrices it feeds, exactly, leaving a gain of one. Not free: see 3F | Defined as a vector of 16 groups if kept |
 | Gain after a sublayer | No | No | Yes, 48 vectors | Cannot be moved: it sits after a normalization and before the residual sum | 16 groups if made binary |
 | Final gain | Yes | Yes | Yes | Feeds the tied matrix. Moving it into that matrix changes the embedding as well, so it cannot be moved | 16 groups if made binary |
-| Query and key gains | Yes | Yes | Yes | 128 or 64 a vector. Cannot be moved | One group, or half of one in LFM2: a single magnitude for every dimension |
+| Query and key gains | Yes | Yes | Yes | 128 or 64 a vector. Cannot be moved | One group in Qwen3 and LFM3: a single magnitude for every dimension. In LFM2 a vector is 64 long, half a group, and the layout has to be chosen: pair query with key in one group, 1.125 bits; pad each to 128, 2.25 bits; or a short group of 64 signs and a scale, 1.25 bits. The sizes below count the pairing |
 
 Bits per weight and file size for each layout, from `scripts/b10_bits.py`:
 
@@ -388,7 +388,7 @@ Answer:
 - Templates, read as text. LFM2: tools are appended to the system turn between `<|tool_list_start|>` and `<|tool_list_end|>`, tool results are wrapped in `<|tool_response_start|>` and `<|tool_response_end|>`. LFM2.5: the system turn gets a line with today's date and the list of tools as JSON; the assistant's calls are written in Python call syntax between `<|tool_call_start|>` and `<|tool_call_end|>`; reasoning is kept only on the last assistant turn; the template has no switch for thinking. LFM3 uses XML. So the three generations need three handlers for the tool benchmark, and the date line makes an LFM2.5 tool prompt depend on the day it is run. The ruler should pin the date.
 - Tokenizer configuration of LFM2-1.2B: beginning-of-text token added by default; the end-of-turn token is the end-of-sequence token; ids 16 to 500 are reserved and unused, 485 rows of the tied matrix that no text ever selects as input.
 - The report's deployment section says its recipes were tuned for 8-bit activations with 4-bit weights in one runtime and the 4-bit block format in another. It has no table of accuracy under quantization.
-- No LFM3 support was found in mlx-lm by a code search of the repository.
+- An official 4-bit MLX build of LFM3 exists with its own model type, in groups of 64 with a scale and an offset, so MLX support exists. A code search of mlx-lm did not locate the file that implements it.
 
 ### 4G. Group F: binary and three-level state-space and convolution models
 
