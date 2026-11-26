@@ -95,12 +95,12 @@ Code announced and not released. Each is checked again when its part comes up.
 
 ## 7. Every open checklist row, accounted for
 
-`PLAN.md` has 51 rows marked open, and two more with an open remainder.
+`PLAN.md` has 57 rows marked open, and two more with an open remainder.
 
 | Kind | Rows | Where they are tracked |
 |---|---|---|
-| Reading and paper work, 4 rows | C18, C111, C134, C136 | Sections 3, 4 and 5 of this document |
+| Reading and paper work, 10 rows | C18, C111, C134, C136, C139, C140, C141, C142, C143, C144 | Sections 3, 4 and 5 of this document |
 | Scripts and runs, 33 rows | C9, C10, C28, C29, C32, C33, C42, C49, C50, C55, C58, C59, C60, C63, C64, C65, C67, C69, C75, C76, C79, C81, C89, C90, C92, C93, C95, C96, C97, C98, C99, C110, C124 | `trials.md` for those with a trial (C76, C90 and C92 are S2; C67 and C50 are S3 in part; C110 is S4); the plan for the rest |
 | Registers, kept current | C106, C107, C113 | `ideas.md`; `trials.md` and `specs/`; this document |
-| Written, with decisions open | C104 | `ruler-spec.md`, section 11: five decisions, handed to the two reviewers by the owner's ruling of 26 November 2026 |
+| Written, with decisions open | C104 | `ruler-spec.md`, section 11: decisions settled between the two reviewers on 26 November 2026 |
 | Milestones, 12 rows | C12 to C17, C19 to C24 | The plan's ladder |

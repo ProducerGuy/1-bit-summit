@@ -148,15 +148,18 @@ What the split decides:
 
 ## 11. Decisions, settled between the two reviewers
 
-By the project owner's ruling of 26 November 2026 these decisions are for the two reviewers to settle between them, each ruling on its own first. Brief to the second reviewer: `docs/research/rulings-prompt-1.md`.
+By the project owner's ruling of 26 November 2026 the open decisions were handed to the two reviewers. Each ruled alone and the rulings were compared: `docs/research/rulings-1-comparison.md`. The owner may overrule any of them. Sections 1 to 10 of this document are a draft written before these rulings and are to be rewritten to them (plan row C140) before any model is scored.
 
-| Decision | Options | What it changes |
-|---|---|---|
-| Category guardrail | Proposed: a step does not count if any one benchmark falls by more than twice the standard error of its paired difference. Alternative: no benchmark may fall below the previous step at all | Whether a step can be bought by trading one ability for another |
-| Starting model of the first step | PrismML's released 1-bit 1.7B, or only models converted by us | With the released model, the first step is a repair of an existing model at our exact format and the baseline is already published. Without it, the ladder starts at our own conversion, which has no measured baseline |
-| Rotation | Inside the format, or a format change | A fixed rotation adds no stored bits and adds a transform at inference. PrismML's first-generation 1-bit format has none; its second-generation ternary format has one |
-| A second set of scales for the tied matrix | Inside the format (1.148 bits per weight, as Boole-1.7B ships), or not (1.125, as PrismML ships) | Whether Boole counts as a model at our format and can be a starting model, and whether the tied matrix's two roles may be separated by added scales or only within one set |
-| Which model the steps count from | PrismML's 1-bit 1.7B as now, or the best released model at the format that this ruler confirms | Where the next five points start. By its maker's run Boole-1.7B is about nine points above PrismML's model |
+| Decision | Ruling |
+|---|---|
+| A step that raises the average while a benchmark falls | Three classes of result: an observed gain; a confirmed step; a result that trades one benchmark for another, which is kept on record and does not advance the ladder. Margins per benchmark are fixed before any score. Losses are also checked against the frozen reference so they cannot pile up. The exact form of the per-benchmark test is open between the reviewers |
+| Starting points | Any: a released file, the parent, a disclosed initializer. Recovery from a released file and conversion from the parent are separate claims, and every result carries its lineage |
+| Rotation | A transform newly required at inference is a separate track. A change folded away exactly offline stays in the original track |
+| A second set of scales for the tied matrix | Outside the format |
+| Models outside the format | Allowed as comparators and as initializers. Never an in-format result until projected into the format and audited |
+| What progress is measured against | Four references kept apart: PrismML's published figure; its released file measured on this ruler; the best released model verified in the format; the project's own conversion from the parent |
+| Tool calling | Full BFCL v3 with its multi-turn part is the primary score. The 13-subset single-turn score of the outside harness is reported beside it as a bridge, and PrismML's own protocol too if it is recovered |
+| Normalization gains | Every learned weight under the binary rule is the strict target. Matrices in the format with gains in 16 bits is a separately named track, reported at its true rate of 1.126 bits per weight |
 
 ## 12. Gaps
 
