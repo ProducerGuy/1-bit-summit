@@ -146,7 +146,9 @@ What the split decides:
 - Nothing from the machine (paths, account names, hostnames) enters results, code or commit messages.
 - Runs are carried out by a lower-cost agent from this specification, on a local task branch.
 
-## 11. Decisions needed from the project owner
+## 11. Decisions, settled between the two reviewers
+
+By the project owner's ruling of 26 November 2026 these decisions are for the two reviewers to settle between them, each ruling on its own first. Brief to the second reviewer: `docs/research/rulings-prompt-1.md`.
 
 | Decision | Options | What it changes |
 |---|---|---|
