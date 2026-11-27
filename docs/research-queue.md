@@ -44,7 +44,7 @@ Ten parts, three batches. Batches 3, 4 and 5 are done, except part O of batch 5 
 | 5 | H. The outside forensics project in full | C100, C56 | Whitepaper, forensic archive, failure register, experiments, the three gate reports, the paper draft, the scripts behind its Qwen3-1.7B ladder, its newer discussion thread; token count, batch size and step count of each 1.7B run | M3: the learning-rate schedule, where it conflicts with "Linger and Lose" (C111). M4. S2 | Done. `research/batch-5-findings.md`, `research/batch-5-comparison.md` |
 | 5 | I. Facts the runs stand on | C3, C4, C6, C8 | The Qwen3-1.7B model card; PrismML's MLX fork and 1-bit kernels; which upstream MLX and mlx-lm versions load the 1-bit files; the evaluation harness on Apple Silicon | M1: the ruler's harness and settings. S2 and S4: reading and loading the released files | Done. `research/batch-5-findings.md`, `research/batch-5-comparison.md` |
 
-## 3A. Batches 8 to 10, in the order agreed on 25 November 2026
+## 3A. Batches 8 to 11, in the order agreed on 25 and 27 November 2026
 
 Each batch has three parts and is worked by both reviewers independently. Each part names the open problem, challenge or unknown it serves (`PLAN.md`, section 1A).
 
@@ -59,6 +59,9 @@ Each batch has three parts and is worked by both reviewers independently. Each p
 | 10 | A. LFM3 in depth | new | Everything public on LFM3, which has no technical report; Liquid AI's 4-bit-adapted weights as a control | U6 | Done by both reviewers and compared: `research/batch-10-findings.md`, `batch-10-comparison.md`. The second review did not meet the reading standard; the first review read its open sources, except those in section 10 of the comparison |
 | 10 | B. The transfer rule in writing | new | What "nothing changes but shapes" means; the format's exceptions; the equivalence test; ideas I24 to I29 and I34 worked through | U6, CH5 | Done by both reviewers and compared: `research/batch-10-findings.md`, `batch-10-comparison.md`. The second review did not meet the reading standard; the first review read its open sources, except those in section 10 of the comparison |
 | 10 | C. Sources read in part in batches 6 and 7 | new | Every source either reviewer read in part, figures included | P3, U6 | Done by both reviewers and compared: `research/batch-10-findings.md`, `batch-10-comparison.md`. The second review did not meet the reading standard; the first review read its open sources, except those in section 10 of the comparison |
+| 11 | A. Figures in the sources the plan rests on | C153 | Every figure carrying a measured result in the sources the plan cites most, read off its axes; every plan statement that rests on a figure or on a description of one, checked | U2, U4, P3 | Issued to both reviewers |
+| 11 | B. What development reads | C153, C142, C149 | Published tests of cheap measures against downstream benchmarks; the project's own measurements and S177 tested; the development measure, its text and its validation; the contents and use of the unread set | U3, CH3 | Issued to both reviewers |
+| 11 | C. Sources known and not yet read | C153 | Pipette's result rows; the WO publication; ARB-LLM's supplement; the Nemotron Bolt appendix; Quamba2's code; llama.cpp and CEWT leftovers; LFM tokenizer files and headers; the LFM2-1.2B quantized listing; Liquid AI's documentation; Precision Numerics' announced models | U4, U6 | Issued to both reviewers |
 
 Not in a batch: C111 waits on the result of S4; the model file headers are a run (C9).
 
