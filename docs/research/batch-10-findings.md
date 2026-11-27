@@ -487,7 +487,7 @@ Stated before reading, then after. They are judgments.
 
 ## 7. Could not be opened in this session
 
-- The drawings of the patent application. Google Patents' page points to 16 drawing files, and those files fail to load, for the project owner in a browser and for a fetch alike. Neither reviewer has seen figures 6 and 7.
+- The drawings of the patent application. Google Patents' page points to 16 drawing files, and those files fail to load, for the project owner in a browser and for a fetch alike. Neither reviewer has seen figures 6 and 7. The application's words for figures 6A and 6B (histograms of the absolute value of the final weights, each an 11-million-weight vector that fits the training data exactly, for the power-10 and the 1-norm potentials) match Figure 6 of the 2019 mirror-descent paper by the same group, which is a ResNet-18 trained on CIFAR-10; an image search for that figure returns it. Figures 7A and 7B, the one layer of a language model before and after, have no such public counterpart found.
 - The rows of Pipette's results table at `pipette.liquid.ai/results` and of its raw data page. Both are drawn by script, and a fetch returns the column headers only. The table has columns for IFBench, IFStruct, GPQA Diamond, MATH-500 and their mean, each beside its full-precision counterpart.
 
 ## 8. Sources
